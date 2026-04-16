@@ -29,7 +29,7 @@ Users must have:
 * account creation and authentication,
 * editable profile page,
 * avatar upload,
-* friends / favorites system,
+* friends system,
 * online status visibility.
 
 This module must include all required profile and friendship features, not only login/signup.
