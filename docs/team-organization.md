@@ -1,205 +1,321 @@
 # Team Organization
 
-> Temporary team structure for **ft_transcendence**.
-> This document will be updated when the full team is confirmed.
+> Initial team structure for **ft_transcendence**.  
+> This organization ensures a balanced workload, clear responsibilities, and
+> full alignment with evaluation requirements.
 
 ---
 
 ## Overview
 
-| Area 					 | Current owner 	 | Status 					  |
-| ---  					 | --- 				 | --- 						  |
-| Product direction 	 | Jennifer + Martin | Shared 					  |
-| Technical architecture | Jennifer + Martin | Temporary shared ownership |
-| Backend foundation 	 | Jennifer 		 | Active 					  |
-| Gameplay conception 	 | Martin 			 | Active 					  |
-| Real-time systems 	 | Future member 	 | To assign 				  |
-| UI system 			 | Future member 	 | To assign 				  |
+| Area | Owner | Status |
+| --- | --- | --- |
+| Product direction | Martin | Active |
+| Project coordination | Jerem | Active |
+| Technical architecture | Jennifer | Active |
+| Gameplay logic | Martin | Active |
+| Frontend & UX | Jennifer | Active |
+| Backend core | Jerem | Active |
+| Security (integrated) | Jerem | Active |
+| UI system & features | Élise | Active |
 
-The current objective is to prepare a stable foundation without locking decisions
-that should be validated by the complete team.
+---
+
+## Roles Distribution
+
+| Member | Roles |
+| --- | --- |
+| Martin | Product Owner (PO), Developer |
+| Jerem | Project Manager (PM / Scrum Master), Developer |
+| Jennifer | Technical Lead / Architect, Developer |
+| Élise | UI Lead & Integration Developer |
 
 ---
 
-## Current Team Members
+## Role Responsibilities
 
-### Jennifer
+### Product Owner (Martin)
 
-**Current focus**
+- Defines the overall game vision
+- Designs gameplay mechanics and experience
+- Prioritizes features
+- Validates gameplay and user experience
+- Ensures the project meets its objectives
 
-- Backend structure
-- User management foundation
-- Security-oriented architecture
-- Project coherence support
+### Project Manager (Jerem)
 
-**Main responsibilities**
+- Organizes team meetings and planning sessions
+- Tracks progress and deadlines
+- Manages tasks (GitHub, etc.)
+- Identifies and resolves blockers
+- Ensures clear communication within the team
 
-- Authentication logic
-- User accounts
-- Profile system
-- Avatar upload
-- Friendship system
-- Backend validation
-- Secure API foundations
-- Prisma models linked to users
+### Technical Lead (Jennifer)
 
-**Main linked modules**
+- Defines technical architecture
+- Makes technology decisions
+- Ensures code quality and consistency
+- Reviews critical implementations
+- Maintains technical coherence across the project
 
-| Module 		  | Link with the role 							|
-| --- 			  | --- 										|
-| User Management | Standard user management and authentication |
-| Web 			  | ORM with Prisma 							|
-| Security 		  | Transversal backend concerns 				|
+### UI Lead & Integration (Élise)
 
-**Secondary participation**
+- Ensures UI consistency and usability
+- Oversees frontend integration
+- Coordinates UI components and pages
+- Ensures proper connection between frontend and backend
+- Contributes to user experience improvements
 
-- Architecture discussions
-- Module validation
-- Technical coherence of the README
+### Developers (All Members)
+
+All team members are developers and must:
+
+- Implement features
+- Participate in code reviews
+- Test their work
+- Document their contributions
+- Understand the overall project
 
 ---
+
+## Team Members
 
 ### Martin
 
-**Current focus**
+**Roles**
 
-- Gameplay conception
-- Core game logic
-- Visual game direction
+- Product Owner
+- Developer (Gameplay)
 
-**Main responsibilities**
+**Main focus**
 
-- Labyrinth gameplay logic
-- Card mechanics
-- Game rules
-- Progression logic
-- Game interaction design
-- Visual gameplay structure
+- Gameplay design
+- Game mechanics
 
-**Main linked modules**
+**Responsibilities**
 
-| Module | Link with the role 		  |
-| --- 	 | --- 						  |
-| Gaming | Complete web-based game    |
-| Gaming | Game customization options |
+- Define gameplay loop
+- Implement labyrinth logic
+- Implement card system
+- Define game rules and progression
+- Ensure gameplay coherence
 
-**Secondary participation**
+**Constraints**
 
-- Game balancing
-- Visual coherence of game interactions
+- No advanced 3D
+- Focus on logic, not UI
 
----
+**Linked modules**
 
-## Future Team Members
-
-### Member 3 - To Be Defined
-
-**Expected role:** real-time systems and synchronization.
-
-**Likely responsibilities**
-
-- WebSocket layer
-- Live synchronization
-- Online presence
-- Reconnection logic
-- Live notifications backend
-
-**Likely linked modules**
-
-| Module | Expected contribution |
-| --- 	 | --- 					 |
-| Web 	 | Real-time features 	 |
-| Gaming | Remote players 		 |
+| Module | Contribution |
+| --- | --- |
+| Gaming | Core game |
+| Gaming | Game customization |
 
 ---
 
-### Member 4 - To Be Defined
+### Jerem
 
-**Expected role:** frontend integration and interface system.
+**Roles**
 
-**Likely responsibilities**
+- Project Manager
+- Developer (Backend & Security)
 
-- Reusable UI components
-- Design system
-- Multilingual integration
-- Notifications UI
-- Responsive pages
+**Main focus**
 
-**Likely linked modules**
+- Backend development
+- Project organization
 
-| Module 		| Expected contribution  				   |
-| --- 	 		| --- 					  				   |
-| Web 	        | Custom-made design system 			   |
-| Accessibility | Multiple languages 					   |
-| Web 			| Notification system frontend integration |
+**Responsibilities**
+
+- Develop backend (Express)
+- Implement API endpoints
+- Handle authentication (JWT)
+- Manage database (Prisma/PostgreSQL)
+- Ensure backend validation
+- Apply security best practices:
+  - password hashing
+  - input validation
+  - rate limiting
+- Support real-time backend
+
+**Secondary responsibilities**
+
+- Organize team workflow
+- Track tasks and progress
+- Manage blockers
+
+**Linked modules**
+
+| Module | Contribution |
+| --- | --- |
+| Web | Backend |
+| User Management | Auth system |
+| Web | API |
+| Security | Backend protections |
 
 ---
 
-## Temporary Organization Rule
+### Jennifer
 
-Until the team is complete, the project should follow these rules:
+**Roles**
 
-- Avoid irreversible architecture decisions made alone.
-- Prepare only stable technical foundations.
-- Document decisions clearly.
-- Keep technical choices open for discussion.
+- Technical Lead
+- Developer (Frontend & Integration)
+
+**Main focus**
+
+- Frontend architecture
+- User experience
+- Integration
+
+**Responsibilities**
+
+- Build frontend with React
+- Implement UI and game interface
+- Handle game rendering (2D labyrinth)
+- Integrate WebSocket on frontend
+- Ensure UX quality
+- Maintain consistency between systems
+
+**Secondary responsibilities**
+
+- Support architecture decisions
+- Help team on technical issues
+
+**Linked modules**
+
+| Module | Contribution |
+| --- | --- |
+| Web | Frontend |
+| Gaming | Game interface |
+| Web | Real-time frontend |
+
+---
+
+### Élise
+
+**Roles**
+
+- UI Lead & Integration Developer
+
+**Main focus**
+
+- Interface development
+- UI consistency
+- Frontend integration
+
+**Responsibilities**
+
+- Develop main UI pages:
+  - login / register
+  - profile
+- Build reusable components
+- Connect frontend to backend
+- Improve UI responsiveness
+- Assist integration of features
+- Ensure consistency in design
+
+**Secondary responsibilities**
+
+- Participate in testing
+- Support frontend improvements
+- Contribute to UX adjustments
+
+**Linked modules**
+
+| Module | Contribution |
+| --- | --- |
+| Web | UI components |
+| Accessibility | UI structure |
+| Web | Notification UI |
+
+---
+
+## Technical Direction
+
+### Chosen approach
+
+- 2D rendering (Canvas / DOM)
+- React frontend
+- Express backend
+- Prisma + PostgreSQL
+- WebSocket for real-time
+
+### Avoid
+
+- Advanced 3D (too complex)
+- Over-engineered security
+- Microservices
+- Complex infrastructure
 
 ---
 
 ## Work Method
 
+### Principles
+
+- Balanced workload
+- No isolated roles
+- Continuous communication
+- Shared understanding
+
 ### Current Phase
 
-Focus on:
+**Focus on**
 
-- Module clarification
 - MVP definition
-- Architecture preparation
-- Technical documentation
+- Architecture
+- Task distribution
 
-Avoid:
+**Avoid**
 
-- Deep implementation that depends on future team decisions
-- Final ownership decisions before all members have joined
-- Technical choices that cannot be easily adjusted later
+- Over-complex solutions
+- Blocking dependencies
+- Premature decisions
 
 ---
 
 ## Immediate Priorities
 
-### Jennifer
-
-- Draft the user and authentication architecture.
-- Propose the backend structure.
-- Prepare the first Prisma model draft.
-
 ### Martin
 
-- Define the gameplay loop.
-- Define the core game MVP.
-- Prepare the first game interaction model.
+- Define gameplay loop
+- Document game rules
 
----
+### Jerem
 
-## To Complete Later
+- Set up backend
+- Implement authentication
 
-When members 3 and 4 join, the team should:
+### Jennifer
 
-- Redistribute responsibilities according to individual strengths.
-- Validate module ownership again.
-- Update the README roles officially.
-- Recheck whether the current architecture still fits the full team.
+- Set up frontend
+- Define UI structure
+
+### Élise
+
+- Build basic pages (login/register)
+- Start component system
 
 ---
 
 ## Internal Rule
 
-Each module must remain understandable by every team member.
+Each member must be able to explain:
 
-The subject requires everyone to be able to explain:
+- Architecture
+- Their work
+- Technical choices
+- Work distribution
 
-- The architecture
-- The work distribution
-- Their own contributions
-- The main technical choices
+---
 
+## Final Note
+
+This organization ensures:
+
+- Balanced team structure
+- Clear responsibilities
+- Real contribution from each member
+- A project that is coherent, feasible, and evaluable
