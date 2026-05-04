@@ -11,7 +11,7 @@
 | Area | Owner | Status |
 | --- | --- | --- |
 | Product direction | Martin | Active |
-| Project coordination | Jerem | Active |
+| Project coordination | Élise | Active |
 | Technical architecture | Jennifer | Active |
 | Gameplay logic | Martin | Active |
 | Frontend & UX | Jennifer | Active |
@@ -28,7 +28,7 @@
 | Martin | Product Owner (PO), Developer |
 | Jerem | Project Manager (PM / Scrum Master), Developer |
 | Jennifer | Technical Lead / Architect, Developer |
-| Élise | UI Lead & Integration Developer |
+| Élise | UI Lead & Integration, Developer |
 
 ---
 
@@ -46,7 +46,7 @@
 
 - Organizes team meetings and planning sessions
 - Tracks progress and deadlines
-- Manages tasks (GitHub, etc.)
+- Manages tasks (Merges, etc.)
 - Identifies and resolves blockers
 - Ensures clear communication within the team
 
@@ -89,7 +89,7 @@ All team members are developers and must:
 
 **Main focus**
 
-- Gameplay design
+- Gameplay
 - Game mechanics
 
 **Responsibilities**
