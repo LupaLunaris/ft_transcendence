@@ -1,23 +1,19 @@
 # Team Organization
 
-> Initial team structure for **ft_transcendence**.  
-> This organization ensures a balanced workload, clear responsibilities, and
-> full alignment with evaluation requirements.
-
 ---
 
 ## Overview
 
-| Area | Owner | Status |
-| --- | --- | --- |
-| Product direction | Martin | Active |
-| Project coordination | Élise | Active |
-| Technical architecture | Jennifer | Active |
-| Gameplay logic | Martin | Active |
-| Frontend & UX | Jennifer | Active |
-| Backend core | Jerem | Active |
-| Security (integrated) | Jerem | Active |
-| UI system & features | Élise | Active |
+| Area | Owner |
+| --- | --- |
+| Product direction | Martin |
+| Project coordination | Jerem |
+| Technical architecture | Jennifer |
+| Gameplay logic | Martin |
+| Backend & API | Jerem |
+| Real-time backend (WebSocket) | Jerem |
+| Frontend logic & integration | Jennifer |
+| UI & Components | Élise |
 
 ---
 
@@ -26,228 +22,155 @@
 | Member | Roles |
 | --- | --- |
 | Martin | Product Owner (PO), Developer |
-| Jerem | Project Manager (PM / Scrum Master), Developer |
-| Jennifer | Technical Lead / Architect, Developer |
-| Élise | UI Lead & Integration, Developer |
+| Jerem | Project Manager (PM), Backend Developer |
+| Jennifer | Technical Lead, Frontend Developer |
+| Élise | UI Lead & Integration Developer |
 
 ---
 
 ## Role Responsibilities
 
-### Product Owner (Martin)
+### Product Owner - Martin
 
-- Defines the overall game vision
-- Designs gameplay mechanics and experience
+- Defines game concept and rules
+- Designs gameplay loop
 - Prioritizes features
-- Validates gameplay and user experience
-- Ensures the project meets its objectives
+- Validates gameplay coherence
 
-### Project Manager (Jerem)
+### Project Manager - Jerem
 
-- Organizes team meetings and planning sessions
-- Tracks progress and deadlines
-- Manages tasks (Merges, etc.)
-- Identifies and resolves blockers
-- Ensures clear communication within the team
+- Organizes workflow and meetings
+- Tracks progress
+- Manages tasks and merges
+- Identifies blockers
 
-### Technical Lead (Jennifer)
+### Technical Lead - Jennifer
 
-- Defines technical architecture
-- Makes technology decisions
-- Ensures code quality and consistency
-- Reviews critical implementations
-- Maintains technical coherence across the project
+- Defines architecture
+- Ensures code quality
+- Maintains consistency
+- Reviews key implementations
 
-### UI Lead & Integration (Élise)
+### UI Lead - Élise
 
-- Ensures UI consistency and usability
-- Oversees frontend integration
-- Coordinates UI components and pages
-- Ensures proper connection between frontend and backend
-- Contributes to user experience improvements
-
-### Developers (All Members)
-
-All team members are developers and must:
-
-- Implement features
-- Participate in code reviews
-- Test their work
-- Document their contributions
-- Understand the overall project
+- Ensures UI consistency
+- Builds reusable components
+- Connects frontend to backend
+- Improves usability
 
 ---
 
-## Team Members
+## Developer Responsibilities
 
-### Martin
+All members must:
 
-**Roles**
-
-- Product Owner
-- Developer (Gameplay)
-
-**Main focus**
-
-- Gameplay
-- Game mechanics
-
-**Responsibilities**
-
-- Define gameplay loop
-- Implement labyrinth logic
-- Implement card system
-- Define game rules and progression
-- Ensure gameplay coherence
-
-**Constraints**
-
-- No advanced 3D
-- Focus on logic, not UI
-
-**Linked modules**
-
-| Module | Contribution |
-| --- | --- |
-| Gaming | Core game |
-| Gaming | Game customization |
+- Write code
+- Review code
+- Test features
+- Document work
+- Understand the full project
 
 ---
 
-### Jerem
+## Detailed Responsibilities
 
-**Roles**
+### Martin - Gameplay
 
-- Project Manager
-- Developer (Backend & Security)
+**Focus**
 
-**Main focus**
+- Game logic
 
-- Backend development
-- Project organization
+**Tasks**
 
-**Responsibilities**
+- Define game rules
+- Implement labyrinth structure
+- Handle player movement rules
+- Detect win condition
 
-- Develop backend (Express)
-- Implement API endpoints
-- Handle authentication (JWT)
-- Manage database (Prisma/PostgreSQL)
-- Ensure backend validation
-- Apply security best practices:
-  - password hashing
-  - input validation
-  - rate limiting
-- Support real-time backend
+**Constraint**
 
-**Secondary responsibilities**
-
-- Organize team workflow
-- Track tasks and progress
-- Manage blockers
-
-**Linked modules**
-
-| Module | Contribution |
-| --- | --- |
-| Web | Backend |
-| User Management | Auth system |
-| Web | API |
-| Security | Backend protections |
+- No advanced systems (cards, progression)
 
 ---
 
-### Jennifer
+### Jerem - Backend & Real-Time
 
-**Roles**
+**Focus**
 
-- Technical Lead
-- Developer (Frontend & Integration)
+- Backend + WebSocket
 
-**Main focus**
+**Tasks**
+
+- Express API
+- Authentication (JWT)
+- Database (Prisma)
+- Input validation
+- Security basics
+- WebSocket server (Socket.IO)
+- Game state synchronization
+
+---
+
+### Jennifer - Frontend Logic & Integration
+
+**Focus**
 
 - Frontend architecture
-- User experience
-- Integration
 
-**Responsibilities**
+**Tasks**
 
-- Build frontend with React
-- Implement UI and game interface
-- Handle game rendering (2D labyrinth)
-- Integrate WebSocket on frontend
-- Ensure UX quality
-- Maintain consistency between systems
-
-**Secondary responsibilities**
-
-- Support architecture decisions
-- Help team on technical issues
-
-**Linked modules**
-
-| Module | Contribution |
-| --- | --- |
-| Web | Frontend |
-| Gaming | Game interface |
-| Web | Real-time frontend |
+- React app structure
+- Game rendering (labyrinth grid)
+- Handle player input
+- Connect WebSocket
+- Sync UI with backend
+- Ensure UX coherence
 
 ---
 
-### Élise
+### Élise - UI & Integration
 
-**Roles**
+**Focus**
 
-- UI Lead & Integration Developer
+- Interface & integration
 
-**Main focus**
+**Tasks**
 
-- Interface development
-- UI consistency
-- Frontend integration
-
-**Responsibilities**
-
-- Develop main UI pages:
-  - login / register
-  - profile
-- Build reusable components
-- Connect frontend to backend
-- Improve UI responsiveness
-- Assist integration of features
-- Ensure consistency in design
-
-**Secondary responsibilities**
-
-- Participate in testing
-- Support frontend improvements
-- Contribute to UX adjustments
-
-**Linked modules**
-
-| Module | Contribution |
-| --- | --- |
-| Web | UI components |
-| Accessibility | UI structure |
-| Web | Notification UI |
+- Build pages:
+  - Login
+  - Register
+  - Lobby
+  - Profile
+- Create reusable components
+- Connect API (fetch/axios)
+- Improve responsiveness
+- Assist frontend integration
 
 ---
 
 ## Technical Direction
 
-### Chosen approach
+### Stack
 
-- 2D rendering (Canvas / DOM)
-- React frontend
-- Express backend
-- Prisma + PostgreSQL
-- WebSocket for real-time
+| Layer | Choice |
+| --- | --- |
+| Frontend | React |
+| Backend | Express |
+| Database | PostgreSQL |
+| ORM | Prisma |
+| Real-time | WebSocket (Socket.IO) |
+| DevOps | Docker |
+
+### Rendering
+
+- 2D grid (DOM or Canvas)
+- No 3D
 
 ### Avoid
 
-- Advanced 3D (too complex)
-- Over-engineered security
 - Microservices
-- Complex infrastructure
+- Over-engineering
+- Complex infra
 
 ---
 
@@ -255,24 +178,16 @@ All team members are developers and must:
 
 ### Principles
 
-- Balanced workload
-- No isolated roles
-- Continuous communication
-- Shared understanding
+- Clear responsibilities
+- No blocking dependencies
+- Frequent communication
+- Simple first, improve later
 
-### Current Phase
+### Current Focus
 
-**Focus on**
-
-- MVP definition
-- Architecture
-- Task distribution
-
-**Avoid**
-
-- Over-complex solutions
-- Blocking dependencies
-- Premature decisions
+- MVP implementation
+- Core architecture
+- Basic gameplay
 
 ---
 
@@ -281,22 +196,23 @@ All team members are developers and must:
 ### Martin
 
 - Define gameplay loop
-- Document game rules
+- Implement basic labyrinth
 
 ### Jerem
 
-- Set up backend
-- Implement authentication
+- Setup backend
+- Implement auth
+- Setup WebSocket
 
 ### Jennifer
 
-- Set up frontend
-- Define UI structure
+- Setup React app
+- Create game view
 
 ### Élise
 
-- Build basic pages (login/register)
-- Start component system
+- Build UI pages
+- Create components
 
 ---
 
@@ -305,9 +221,11 @@ All team members are developers and must:
 Each member must be able to explain:
 
 - Architecture
-- Their work
-- Technical choices
-- Work distribution
+- Game flow
+- WebSocket logic
+- Their contributions
+
+**Required for evaluation**
 
 ---
 
@@ -315,7 +233,7 @@ Each member must be able to explain:
 
 This organization ensures:
 
-- Balanced team structure
+- Balanced workload
 - Clear responsibilities
-- Real contribution from each member
-- A project that is coherent, feasible, and evaluable
+- Functional MVP
+- Strong evaluation readiness
