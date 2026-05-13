@@ -4,30 +4,30 @@
 
 ---
 
-# Table of Contents
+## Table of Contents
 
-1. Project Objective
-2. Global Team Summary
-3. Team Overview
-4. Global Workload Philosophy
-5. Role Distribution
-6. Product Owner — Martin
-7. Project Manager / Backend Lead — Jerem
-8. Technical Lead / Frontend Architecture — Jennifer
-9. UI Lead / Frontend Integration — Élise
-10. Shared Developer Responsibilities
-11. Detailed Technical Ownership
-12. MVP Definition
-13. Modules Ownership
-14. Communication Rules
-15. Pull Requests and Code Reviews
-16. Evaluation Preparation
-17. Risk Management
-18. Final Team Rules
+1. [Project Objective](#1-project-objective)
+2. [Global Team Summary](#2-global-team-summary)
+3. [Team Overview](#3-team-overview)
+4. [Global Workload Philosophy](#4-global-workload-philosophy)
+5. [Role Distribution](#5-role-distribution)
+6. [Product Owner — Martin](#6-product-owner--martin)
+7. [Project Manager / Backend Lead — Jerem](#7-project-manager--backend-lead--jerem)
+8. [Technical Lead / Frontend Architecture — Jennifer](#8-technical-lead--frontend-architecture--jennifer)
+9. [UI Lead / Frontend Integration — Élise](#9-ui-lead--frontend-integration--élise)
+10. [Shared Developer Responsibilities](#10-shared-developer-responsibilities)
+11. [Detailed Technical Ownership](#11-detailed-technical-ownership)
+12. [MVP Definition](#12-mvp-definition)
+13. [Modules Ownership](#13-modules-ownership)
+14. [Communication Rules](#14-communication-rules)
+15. [Pull Requests and Code Reviews](#15-pull-requests-and-code-reviews)
+16. [Evaluation Preparation](#16-evaluation-preparation)
+17. [Risk Management](#17-risk-management)
+18. [Final Team Rules](#18-final-team-rules)
 
 ---
 
-# 1. Project Objective
+## 1. Project Objective
 
 The objective of this organization document is to:
 
@@ -53,9 +53,9 @@ This document defines:
 
 ---
 
-# 2. Global Team Summary
+## 2. Global Team Summary
 
-## Martin — Product Owner & Gameplay Systems
+### Martin — Product Owner & Gameplay Systems
 
 Martin owns:
 
@@ -73,7 +73,7 @@ The game is coherent, playable, understandable, and fun.
 
 ---
 
-## Jerem — Project Manager & Backend Lead
+### Jerem — Project Manager & Backend Lead
 
 Jerem owns:
 
@@ -92,7 +92,7 @@ The backend is stable, organized, synchronized, and the team always knows the pr
 
 ---
 
-## Jennifer — Technical Lead & Frontend Architecture
+### Jennifer — Technical Lead & Frontend Architecture
 
 Jennifer owns:
 
@@ -110,7 +110,7 @@ The project remains maintainable, coherent, demonstrable, and technically clean.
 
 ---
 
-## Élise — UI Lead & Frontend Integration
+### Élise — UI Lead & Frontend Integration
 
 Élise owns:
 
@@ -129,7 +129,7 @@ The application is clean, usable, responsive, understandable, and visually coher
 
 ---
 
-# 3. Team Overview
+## 3. Team Overview
 
 | Member   | Main Role                           | Main Technical Focus                        |
 | -------- | ----------------------------------- | ------------------------------------------- |
@@ -140,7 +140,7 @@ The application is clean, usable, responsive, understandable, and visually coher
 
 ---
 
-# 4. Global Workload Philosophy
+## 4. Global Workload Philosophy
 
 The goal is not only to distribute titles.
 
@@ -171,7 +171,7 @@ Target balance:
 
 ---
 
-# 5. Role Distribution
+## 5. Role Distribution
 
 | Role                           | Owner    |
 | ------------------------------ | -------- |
@@ -188,9 +188,9 @@ Target balance:
 
 ---
 
-# 6. Product Owner — Martin
+## 6. Product Owner — Martin
 
-## Purpose
+### Purpose
 
 The Product Owner is responsible for the product vision and gameplay coherence.
 
@@ -205,7 +205,7 @@ The PO protects the gameplay identity of the project.
 
 ---
 
-## Main Responsibilities
+### Main Responsibilities
 
 Martin is responsible for:
 
@@ -220,7 +220,7 @@ Martin is responsible for:
 
 ---
 
-## Technical Responsibilities
+### Technical Responsibilities
 
 Martin is also a major gameplay developer.
 
@@ -239,7 +239,7 @@ He is responsible for:
 
 ---
 
-## Expected Deliverables
+### Expected Deliverables
 
 Martin must maintain:
 
@@ -252,7 +252,7 @@ Martin must maintain:
 
 ---
 
-## What Martin Must Avoid
+### What Martin Must Avoid
 
 Martin should not:
 
@@ -266,7 +266,7 @@ Technical decisions must be validated with Jennifer.
 
 ---
 
-## Evaluation Expectations
+### Evaluation Expectations
 
 Martin must be able to explain:
 
@@ -280,9 +280,9 @@ Martin must be able to explain:
 
 ---
 
-# 7. Project Manager / Backend Lead — Jerem
+## 7. Project Manager / Backend Lead — Jerem
 
-## Purpose
+### Purpose
 
 The Project Manager is responsible for project coordination, organization, planning visibility, and execution tracking.
 
@@ -296,7 +296,7 @@ The PM ensures that:
 
 ---
 
-## Main PM Responsibilities
+### Main PM Responsibilities
 
 Jerem is responsible for:
 
@@ -315,7 +315,7 @@ Jerem is responsible for:
 
 ---
 
-## Mandatory PM Deliverables
+### Mandatory PM Deliverables
 
 Jerem must maintain:
 
@@ -331,7 +331,7 @@ Jerem must maintain:
 
 ---
 
-## Backend Responsibilities
+### Backend Responsibilities
 
 Jerem is also Backend Lead.
 
@@ -355,7 +355,7 @@ He is responsible for:
 
 ---
 
-## Important Workload Note
+### Important Workload Note
 
 The PM role includes a large invisible workload:
 
@@ -373,7 +373,7 @@ Therefore:
 
 ---
 
-## What Jerem Must Avoid
+### What Jerem Must Avoid
 
 Jerem should not:
 
@@ -386,7 +386,7 @@ Jerem should not:
 
 ---
 
-## Evaluation Expectations
+### Evaluation Expectations
 
 Jerem must be able to explain:
 
@@ -400,9 +400,9 @@ Jerem must be able to explain:
 
 ---
 
-# 8. Technical Lead / Frontend Architecture — Jennifer
+## 8. Technical Lead / Frontend Architecture — Jennifer
 
-## Purpose
+### Purpose
 
 The Technical Lead is responsible for technical coherence and maintainability.
 
@@ -422,7 +422,7 @@ This role is transversal and includes:
 
 ---
 
-## Main Responsibilities
+### Main Responsibilities
 
 Jennifer is responsible for:
 
@@ -440,7 +440,7 @@ Jennifer is responsible for:
 
 ---
 
-## Frontend Architecture Responsibilities
+### Frontend Architecture Responsibilities
 
 Jennifer is responsible for:
 
@@ -457,7 +457,7 @@ Jennifer is responsible for:
 
 ---
 
-## Visual Direction Responsibilities
+### Visual Direction Responsibilities
 
 Jennifer also coordinates:
 
@@ -471,7 +471,7 @@ This does not mean producing all graphical assets alone.
 
 ---
 
-## Important Workload Note
+### Important Workload Note
 
 The Technical Lead role includes heavy invisible workload:
 
@@ -490,7 +490,7 @@ Therefore:
 
 ---
 
-## What Jennifer Must Avoid
+### What Jennifer Must Avoid
 
 Jennifer should not:
 
@@ -502,7 +502,7 @@ Jennifer should not:
 
 ---
 
-## Evaluation Expectations
+### Evaluation Expectations
 
 Jennifer must be able to explain:
 
@@ -518,9 +518,9 @@ Jennifer must be able to explain:
 
 ---
 
-# 9. UI Lead / Frontend Integration — Élise
+## 9. UI Lead / Frontend Integration — Élise
 
-## Purpose
+### Purpose
 
 The UI Lead is responsible for usability, responsive integration, reusable components, and user-facing consistency.
 
@@ -536,7 +536,7 @@ It includes:
 
 ---
 
-## Main Responsibilities
+### Main Responsibilities
 
 Élise is responsible for:
 
@@ -554,7 +554,7 @@ It includes:
 
 ---
 
-## Technical Responsibilities
+### Technical Responsibilities
 
 Élise contributes heavily to frontend implementation.
 
@@ -575,7 +575,7 @@ She is responsible for:
 
 ---
 
-## Design System Responsibilities
+### Design System Responsibilities
 
 Élise should maintain reusable components such as:
 
@@ -596,7 +596,7 @@ This supports the custom-made design system module.
 
 ---
 
-## What Élise Must Avoid
+### What Élise Must Avoid
 
 Élise should not:
 
@@ -609,7 +609,7 @@ Frontend architecture decisions must remain aligned with Jennifer.
 
 ---
 
-## Evaluation Expectations
+### Evaluation Expectations
 
 Élise must be able to explain:
 
@@ -623,7 +623,7 @@ Frontend architecture decisions must remain aligned with Jennifer.
 
 ---
 
-# 10. Shared Developer Responsibilities
+## 10. Shared Developer Responsibilities
 
 Every member is also a developer.
 
@@ -649,7 +649,7 @@ Everyone must contribute technically.
 
 ---
 
-# 11. Detailed Technical Ownership
+## 11. Detailed Technical Ownership
 
 | Area                  | Main Owner | Support  |
 | --------------------- | ---------- | -------- |
@@ -672,9 +672,9 @@ Everyone must contribute technically.
 
 ---
 
-# 12. MVP Definition
+## 12. MVP Definition
 
-## MVP Includes
+### MVP Includes
 
 * user registration,
 * user login,
@@ -694,7 +694,7 @@ Everyone must contribute technically.
 
 ---
 
-## MVP Does NOT Include
+### MVP Does NOT Include
 
 * economy systems,
 * large persistent world,
@@ -712,9 +712,9 @@ These can only be considered later if the MVP is stable.
 
 ---
 
-# 13. Modules Ownership
+## 13. Modules Ownership
 
-## Major Modules
+### Major Modules
 
 | Module                     | Main Owner       | Support           |
 | -------------------------- | ---------------- | ----------------- |
@@ -726,7 +726,7 @@ These can only be considered later if the MVP is stable.
 
 ---
 
-## Minor Modules
+### Minor Modules
 
 | Module                     | Main Owner | Support       |
 | -------------------------- | ---------- | ------------- |
@@ -739,9 +739,9 @@ These can only be considered later if the MVP is stable.
 
 ---
 
-# 14. Communication Rules
+## 14. Communication Rules
 
-## Meetings
+### Meetings
 
 The team should have:
 
@@ -751,7 +751,7 @@ The team should have:
 
 ---
 
-## Meeting Structure
+### Meeting Structure
 
 Each meeting should answer:
 
@@ -763,7 +763,7 @@ Each meeting should answer:
 
 ---
 
-## Decision Rules
+### Decision Rules
 
 | Decision Type       | Main Lead |
 | ------------------- | --------- |
@@ -776,9 +776,9 @@ Important decisions should always be documented.
 
 ---
 
-# 15. Pull Requests and Code Reviews
+## 15. Pull Requests and Code Reviews
 
-## Branching Strategy
+### Branching Strategy
 
 Recommended branches:
 
@@ -792,7 +792,7 @@ No direct push to `main`.
 
 ---
 
-## Pull Requests
+### Pull Requests
 
 Each PR should include:
 
@@ -804,7 +804,7 @@ Each PR should include:
 
 ---
 
-## Review Rules
+### Review Rules
 
 | Type             | Preferred Reviewer |
 | ---------------- | ------------------ |
@@ -815,7 +815,7 @@ Each PR should include:
 
 ---
 
-# 16. Evaluation Preparation
+## 16. Evaluation Preparation
 
 Each member must understand:
 
@@ -833,7 +833,7 @@ Nobody should only understand their isolated part.
 
 ---
 
-# 17. Risk Management
+## 17. Risk Management
 
 | Risk                        | Prevention                        |
 | --------------------------- | --------------------------------- |
@@ -849,7 +849,7 @@ Nobody should only understand their isolated part.
 
 ---
 
-# 18. Final Team Rules
+## 18. Final Team Rules
 
 The objective is not to build the biggest possible project.
 
@@ -869,4 +869,3 @@ Every member must:
 * test,
 * document,
 * understand the project globally.
-
