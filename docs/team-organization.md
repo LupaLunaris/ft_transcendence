@@ -1,862 +1,872 @@
-# Team Organization
+# Team Organization — ft_transcendence
 
-ft_transcendence team organization document.
-
-This document defines the team roles, responsibilities, work distribution, technical ownership, and collaboration rules for the project.
+*This project has been created as part of the 42 curriculum.*
 
 ---
 
-## 1. Objective
+# Table of Contents
 
-The goal of this organization is to ensure:
-
-- clear responsibilities,
-- balanced workload,
-- no unclear ownership,
-- efficient teamwork,
-- clean technical decisions,
-- a realistic MVP,
-- strong evaluation readiness.
-
-ft_transcendence is a group project. Every member must actively contribute to the mandatory part, modules, code, documentation, testing, and understanding of the whole project.
-
----
-
-## 2. Team Overview
-
-| Member | Main Role | Developer Focus |
-| --- | --- | --- |
-| Martin | Product Owner | Gameplay logic |
-| Jerem | Project Manager / Backend Lead | Backend, API, WebSocket |
-| Jennifer | Technical Lead / Architect | Frontend architecture, integration, reviews |
-| Élise | UI Lead / Frontend Integration Developer | UI system, pages, i18n, usability |
+1. Project Objective
+2. Global Team Summary
+3. Team Overview
+4. Global Workload Philosophy
+5. Role Distribution
+6. Product Owner — Martin
+7. Project Manager / Backend Lead — Jerem
+8. Technical Lead / Frontend Architecture — Jennifer
+9. UI Lead / Frontend Integration — Élise
+10. Shared Developer Responsibilities
+11. Detailed Technical Ownership
+12. MVP Definition
+13. Modules Ownership
+14. Communication Rules
+15. Pull Requests and Code Reviews
+16. Evaluation Preparation
+17. Risk Management
+18. Final Team Rules
 
 ---
 
-## 3. Role Distribution
+# 1. Project Objective
 
-| Role | Owner |
-| --- | --- |
-| Product Owner | Martin |
-| Project Manager / Scrum Master | Jerem |
-| Technical Lead / Architect | Jennifer |
-| Backend Lead | Jerem |
-| Gameplay Developer | Martin |
-| Frontend Architecture Lead | Jennifer |
-| UI Lead | Élise |
-| Integration Developer | Élise |
-| Developers | Everyone |
+The objective of this organization document is to:
+
+* clearly define responsibilities,
+* avoid role confusion,
+* balance workload fairly,
+* reduce technical chaos,
+* keep the MVP realistic,
+* improve collaboration,
+* prepare the team for evaluation.
+
+ft_transcendence is a long-term group project.
+
+A clean organization is essential because poor coordination early in the project can create major delays later.
+
+This document defines:
+
+* who owns each area,
+* what is expected from each member,
+* what each member should avoid,
+* how work is distributed,
+* how the project will be coordinated.
 
 ---
 
-# 4. Role Definitions
+# 2. Global Team Summary
+
+## Martin — Product Owner & Gameplay Systems
+
+Martin owns:
+
+* gameplay vision,
+* gameplay rules,
+* labyrinth systems,
+* enemy systems,
+* movement logic,
+* map validation,
+* game balance.
+
+Expected result:
+
+The game is coherent, playable, understandable, and fun.
 
 ---
 
-## 4.1 Product Owner — Martin
+## Jerem — Project Manager & Backend Lead
 
-### Purpose
+Jerem owns:
 
-The Product Owner is responsible for the product vision.
+* project organization,
+* meetings,
+* planning,
+* backend architecture,
+* API,
+* authentication,
+* database,
+* WebSocket server.
 
-He decides what the game should be, what features are important, and what must be included in the MVP.
+Expected result:
 
-The Product Owner focuses on the user experience, gameplay coherence, and feature priorities.
+The backend is stable, organized, synchronized, and the team always knows the project status.
 
-### Main Responsibilities
+---
+
+## Jennifer — Technical Lead & Frontend Architecture
+
+Jennifer owns:
+
+* technical coherence,
+* frontend architecture,
+* integration quality,
+* reviews,
+* frontend/game integration,
+* game rendering architecture,
+* visual direction coordination.
+
+Expected result:
+
+The project remains maintainable, coherent, demonstrable, and technically clean.
+
+---
+
+## Élise — UI Lead & Frontend Integration
+
+Élise owns:
+
+* UI system,
+* reusable components,
+* responsive pages,
+* frontend integration,
+* user-facing polish,
+* accessibility basics,
+* i18n integration,
+* frontend API integration.
+
+Expected result:
+
+The application is clean, usable, responsive, understandable, and visually coherent.
+
+---
+
+# 3. Team Overview
+
+| Member   | Main Role                           | Main Technical Focus                        |
+| -------- | ----------------------------------- | ------------------------------------------- |
+| Martin   | Product Owner                       | Gameplay systems                            |
+| Jerem    | Project Manager / Backend Lead      | Backend, API, WebSocket                     |
+| Jennifer | Technical Lead / Frontend Architect | Frontend architecture, integration, reviews |
+| Élise    | UI Lead / Frontend Integration      | UI systems, pages, frontend integration     |
+
+---
+
+# 4. Global Workload Philosophy
+
+The goal is not only to distribute titles.
+
+The goal is to balance:
+
+* coding workload,
+* invisible coordination workload,
+* integration workload,
+* technical complexity,
+* evaluation preparation.
+
+Important:
+
+* Technical Lead and PM roles include large invisible workloads.
+* Therefore, their pure feature implementation workload must remain realistic.
+* Every member must contribute technically.
+* Nobody should become overloaded.
+* Nobody should become underloaded.
+
+Target balance:
+
+| Member   | Main Invisible Work          | Main Coding Work            |
+| -------- | ---------------------------- | --------------------------- |
+| Martin   | Product decisions            | Gameplay systems            |
+| Jerem    | Planning & coordination      | Backend & realtime          |
+| Jennifer | Architecture & reviews       | Frontend/game integration   |
+| Élise    | UI consistency & integration | UI systems & frontend logic |
+
+---
+
+# 5. Role Distribution
+
+| Role                           | Owner    |
+| ------------------------------ | -------- |
+| Product Owner                  | Martin   |
+| Gameplay Systems Lead          | Martin   |
+| Project Manager / Scrum Master | Jerem    |
+| Backend Lead                   | Jerem    |
+| Technical Lead / Architect     | Jennifer |
+| Frontend Architecture Lead     | Jennifer |
+| Visual Direction Coordinator   | Jennifer |
+| UI Lead                        | Élise    |
+| Frontend Integration Developer | Élise    |
+| Developers                     | Everyone |
+
+---
+
+# 6. Product Owner — Martin
+
+## Purpose
+
+The Product Owner is responsible for the product vision and gameplay coherence.
+
+The PO defines:
+
+* what the game should be,
+* what belongs in the MVP,
+* what features are important,
+* what should be postponed.
+
+The PO protects the gameplay identity of the project.
+
+---
+
+## Main Responsibilities
 
 Martin is responsible for:
 
-- defining the game concept,
-- defining the gameplay loop,
-- deciding what belongs in the MVP,
-- prioritizing features,
-- validating if a feature makes sense for the game,
-- keeping the project coherent,
-- avoiding unnecessary scope changes,
-- documenting the gameplay rules.
+* defining the gameplay loop,
+* defining game objectives,
+* defining win/loss conditions,
+* deciding MVP gameplay priorities,
+* documenting gameplay rules,
+* keeping gameplay coherent,
+* preventing gameplay scope explosion,
+* validating gameplay-related features.
 
-### Expected Deliverables
+---
 
-Martin must produce and maintain:
+## Technical Responsibilities
 
-- clear gameplay rules,
-- MVP feature list,
-- game loop description,
-- win/loss conditions,
-- map/labyrinth rules,
-- player progression rules if included,
-- list of postponed features.
+Martin is also a major gameplay developer.
 
-### Developer Responsibilities
+He is responsible for:
 
-Martin also contributes as a developer.
+* movement systems,
+* collision systems,
+* enemy systems,
+* map validation,
+* map parsing,
+* gameplay state logic,
+* game balancing,
+* gameplay testing,
+* labyrinth logic,
+* game rule implementation.
 
-His technical focus is:
+---
 
-- labyrinth logic,
-- map structure,
-- player movement rules,
-- collision rules,
-- win condition,
-- game state rules,
-- basic gameplay testing.
+## Expected Deliverables
 
-### What Martin Does Not Decide Alone
+Martin must maintain:
 
-Martin does not decide alone:
+* gameplay rules document,
+* MVP gameplay scope,
+* gameplay diagrams if needed,
+* map rules,
+* enemy behavior definitions,
+* postponed features list.
 
-- technical architecture,
-- database structure,
-- WebSocket architecture,
-- folder structure,
-- coding conventions,
-- final technical implementation choices.
+---
 
-These decisions must be validated with the Technical Lead.
+## What Martin Must Avoid
 
-### Evaluation Expectations
+Martin should not:
+
+* continuously change the MVP,
+* add unplanned features during implementation,
+* impose technical architecture alone,
+* overload the game with future ideas,
+* bypass technical validation.
+
+Technical decisions must be validated with Jennifer.
+
+---
+
+## Evaluation Expectations
 
 Martin must be able to explain:
 
-- what the game is,
-- why the MVP was chosen,
-- how the gameplay works,
-- what was postponed and why,
-- what he personally implemented.
+* the gameplay loop,
+* the MVP choices,
+* how gameplay systems work,
+* how the labyrinth system works,
+* enemy logic,
+* game balancing decisions,
+* what he personally implemented.
 
 ---
 
-## 4.2 Project Manager / Scrum Master — Jerem
+# 7. Project Manager / Backend Lead — Jerem
 
-### Purpose
+## Purpose
 
-The Project Manager is responsible for organization, planning, communication, and blockers.
+The Project Manager is responsible for project coordination, organization, planning visibility, and execution tracking.
 
-He makes sure the team works in a coordinated way and that everyone knows what to do.
+The PM ensures that:
 
-### Main Responsibilities
+* the team stays organized,
+* tasks remain visible,
+* blockers are identified early,
+* meetings are useful,
+* decisions are documented.
+
+---
+
+## Main PM Responsibilities
 
 Jerem is responsible for:
 
-- organizing meetings,
-- preparing meeting agendas,
-- writing meeting summaries,
-- tracking progress,
-- checking blockers,
-- maintaining GitHub Issues or task board,
-- making sure tasks are assigned,
-- making sure deadlines are realistic,
-- helping the team stay focused on the MVP.
+* organizing meetings,
+* preparing meeting agendas,
+* keeping meetings focused,
+* writing meeting summaries,
+* maintaining GitHub Issues / task board,
+* tracking project progress,
+* assigning tasks clearly,
+* identifying blockers,
+* following unfinished tasks,
+* helping freeze the MVP,
+* maintaining roadmap visibility,
+* making sure responsibilities are clear.
 
-### Expected Deliverables
+---
+
+## Mandatory PM Deliverables
 
 Jerem must maintain:
 
-- task board,
-- meeting notes,
-- sprint planning,
-- list of blockers,
-- task ownership,
-- project timeline,
-- progress tracking.
+| Deliverable         | Frequency       |
+| ------------------- | --------------- |
+| Task board          | Continuous      |
+| Meeting agenda      | Before meetings |
+| Meeting summary     | After meetings  |
+| MVP tracking        | Weekly          |
+| Sprint planning     | Weekly          |
+| Blockers list       | Continuous      |
+| Task ownership list | Continuous      |
 
-### Developer Responsibilities
+---
 
-Jerem also contributes as Backend Lead.
+## Backend Responsibilities
 
-His technical focus is:
+Jerem is also Backend Lead.
 
-- Express backend,
-- API routes,
-- authentication,
-- Prisma setup,
-- PostgreSQL schema implementation,
-- backend validation,
-- backend security basics,
-- WebSocket server,
-- game rooms,
-- real-time synchronization.
+He is responsible for:
 
-### What Jerem Does Not Do Alone
+* Express backend setup,
+* API architecture,
+* Prisma setup,
+* PostgreSQL integration,
+* authentication,
+* JWT/session logic,
+* password hashing,
+* backend validation,
+* user routes,
+* game routes,
+* WebSocket server,
+* rooms management,
+* realtime synchronization,
+* disconnect handling,
+* reconnection basics.
 
-Jerem does not merge large changes without review.
+---
 
-He does not change core architecture without discussing with Jennifer.
+## Important Workload Note
 
-He does not silently change backend contracts without informing frontend developers.
+The PM role includes a large invisible workload:
 
-### Evaluation Expectations
+* planning,
+* coordination,
+* follow-up,
+* organization,
+* communication.
+
+Therefore:
+
+* backend scope must remain realistic,
+* backend complexity must stay controlled,
+* responsibilities must be delegated when needed.
+
+---
+
+## What Jerem Must Avoid
+
+Jerem should not:
+
+* disappear from PM responsibilities,
+* improvise planning constantly,
+* leave meetings undocumented,
+* silently change backend contracts,
+* overload himself with unnecessary backend complexity,
+* merge large changes without review.
+
+---
+
+## Evaluation Expectations
 
 Jerem must be able to explain:
 
-- how the team organized the work,
-- how tasks were tracked,
-- how backend routes work,
-- how authentication works,
-- how WebSocket communication works,
-- what he personally implemented.
+* how the team organized work,
+* how meetings were managed,
+* how tasks were tracked,
+* how the backend works,
+* how authentication works,
+* how WebSocket synchronization works,
+* what he personally implemented.
 
 ---
 
-## 4.3 Technical Lead / Architect — Jennifer
+# 8. Technical Lead / Frontend Architecture — Jennifer
 
-### Purpose
+## Purpose
 
-The Technical Lead is responsible for technical coherence.
+The Technical Lead is responsible for technical coherence and maintainability.
 
-Jennifer ensures that the project has a clean architecture, consistent code, good technical decisions, and maintainable implementation.
+Jennifer ensures that:
 
-This role is transversal and requires reviewing, guiding, and integrating the work of others.
+* the architecture remains clean,
+* integration remains stable,
+* technical decisions stay realistic,
+* the project remains demonstrable.
 
-### Main Responsibilities
+This role is transversal and includes:
+
+* reviews,
+* debugging support,
+* integration guidance,
+* architectural consistency.
+
+---
+
+## Main Responsibilities
 
 Jennifer is responsible for:
 
-- defining the technical architecture,
-- validating the stack,
-- defining folder structure,
-- defining coding conventions,
-- reviewing important pull requests,
-- ensuring frontend/backend consistency,
-- helping define API contracts,
-- preventing over-engineering,
-- identifying risky technical choices,
-- ensuring the project remains demonstrable.
+* defining frontend architecture,
+* validating the technical stack,
+* defining folder structures,
+* defining coding conventions,
+* reviewing important pull requests,
+* ensuring frontend/backend consistency,
+* validating risky technical choices,
+* preventing over-engineering,
+* helping define API contracts,
+* integration strategy,
+* technical documentation.
 
-### Expected Deliverables
+---
 
-Jennifer must maintain:
+## Frontend Architecture Responsibilities
 
-- architecture documentation,
-- frontend structure,
-- technical conventions,
-- API contract documentation with Jerem,
-- review checklist,
-- integration strategy,
-- technical risks list,
-- README technical sections.
+Jennifer is responsible for:
 
-### Developer Responsibilities
+* React structure,
+* routing architecture,
+* frontend organization,
+* WebSocket client integration,
+* game rendering architecture,
+* frontend/backend synchronization,
+* shared frontend types,
+* global error handling,
+* gameplay rendering consistency,
+* visual direction coordination.
 
-Jennifer also contributes as Frontend Architecture Lead.
+---
 
-Her technical focus is:
+## Visual Direction Responsibilities
 
-- React app structure,
-- routing,
-- frontend state management,
-- WebSocket client integration,
-- game view architecture,
-- frontend/backend integration,
-- global error handling,
-- technical consistency.
+Jennifer also coordinates:
 
-### Important Workload Note
+* gameplay visual coherence,
+* visual identity consistency,
+* map rendering integration,
+* gameplay UI consistency,
+* art direction validation.
 
-Jennifer should not be assigned too many isolated feature pages.
+This does not mean producing all graphical assets alone.
 
-Her Tech Lead role already includes:
+---
 
-- code reviews,
-- architecture decisions,
-- debugging support,
-- integration help,
-- checking consistency,
-- helping other members.
+## Important Workload Note
 
-Therefore, her developer workload must be slightly smaller than a pure developer workload.
+The Technical Lead role includes heavy invisible workload:
 
-### What Jennifer Does Not Do
+* reviews,
+* architecture decisions,
+* debugging,
+* integration support,
+* consistency validation,
+* technical coordination.
+
+Therefore:
+
+* Jennifer should not own too many isolated feature pages,
+* Jennifer should not become the main support for every issue,
+* Jennifer should not absorb other members' responsibilities.
+
+---
+
+## What Jennifer Must Avoid
 
 Jennifer should not:
 
-- write everyone’s code,
-- fix every problem alone,
-- replace other members’ responsibilities,
-- take over the whole frontend,
-- become the only person who understands the project.
+* write everyone’s code,
+* fix every problem alone,
+* take over the whole frontend,
+* become the only person understanding the architecture,
+* block progress through perfectionism.
 
-Each member remains responsible for their own code.
+---
 
-### Evaluation Expectations
+## Evaluation Expectations
 
 Jennifer must be able to explain:
 
-- the full architecture,
-- why the stack was chosen,
-- how frontend and backend communicate,
-- how WebSocket is integrated,
-- how code quality was maintained,
-- what she personally implemented and reviewed.
+* the full architecture,
+* why the stack was chosen,
+* frontend/backend communication,
+* WebSocket integration,
+* frontend organization,
+* rendering logic,
+* review process,
+* technical consistency decisions,
+* what she personally implemented.
 
 ---
 
-## 4.4 UI Lead / Frontend Integration Developer — Élise
+# 9. UI Lead / Frontend Integration — Élise
 
-### Purpose
+## Purpose
 
-The UI Lead is responsible for the visual consistency, usability, accessibility basics, reusable components, and user-facing pages.
+The UI Lead is responsible for usability, responsive integration, reusable components, and user-facing consistency.
 
-This is not only “making things pretty”.  
-This role is essential for making the application usable, clean, responsive, and coherent.
+This role is not only visual.
 
-### Main Responsibilities
+It includes:
+
+* frontend integration,
+* state handling,
+* API integration,
+* usability,
+* accessibility basics.
+
+---
+
+## Main Responsibilities
 
 Élise is responsible for:
 
-- UI consistency,
-- design system,
-- reusable components,
-- responsive layouts,
-- frontend pages,
-- form interfaces,
-- usability improvements,
-- language switcher and translations if i18n is included,
-- user-facing polish.
-
-### Expected Deliverables
-
-Élise must produce:
-
-- reusable UI components,
-- design system documentation,
-- page layouts,
-- responsive UI,
-- consistent buttons, forms, cards, modals,
-- translated UI texts if i18n is implemented,
-- UI testing checklist.
-
-### Developer Responsibilities
-
-Élise contributes as a frontend developer.
-
-Her technical focus is:
-
-- login page,
-- register page,
-- lobby page,
-- profile page,
-- settings page,
-- UI components,
-- forms,
-- API integration for user-facing pages,
-- notifications display,
-- accessibility basics,
-- responsiveness.
-
-### Suggested Components
-
-Élise should build and maintain at least:
-
-- Button,
-- Input,
-- Card,
-- Modal,
-- Navbar,
-- Avatar,
-- Badge,
-- Toast,
-- FormError,
-- Layout,
-- Tabs,
-- LoadingState.
-
-This supports the custom-made design system module.
-
-### What Élise Does Not Do Alone
-
-Élise does not decide gameplay rules.
-
-Élise does not change API contracts alone.
-
-Élise does not own the full frontend architecture.
-
-She works with Jennifer for architecture and with Jerem for API integration.
-
-### Evaluation Expectations
-
-Élise must be able to explain:
-
-- how the UI is structured,
-- how reusable components work,
-- how pages connect to the backend,
-- how responsiveness was handled,
-- how i18n works if implemented,
-- what she personally implemented.
+* reusable components,
+* responsive layouts,
+* forms,
+* frontend pages,
+* notifications UI,
+* loading states,
+* accessibility basics,
+* i18n integration,
+* user-facing polish,
+* frontend API integration,
+* frontend validation integration.
 
 ---
 
-# 5. Developer Responsibilities — Everyone
+## Technical Responsibilities
 
-Every team member is also a developer.
+Élise contributes heavily to frontend implementation.
+
+She is responsible for:
+
+* login page,
+* register page,
+* lobby page,
+* profile page,
+* settings page,
+* notifications integration,
+* avatar integration,
+* frontend forms,
+* API calls integration,
+* UI-side state synchronization,
+* responsive fixes,
+* frontend data synchronization.
+
+---
+
+## Design System Responsibilities
+
+Élise should maintain reusable components such as:
+
+* Button,
+* Input,
+* Card,
+* Modal,
+* Navbar,
+* Avatar,
+* Badge,
+* Toast,
+* FormError,
+* Layout,
+* Tabs,
+* LoadingState.
+
+This supports the custom-made design system module.
+
+---
+
+## What Élise Must Avoid
+
+Élise should not:
+
+* only work on decorative visuals,
+* create isolated pages without integration,
+* bypass frontend architecture conventions,
+* modify API contracts alone.
+
+Frontend architecture decisions must remain aligned with Jennifer.
+
+---
+
+## Evaluation Expectations
+
+Élise must be able to explain:
+
+* how the UI is structured,
+* how reusable components work,
+* how frontend integration works,
+* how forms connect to backend APIs,
+* how responsiveness was handled,
+* how i18n works if implemented,
+* what she personally implemented.
+
+---
+
+# 10. Shared Developer Responsibilities
+
+Every member is also a developer.
 
 Each member must:
 
-- write code,
-- test their code,
-- review code when asked,
-- document their work,
-- use clear commit messages,
-- work on feature branches,
-- understand the full project,
-- be able to explain their own contributions.
+* write code,
+* test their code,
+* document their work,
+* use feature branches,
+* create understandable commits,
+* participate in reviews,
+* understand the full project,
+* be able to explain their work during evaluation.
 
-No member should only manage, design, or decide.
+Nobody should only:
+
+* manage,
+* design,
+* organize,
+* decide.
 
 Everyone must contribute technically.
 
 ---
 
-# 6. Detailed Work Distribution
+# 11. Detailed Technical Ownership
+
+| Area                  | Main Owner | Support  |
+| --------------------- | ---------- | -------- |
+| Gameplay systems      | Martin     | Jennifer |
+| Enemy systems         | Martin     | Jerem    |
+| Frontend architecture | Jennifer   | Élise    |
+| Backend architecture  | Jerem      | Jennifer |
+| WebSocket server      | Jerem      | Jennifer |
+| WebSocket client      | Jennifer   | Jerem    |
+| UI components         | Élise      | Jennifer |
+| Visual direction      | Jennifer   | Élise    |
+| Authentication        | Jerem      | Élise    |
+| Notifications         | Élise      | Jerem    |
+| Map rendering         | Jennifer   | Martin   |
+| Responsive UI         | Élise      | Jennifer |
+| Game integration      | Jennifer   | Jerem    |
+| Database schema       | Jerem      | Jennifer |
+| Docker setup          | Jerem      | Jennifer |
+| README coordination   | Jennifer   | Everyone |
 
 ---
 
-## 6.1 Martin — Gameplay
-
-### Main Focus
-
-Gameplay logic and game coherence.
-
-### Tasks
-
-Martin is responsible for:
-
-- defining game rules,
-- implementing labyrinth structure,
-- implementing map logic,
-- handling player movement rules,
-- handling collisions,
-- defining win/loss conditions,
-- creating simple test maps,
-- documenting gameplay decisions.
-
-### MVP Tasks
-
-For MVP, Martin must deliver:
-
-- one playable labyrinth mode,
-- clear movement rules,
-- clear objective,
-- clear victory condition,
-- basic game rules documented.
-
-### Optional Later
-
-Can be added later:
-
-- advanced cards,
-- economy,
-- unlockable decorations,
-- advanced progression,
-- multiple map types,
-- complex balancing.
-
----
-
-## 6.2 Jerem — Backend and Real-Time
-
-### Main Focus
-
-Backend, database, authentication, and real-time server.
-
-### Tasks
-
-Jerem is responsible for:
-
-- Express project setup,
-- API structure,
-- Prisma setup,
-- PostgreSQL connection,
-- database schema,
-- authentication,
-- password hashing,
-- JWT/session logic,
-- backend validation,
-- user routes,
-- profile routes,
-- friends routes if included,
-- WebSocket server,
-- game rooms,
-- broadcasting game state,
-- handling disconnects,
-- reconnection basics.
-
-### MVP Tasks
-
-For MVP, Jerem must deliver:
-
-- working backend,
-- working database,
-- login/register backend,
-- basic authenticated routes,
-- WebSocket room system,
-- real-time game sync.
-
-### Optional Later
-
-Can be added later:
-
-- advanced notifications,
-- advanced stats,
-- admin tools,
-- complex matchmaking,
-- advanced security modules.
-
----
-
-## 6.3 Jennifer — Technical Lead and Frontend Architecture
-
-### Main Focus
-
-Architecture, frontend structure, real-time integration, and code quality.
-
-### Tasks
-
-Jennifer is responsible for:
-
-- defining frontend architecture,
-- setting up React structure,
-- defining route structure,
-- defining shared types if used,
-- creating frontend conventions,
-- integrating WebSocket client,
-- creating game view structure,
-- syncing UI with backend state,
-- reviewing critical PRs,
-- helping debug cross-feature issues,
-- ensuring consistency between modules.
-
-### MVP Tasks
-
-For MVP, Jennifer must deliver:
-
-- clean frontend architecture,
-- working game screen,
-- WebSocket client connection,
-- player input handling,
-- live game state display,
-- integration with backend game state,
-- review process.
-
-### Optional Later
-
-Can be added later:
-
-- advanced animations,
-- advanced frontend state patterns,
-- performance optimization,
-- advanced game rendering,
-- richer UX polish.
-
----
-
-## 6.4 Élise — UI System and Frontend Integration
-
-### Main Focus
-
-User interface, reusable components, pages, responsiveness, and integration.
-
-### Tasks
-
-Élise is responsible for:
-
-- design system,
-- reusable components,
-- login page,
-- register page,
-- lobby page,
-- profile page,
-- settings page,
-- notifications UI,
-- forms,
-- error messages,
-- loading states,
-- responsive layouts,
-- accessibility basics,
-- i18n UI integration if included.
-
-### MVP Tasks
-
-For MVP, Élise must deliver:
-
-- clean login/register UI,
-- lobby UI,
-- profile UI,
-- reusable components,
-- responsive layout,
-- basic design system,
-- basic frontend API calls.
-
-### Optional Later
-
-Can be added later:
-
-- advanced animations,
-- decorative assets,
-- theme customization,
-- richer profile UI,
-- visual polish.
-
----
-
-# 7. Module Ownership
-
-## Major Modules
-
-| Module | Main Owner | Support |
-| --- | --- | --- |
-| Web framework frontend/backend | Jennifer / Jerem | Everyone |
-| Real-time features | Jerem | Jennifer |
-| Standard user management | Jerem | Élise |
-| Complete web-based game | Martin | Jennifer / Jerem |
-| Remote players | Jerem | Jennifer / Martin |
-
-## Minor Modules
-
-| Module | Main Owner | Support |
-| --- | --- | --- |
-| ORM | Jerem | Jennifer |
-| Multiple languages | Élise | Jennifer |
-| Gamification system | Martin | Jerem / Élise |
-| Notification system | Jerem | Élise |
-| Custom-made design system | Élise | Jennifer |
-| Game customization options | Martin | Jennifer |
-
----
-
-# 8. MVP Definition
-
-The MVP must be simple, functional, and demonstrable.
+# 12. MVP Definition
 
 ## MVP Includes
 
-- user registration,
-- user login,
-- basic profile,
-- lobby,
-- create/join game,
-- one playable labyrinth game mode,
-- real-time remote player movement,
-- win/loss condition,
-- basic notifications,
-- basic responsive UI,
-- Docker setup,
-- PostgreSQL database,
-- Prisma ORM,
-- README documentation.
-
-## MVP Does Not Include
-
-- complex economy,
-- large persistent world,
-- advanced card system,
-- advanced decorations,
-- complex matchmaking,
-- advanced chat,
-- 3D rendering,
-- AI opponent,
-- microservices,
-- blockchain,
-- heavy analytics.
-
-These can be considered later only if the MVP is stable.
+* user registration,
+* user login,
+* map creation,
+* map editing,
+* map validation,
+* one playable labyrinth mode,
+* remote realtime gameplay,
+* basic profile,
+* map publication,
+* public map exploration,
+* responsive frontend,
+* Docker setup,
+* PostgreSQL,
+* Prisma ORM,
+* README documentation.
 
 ---
 
-# 9. Work Method
+## MVP Does NOT Include
 
-## Branching
+* economy systems,
+* large persistent world,
+* advanced progression,
+* marketplace systems,
+* AI opponent,
+* 3D rendering,
+* blockchain,
+* microservices,
+* advanced matchmaking,
+* heavy analytics,
+* complex social systems.
 
-Recommended branches:
-
-- `main`: stable version only,
-- `dev`: integration branch,
-- `feature/name`: individual features,
-- `fix/name`: bug fixes,
-- `docs/name`: documentation changes.
-
-No direct push to `main`.
-
-Large changes must go through pull requests.
-
-## Pull Requests
-
-Each PR should include:
-
-- what was changed,
-- how it was tested,
-- screenshots if UI changed,
-- known limitations,
-- reviewer name.
-
-## Code Review
-
-Important PRs must be reviewed by at least one other member.
-
-Critical architecture or backend/frontend integration PRs should be reviewed by Jennifer.
-
-Backend PRs should preferably be reviewed by Jerem.
-
-UI PRs should preferably be reviewed by Élise or Jennifer.
-
-Gameplay PRs should preferably be reviewed by Martin and Jennifer.
+These can only be considered later if the MVP is stable.
 
 ---
 
-# 10. Communication Rules
+# 13. Modules Ownership
+
+## Major Modules
+
+| Module                     | Main Owner       | Support           |
+| -------------------------- | ---------------- | ----------------- |
+| Framework frontend/backend | Jennifer / Jerem | Everyone          |
+| Realtime features          | Jerem            | Jennifer          |
+| Standard user management   | Jerem            | Élise             |
+| Complete web-based game    | Martin           | Jennifer / Jerem  |
+| Remote players             | Jerem            | Jennifer / Martin |
+
+---
+
+## Minor Modules
+
+| Module                     | Main Owner | Support       |
+| -------------------------- | ---------- | ------------- |
+| ORM                        | Jerem      | Jennifer      |
+| Multiple languages         | Élise      | Jennifer      |
+| Gamification system        | Martin     | Jerem / Élise |
+| Notification system        | Élise      | Jerem         |
+| Custom-made design system  | Élise      | Jennifer      |
+| Game customization options | Martin     | Jennifer      |
+
+---
+
+# 14. Communication Rules
 
 ## Meetings
 
 The team should have:
 
-- one weekly planning meeting,
-- short progress updates during the week,
-- extra meetings only when needed.
+* one weekly planning meeting,
+* short progress updates during the week,
+* additional meetings only when necessary.
+
+---
 
 ## Meeting Structure
 
-Each meeting should cover:
+Each meeting should answer:
 
-1. What was done?
+1. What was completed?
 2. What is blocked?
 3. What needs review?
-4. What changed in the MVP?
-5. What is the next task for each person?
+4. Did the MVP change?
+5. What is the next task for each member?
+
+---
 
 ## Decision Rules
 
-Product decisions:
+| Decision Type       | Main Lead |
+| ------------------- | --------- |
+| Product decisions   | Martin    |
+| Technical decisions | Jennifer  |
+| Planning decisions  | Jerem     |
+| UI decisions        | Élise     |
 
-- led by Martin,
-- discussed with the team.
-
-Technical decisions:
-
-- led by Jennifer,
-- discussed with relevant developers.
-
-Planning decisions:
-
-- led by Jerem,
-- validated with the team.
-
-UI decisions:
-
-- led by Élise,
-- validated with Jennifer for consistency.
+Important decisions should always be documented.
 
 ---
 
-# 11. Evaluation Preparation
+# 15. Pull Requests and Code Reviews
 
-Each member must be able to explain:
+## Branching Strategy
 
-- the project goal,
-- the MVP,
-- chosen modules,
-- their own role,
-- their own code,
-- how frontend and backend communicate,
-- how WebSocket works,
-- how authentication works,
-- how the database is structured,
-- how the team worked together.
+Recommended branches:
 
-No member should only understand their isolated part.
+* `main` → stable only,
+* `dev` → integration branch,
+* `feature/name` → features,
+* `fix/name` → bug fixes,
+* `docs/name` → documentation.
+
+No direct push to `main`.
 
 ---
 
-# 12. Risk Management
+## Pull Requests
 
-## Main Risks
+Each PR should include:
 
-| Risk | Prevention |
-| --- | --- |
-| MVP too large | Freeze MVP early |
-| Martin changes scope too often | Use written backlog |
-| Jennifer becomes bottleneck | Limit her feature workload |
-| Jerem overloaded with backend + PM | Keep backend scope simple |
-| Élise underloaded | Give her UI system + pages + i18n |
-| Integration problems | Define API contracts early |
-| WebSocket complexity | Keep first version simple |
-| Evaluation failure | Document modules clearly |
+* summary of changes,
+* screenshots if UI changed,
+* testing information,
+* known limitations,
+* reviewer.
 
 ---
 
-# 13. Final Responsibility Summary
+## Review Rules
 
-## Martin
-
-Owns:
-
-- product vision,
-- gameplay rules,
-- labyrinth logic,
-- game coherence.
-
-Expected result:
-
-- the game makes sense and is playable.
-
-## Jerem
-
-Owns:
-
-- project tracking,
-- backend,
-- database,
-- authentication,
-- WebSocket server.
-
-Expected result:
-
-- the backend is stable and real-time works.
-
-## Jennifer
-
-Owns:
-
-- technical architecture,
-- frontend architecture,
-- integration quality,
-- code consistency,
-- reviews.
-
-Expected result:
-
-- the project is clean, coherent, and maintainable.
-
-## Élise
-
-Owns:
-
-- UI system,
-- reusable components,
-- user-facing pages,
-- responsiveness,
-- usability,
-- i18n if included.
-
-Expected result:
-
-- the application is usable, clean, coherent, and presentable.
+| Type             | Preferred Reviewer |
+| ---------------- | ------------------ |
+| Architecture PRs | Jennifer           |
+| Backend PRs      | Jerem              |
+| Gameplay PRs     | Martin + Jennifer  |
+| UI PRs           | Élise + Jennifer   |
 
 ---
 
-# 14. Final Rule
+# 16. Evaluation Preparation
 
-Each member owns a clear area, but the project belongs to the whole team.
+Each member must understand:
 
-Everyone must:
+* the project goal,
+* the MVP,
+* selected modules,
+* frontend/backend communication,
+* authentication,
+* WebSocket synchronization,
+* database structure,
+* their own contributions,
+* the overall architecture.
 
-- contribute,
-- communicate,
-- test,
-- document,
-- understand,
-- be ready to explain the project during evaluation.
+Nobody should only understand their isolated part.
+
+---
+
+# 17. Risk Management
+
+| Risk                        | Prevention                        |
+| --------------------------- | --------------------------------- |
+| MVP becomes too large       | Freeze MVP early                  |
+| Scope constantly changes    | Maintain written backlog          |
+| Jennifer becomes bottleneck | Limit feature overload            |
+| Jerem overloaded            | Keep backend simple               |
+| Élise underloaded           | Give integration responsibilities |
+| Martin undercodes           | Give gameplay systems ownership   |
+| Integration problems        | Define API contracts early        |
+| WebSocket complexity        | Keep first version minimal        |
+| Evaluation failure          | Document everything clearly       |
+
+---
+
+# 18. Final Team Rules
 
 The objective is not to build the biggest possible project.
 
-The objective is to build a clean, functional, demonstrable, and well-organized ft_transcendence project.
+The objective is to build:
+
+* a stable project,
+* a demonstrable project,
+* a maintainable project,
+* a coherent project,
+* a project the entire team understands.
+
+Every member must:
+
+* contribute,
+* communicate,
+* review,
+* test,
+* document,
+* understand the project globally.
+
