@@ -1,0 +1,76 @@
+// ************************************************************************** //
+//                                                                            //
+//                                                        :::      ::::::::   //
+// schema.prisma                                        :+:      :+:    :+:   //
+//                                                    +:+ +:+         +:+     //
+// By: jdebrull <jdebrull@student.42be               +#+  +:+       +#+       //
+//                                                +#+#+#+#+#+   +#+           //
+// Created: 2026/05/15 00:00:00 by jdebrull          #+#    #+#               //
+// Updated: 2026/05/15 00:00:00 by jdebrull        ###   ########.fr          //
+//                                                                            //
+// ************************************************************************** //
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id                 String   @id @default(uuid())
+  email              String   @unique
+  username           String   @unique
+  password_hash      String
+  avatar             String?
+  diamonds           Int      @default(0)
+  tower_progress     Int      @default(0)
+  created_maps_count Int      @default(0)
+  is_admin           Boolean  @default(false)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  maps   Map[]
+  scores Score[]
+}
+
+model Map {
+  id                String   @id @default(uuid())
+  name              String
+  grid_json         String
+  published         Boolean  @default(false)
+  creator_completed Boolean  @default(false)
+  difficulty        String   @default("EASY")
+  play_count        Int      @default(0)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  creator_id        String
+
+  creator User    @relation(fields: [creator_id], references: [id])
+  scores  Score[]
+}
+
+model AdminMap {
+  id          String   @id @default(uuid())
+  order_index Int      @unique
+  name        String
+  grid_json   String
+  created_at  DateTime @default(now())
+}
+
+model Score {
+  id                 String   @id @default(uuid())
+  completion_time_ms Int
+  created_at         DateTime @default(now())
+  user_id            String
+  map_id             String
+
+  user User @relation(fields: [user_id], references: [id])
+  map  Map  @relation(fields: [map_id], references: [id])
+
+  @@index([map_id, completion_time_ms])
+}

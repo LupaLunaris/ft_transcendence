@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(npx prisma *)",
+      "Bash(DATABASE_URL=\"postgresql://ft_user:change_me_in_prod@localhost:5432/ft_transcendence\" npx prisma generate)"
+    ]
+  }
+}

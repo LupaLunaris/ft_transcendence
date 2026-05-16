@@ -1,0 +1,161 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/* api.service.ts                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/* By: jpaulis <jpaulis@student.42belgium.be        +#+  +:+       +#+       */
+/*                                                +#+#+#+#+#+   +#+           */
+/* Created: 2026/05/15 00:00:00 by jpaulis         #+#    #+#               */
+/* Updated: 2026/05/15 00:00:00 by jpaulis        ###   ########.fr          */
+/*                                                                            */
+/* ************************************************************************** */
+
+import type {
+  UserPublic,
+  AuthResponse,
+  MapData,
+  MapSummary,
+  CreateMapRequest,
+  UpdateMapRequest,
+  LoginRequest,
+  RegisterRequest,
+  ApiError,
+  ApiResponse,
+  PaginatedResponse,
+  Grid,
+  Difficulty,
+} from '@ft/shared';
+
+// UpdateProfileRequest isn't in @ft/shared index but lives in user.types
+interface UpdateProfileRequest {
+  username?: string;
+  avatar?: string;
+}
+
+interface TowerLevel {
+  id: string;
+  order_index: number;
+  name: string;
+}
+
+interface TowerLevelFull extends TowerLevel {
+  grid_json: Grid;
+}
+
+interface ScoreEntry {
+  id: string;
+  username: string;
+  completion_time_ms: number;
+  created_at: string;
+}
+
+interface ScoreResult {
+  id: string;
+  map_id: string;
+  user_id: string;
+  completion_time_ms: number;
+  created_at: string;
+}
+
+class ApiService {
+  private readonly baseUrl: string = import.meta.env.VITE_API_URL ?? '/api/v1';
+
+  private async request<T>(method: string, path: string, body?: unknown): Promise<T> {
+    const token = localStorage.getItem('ft_token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${this.baseUrl}${path}`, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+
+    if (res.status === 204) return undefined as T;
+
+    const json: unknown = await res.json();
+
+    if (!res.ok) throw json as ApiError;
+
+    return (json as ApiResponse<T>).data;
+  }
+
+  // Paginated responses are not wrapped in an extra { data: ... } layer
+  private async requestPaginated<T>(path: string): Promise<PaginatedResponse<T>> {
+    const token = localStorage.getItem('ft_token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${this.baseUrl}${path}`, { headers });
+    const json: unknown = await res.json();
+
+    if (!res.ok) throw json as ApiError;
+
+    return json as PaginatedResponse<T>;
+  }
+
+  auth = {
+    register: (req: RegisterRequest): Promise<AuthResponse> =>
+      this.request<AuthResponse>('POST', '/auth/register', req),
+
+    login: (req: LoginRequest): Promise<AuthResponse> =>
+      this.request<AuthResponse>('POST', '/auth/login', req),
+
+    getMe: (): Promise<UserPublic> =>
+      this.request<UserPublic>('GET', '/auth/me'),
+
+    updateProfile: (req: UpdateProfileRequest): Promise<UserPublic> =>
+      this.request<UserPublic>('PUT', '/auth/profile', req),
+  };
+
+  maps = {
+    getPublished: (page = 1, difficulty?: Difficulty): Promise<PaginatedResponse<MapSummary>> => {
+      const params = new URLSearchParams({ page: String(page) });
+      if (difficulty) params.set('difficulty', difficulty);
+      return this.requestPaginated<MapSummary>(`/maps?${params}`);
+    },
+
+    getById: (id: string): Promise<MapData> =>
+      this.request<MapData>('GET', `/maps/${id}`),
+
+    getMine: (): Promise<MapData[]> =>
+      this.request<MapData[]>('GET', '/maps/my'),
+
+    create: (req: CreateMapRequest): Promise<MapData> =>
+      this.request<MapData>('POST', '/maps', req),
+
+    update: (id: string, req: UpdateMapRequest): Promise<MapData> =>
+      this.request<MapData>('PUT', `/maps/${id}`, req),
+
+    delete: (id: string): Promise<void> =>
+      this.request<void>('DELETE', `/maps/${id}`),
+
+    markComplete: (id: string): Promise<MapData> =>
+      this.request<MapData>('POST', `/maps/${id}/complete`),
+
+    publish: (id: string): Promise<MapData> =>
+      this.request<MapData>('POST', `/maps/${id}/publish`),
+  };
+
+  tower = {
+    getList: (): Promise<TowerLevel[]> =>
+      this.request<TowerLevel[]>('GET', '/tower'),
+
+    getLevel: (order_index: number): Promise<TowerLevelFull> =>
+      this.request<TowerLevelFull>('GET', `/tower/${order_index}`),
+  };
+
+  scores = {
+    submit: (map_id: string, time_ms: number): Promise<ScoreResult> =>
+      this.request<ScoreResult>('POST', '/scores', {
+        map_id,
+        completion_time_ms: time_ms,
+      }),
+
+    getLeaderboard: (map_id: string): Promise<ScoreEntry[]> =>
+      this.request<ScoreEntry[]>('GET', `/scores/leaderboard/${map_id}`),
+  };
+}
+
+export const api = new ApiService();
+export type { UpdateProfileRequest, TowerLevel, TowerLevelFull, ScoreEntry, ScoreResult };
