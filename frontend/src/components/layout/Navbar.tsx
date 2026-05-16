@@ -23,7 +23,7 @@ const NAV_LINKS = [
 ];
 
 export function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -56,7 +56,7 @@ export function Navbar() {
 
         {/* Desktop right side */}
         <div className="hidden md:flex items-center gap-3">
-          {user ? (
+          {!loading && (user ? (
             <>
               <Link
                 to="/profile"
@@ -84,7 +84,7 @@ export function Navbar() {
                 <Button variant="primary" size="sm">Inscription</Button>
               </Link>
             </>
-          )}
+          ))}
         </div>
 
         {/* Mobile burger */}
@@ -107,7 +107,7 @@ export function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden border-t border-surface-border bg-surface px-4 py-3 flex flex-col gap-3">
-          {user ? (
+          {!loading && (user ? (
             <>
               {NAV_LINKS.map(({ to, label }) => (
                 <NavLink
@@ -136,7 +136,7 @@ export function Navbar() {
                 <Button variant="primary" size="sm">Inscription</Button>
               </Link>
             </div>
-          )}
+          ))}
         </div>
       )}
     </nav>

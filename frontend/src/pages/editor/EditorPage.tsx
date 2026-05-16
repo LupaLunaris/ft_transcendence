@@ -42,6 +42,8 @@ export function EditorPage() {
   const [selectedTile, setSelectedTile] = useState<TileValue>(TILE.WALL);
   const [mapName, setMapName] = useState('');
   const [mapId, setMapId] = useState<string | null>(id ?? null);
+  const [creatorCompleted, setCreatorCompleted] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
   const [loadingMap, setLoadingMap] = useState(!!id);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -56,6 +58,8 @@ export function EditorPage() {
         setGrid(map.grid);
         setMapName(map.name);
         setMapId(map.id);
+        setCreatorCompleted(map.creator_completed);
+        setIsPublished(map.published);
       })
       .catch(() => showToast('Impossible de charger la map', 'error'))
       .finally(() => setLoadingMap(false));
@@ -106,7 +110,8 @@ export function EditorPage() {
     setShowPublishModal(false);
     try {
       await api.maps.publish(mapId);
-      showToast('Map publiée !', 'success');
+      setIsPublished(true);
+      showToast('Map publiée ! Elle est désormais accessible dans S\'entraîner.', 'success');
     } catch (err) {
       const msg = err && typeof err === 'object' && 'error' in err
         ? String((err as { error: string }).error)
@@ -139,14 +144,19 @@ export function EditorPage() {
     <Layout>
       <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col gap-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <h1 className="text-2xl font-semibold font-fantasy text-white tracking-wide">
-            {mapId ? 'Modifier la map' : 'Nouvelle map'}
+          <h1 className="text-2xl font-semibold font-fantasy text-white tracking-wide flex items-center gap-3">
+            {mapId ? (isPublished ? 'Map publiée' : 'Modifier la map') : 'Nouvelle map'}
+            {isPublished && (
+              <span className="text-xs font-sans font-medium bg-deep-600 text-deep-200 px-2 py-0.5 rounded-full">
+                ✓ publiée
+              </span>
+            )}
           </h1>
           <div className="flex gap-2 flex-wrap">
-            <Button variant="secondary" size="sm" onClick={handleTest} disabled={!mapId}>
+            <Button variant="secondary" size="sm" onClick={handleTest} disabled={!mapId || isPublished}>
               🎮 Tester
             </Button>
-            <Button variant="secondary" size="sm" onClick={handleSave} loading={saving}>
+            <Button variant="secondary" size="sm" onClick={handleSave} loading={saving} disabled={isPublished}>
               💾 Sauvegarder
             </Button>
             <Button
@@ -154,9 +164,14 @@ export function EditorPage() {
               size="sm"
               onClick={() => setShowPublishModal(true)}
               loading={publishing}
-              disabled={!mapId}
+              disabled={!mapId || !creatorCompleted || isPublished}
+              title={
+                isPublished ? 'Map déjà publiée' :
+                !creatorCompleted ? 'Teste ta map d\'abord pour pouvoir la publier' :
+                undefined
+              }
             >
-              🚀 Publier
+              🚀 {isPublished ? 'Publiée' : 'Publier'}
             </Button>
           </div>
         </div>
@@ -179,7 +194,7 @@ export function EditorPage() {
             <EditorGrid
               grid={grid}
               selectedTile={selectedTile}
-              onTileClick={setTile}
+              onTileClick={isPublished ? () => {} : setTile}
             />
           </div>
         </div>

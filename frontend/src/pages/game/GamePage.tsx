@@ -35,9 +35,19 @@ export function GamePage() {
       } catch {
         showToast('Score non enregistré', 'error');
       }
-      navigate('/train');
+      // Creator completing their own map: mark it done and return to editor to publish
+      if (map && user && map.creator_id === user.id) {
+        try {
+          await api.maps.markComplete(map_id);
+        } catch {
+          // Silently ignore — map may already be marked complete
+        }
+        navigate(`/editor/${map_id}`);
+      } else {
+        navigate('/train');
+      }
     },
-    [map_id, navigate, showToast],
+    [map_id, map, user, navigate, showToast],
   );
 
   if (loading) {

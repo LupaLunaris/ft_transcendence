@@ -39,7 +39,7 @@ export function EditorGrid({ grid, onTileClick }: EditorGridProps) {
       className="inline-block border border-surface-border rounded overflow-hidden cursor-crosshair select-none"
       style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
+        gridTemplateColumns: `repeat(${GRID_SIZE}, 22px)`,
         gap: 0,
       }}
       // Prevent context menu on right-click drag

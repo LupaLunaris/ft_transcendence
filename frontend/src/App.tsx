@@ -13,6 +13,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { ToastProvider } from '@/components/ui/useToast';
+import { ToastContainer } from '@/components/ui/Toast';
 import { AuthProvider, useAuth } from '@/context/auth.context';
 import { Spinner } from '@/components/ui/Spinner';
 
@@ -74,6 +75,7 @@ export default function App() {
           <AppRoutes />
         </BrowserRouter>
       </AuthProvider>
+      <ToastContainer />
     </ToastProvider>
   );
 }

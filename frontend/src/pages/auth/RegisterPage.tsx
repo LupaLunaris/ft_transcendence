@@ -16,10 +16,11 @@ import { useAuth } from '@/context/auth.context';
 import { useToast } from '@/components/ui/useToast';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Spinner } from '@/components/ui/Spinner';
 import type { ApiError } from '@ft/shared';
 
 export function RegisterPage() {
-  const { user, register } = useAuth();
+  const { user, register, loading: authLoading } = useAuth();
   const { showToast } = useToast();
 
   const [username, setUsername] = useState('');
@@ -29,6 +30,12 @@ export function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  if (authLoading)
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <Spinner size="lg" className="text-deep-400" />
+      </div>
+    );
   if (user) return <Navigate to="/" replace />;
 
   const validate = (): boolean => {

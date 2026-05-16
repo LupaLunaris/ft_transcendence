@@ -16,16 +16,23 @@ import { useAuth } from '@/context/auth.context';
 import { useToast } from '@/components/ui/useToast';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Spinner } from '@/components/ui/Spinner';
 import type { ApiError } from '@ft/shared';
 
 export function LoginPage() {
-  const { user, login } = useAuth();
+  const { user, login, loading: authLoading } = useAuth();
   const { showToast } = useToast();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  if (authLoading)
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <Spinner size="lg" className="text-deep-400" />
+      </div>
+    );
   if (user) return <Navigate to="/" replace />;
 
   const handleSubmit = async (e: FormEvent) => {
