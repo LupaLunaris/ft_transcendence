@@ -35,6 +35,7 @@ function toUserPublic(user: User): UserPublic {
     diamonds: user.diamonds,
     tower_progress: user.tower_progress,
     created_maps_count: user.created_maps_count,
+    is_admin: user.is_admin,
     created_at: user.created_at.toISOString(),
   };
 }
@@ -46,6 +47,13 @@ function signToken(user: User): string {
     { expiresIn: (process.env.JWT_EXPIRES_IN ?? '7d') as jwt.SignOptions['expiresIn'] },
   );
 }
+
+const ADMIN_EMAILS = [
+  'malafont@student.42belgium.be',
+  'jdebrull@student.42belgium.be',
+  'jpaulis@student.42belgium.be',
+  'evan-dro@student.42belgium.be',
+];
 
 // POST /api/v1/auth/register
 router.post('/register', validateBody(registerSchema), async (req: Request, res: Response) => {
@@ -62,9 +70,10 @@ router.post('/register', validateBody(registerSchema), async (req: Request, res:
   }
 
   const password_hash = await bcrypt.hash(password, 12);
+  const is_admin = ADMIN_EMAILS.includes(email);
 
   const user = await prisma.user.create({
-    data: { email, username, password_hash },
+    data: { email, username, password_hash, is_admin },
   });
 
   const response: AuthResponse = { user: toUserPublic(user), token: signToken(user) };
