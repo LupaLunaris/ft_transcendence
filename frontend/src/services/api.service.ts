@@ -6,7 +6,7 @@
 /* By: jpaulis <jpaulis@student.42belgium.be        +#+  +:+       +#+       */
 /*                                                +#+#+#+#+#+   +#+           */
 /* Created: 2026/05/15 00:00:00 by jpaulis         #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jpaulis        ###   ########.fr          */
+/* Updated: 2026/05/17 00:00:00 by jpaulis        ###   ########.fr          */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,8 @@ import type {
   PaginatedResponse,
   Grid,
   Difficulty,
+  UpdateProfileRequest,
 } from '@ft/shared';
-
-// UpdateProfileRequest isn't in @ft/shared index but lives in user.types
-interface UpdateProfileRequest {
-  username?: string;
-  avatar?: string;
-}
 
 interface TowerLevel {
   id: string;
@@ -40,6 +35,14 @@ interface TowerLevel {
 
 interface TowerLevelFull extends TowerLevel {
   grid_json: Grid;
+}
+
+interface AdminMap {
+  id: string;
+  order_index: number;
+  name: string;
+  grid_json: Grid;
+  created_at: string;
 }
 
 interface ScoreEntry {
@@ -143,6 +146,20 @@ class ApiService {
 
     getLevel: (order_index: number): Promise<TowerLevelFull> =>
       this.request<TowerLevelFull>('GET', `/tower/${order_index}`),
+
+    complete: (order_index: number): Promise<{ tower_progress: number; diamonds: number }> =>
+      this.request<{ tower_progress: number; diamonds: number }>('POST', `/tower/${order_index}/complete`),
+  };
+
+  admin = {
+    getTowerLevels: (): Promise<AdminMap[]> =>
+      this.request<AdminMap[]>('GET', '/admin/tower'),
+
+    updateTowerLevel: (
+      order_index: number,
+      data: { name?: string; grid_json?: string },
+    ): Promise<AdminMap> =>
+      this.request<AdminMap>('PUT', `/admin/tower/${order_index}`, data),
   };
 
   scores = {
@@ -158,4 +175,4 @@ class ApiService {
 }
 
 export const api = new ApiService();
-export type { UpdateProfileRequest, TowerLevel, TowerLevelFull, ScoreEntry, ScoreResult };
+export type { UpdateProfileRequest, TowerLevel, TowerLevelFull, AdminMap, ScoreEntry, ScoreResult };
