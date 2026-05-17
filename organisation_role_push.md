@@ -173,6 +173,27 @@
 
 ---
 
+### Jeremy — `jdebrull`
+*Backend — Mode tour admin : middleware, routes admin, seed*
+
+#### Jour 3 — 2026/05/17 — Admin middleware + routes admin tour + seed 8 niveaux + completion tour
+> **Étape bloquante :** `adminMiddleware` doit être chaîné APRÈS `authMiddleware` — si l'ordre est inversé, `req.user` n'est pas encore peuplé et le check `is_admin` retourne toujours `false`.
+> **Étape bloquante :** `prisma.user.update` avec `diamonds: { increment: 1 }` — opération atomique Prisma, nécessite que le champ soit de type `Int` (non-optionnel) dans le schéma pour éviter une erreur de type au runtime.
+
+| Fichier | Description |
+|---------|-------------|
+| `backend/src/middleware/admin.middleware.ts` | Vérifie `req.user.is_admin === true`, retourne 403 sinon |
+| `backend/src/routes/admin.routes.ts` | `GET /admin/tower` (8 niveaux complets) + `PUT /admin/tower/:idx` (upsert + validation grille) |
+| `backend/src/routes/tower.routes.ts` | Ajout `POST /:order_index/complete` — vérifie séquence, incrémente `tower_progress` + `diamonds` |
+| `backend/src/routes/auth.routes.ts` | Auto-promotion `is_admin` à la création si email dans `ADMIN_EMAILS` |
+| `backend/src/routes/index.ts` | Ajout du router `/admin` |
+| `backend/prisma/seed-tower.ts` | Seed 8 AdminMap avec grilles 25×25 valides (BFS garanti, noms thématiques) |
+| `backend/src/__tests__/admin.middleware.test.ts` | 3 tests unitaires middleware admin |
+| `backend/src/__tests__/admin.routes.test.ts` | 8 tests routes admin (GET + PUT, auth, validation grille) |
+| `backend/src/__tests__/tower.complete.test.ts` | 7 tests POST complete (séquence, limites, diamants) |
+
+---
+
 ### Martin — `malafont`
 *Phaser 3, jeu, éditeur*
 
@@ -187,3 +208,54 @@
 | `frontend/src/pages/game/GamePage.tsx` | Fetch map → spinner → GameCanvas → submit score → navigate |
 | `frontend/src/pages/game/RacePage.tsx` | Stub sprint 4 |
 | `frontend/src/pages/editor/EditorPage.tsx` | State grille + nom, save/update/publish avec Modal de confirmation |
+
+---
+
+### Jenifer — `jpaulis`
+*Application React — routing, services, contexte*
+
+#### Jour 4 — 2026/05/17 — Mode tour admin frontend + TowerPage + TowerGamePage + modal
+> **Étape bloquante :** `is_admin` absent de `UserPublic` côté shared — le champ existait en base (Prisma) et dans le JWT, mais n'était ni sérialisé dans `toUserPublic()` ni présent dans l'interface TypeScript. La condition `user?.is_admin` dans EditorPage retournait toujours `undefined` sans ce patch.
+> **Étape bloquante :** Route `/play/tower/:order_index` doit être déclarée AVANT `/play/:map_id` dans App.tsx — React Router mappe par ordre de déclaration, et sans ce positionnement le segment `"tower"` était interprété comme un `map_id`.
+> **Étape bloquante :** `api.tower.complete()` retourne 403 sur un niveau déjà complété (replay) — `TowerGamePage` doit attraper l'erreur et naviguer vers `/tower` sans afficher le modal, sinon l'utilisateur se retrouve bloqué.
+
+| Fichier | Description |
+|---------|-------------|
+| `shared/src/types/user.types.ts` | Ajout `is_admin: boolean` dans `UserPublic` |
+| `frontend/src/services/api.service.ts` | Interface `AdminMap`, namespace `admin` (`getTowerLevels`, `updateTowerLevel`), `tower.complete` |
+| `frontend/src/App.tsx` | Route protégée `/play/tower/:order_index` → `TowerGamePage` (déclarée avant `/play/:map_id`) |
+
+---
+
+### Elise — `evan-dro`
+*Composants UI — modal tour*
+
+#### Jour 4 — 2026/05/17 — CongratulatoryModal
+
+| Fichier | Description |
+|---------|-------------|
+| `frontend/src/components/tower/CongratulatoryModal.tsx` | Modal de félicitations : compteur diamants animé, bouton niveau suivant / accueil |
+
+---
+
+### Martin — `malafont`
+*Pages jeu + éditeur admin*
+
+#### Jour 4 — 2026/05/17 — TowerGamePage + TowerPage + mode admin EditorPage
+
+| Fichier | Description |
+|---------|-------------|
+| `frontend/src/pages/game/TowerGamePage.tsx` | Charge niveau tour, GameCanvas, `tower.complete` → `updateUser()` → `CongratulatoryModal` |
+| `frontend/src/pages/TowerPage.tsx` | 8 cases numérotées (complété ✓, débloqué, verrouillé 🔒), barre de progression |
+| `frontend/src/pages/editor/EditorPage.tsx` | Mode Admin : panneau 8 niveaux, chargement admin levels, save niveau admin, masque Publier |
+
+---
+
+### Jeremy — `jdebrull`
+*Backend — sérialisation is_admin*
+
+#### Jour 4 — 2026/05/17 — toUserPublic() + is_admin
+
+| Fichier | Description |
+|---------|-------------|
+| `backend/src/routes/auth.routes.ts` | `toUserPublic()` inclut désormais `is_admin` dans la réponse sérialisée |

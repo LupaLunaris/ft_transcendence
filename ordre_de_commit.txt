@@ -1,3 +1,5 @@
+
+
 # ═══════════════════════════════════════════════════════════════
 # ÉTAPE 1 — Scaffold
 # ═══════════════════════════════════════════════════════════════
@@ -153,6 +155,69 @@ git commit -m "feat(frontend): add EditorPage with save and publish flow_mar"
 
 
 # ═══════════════════════════════════════════════════════════════
+# ÉTAPE 4.5 — Mode Tour Admin
+# ═══════════════════════════════════════════════════════════════
+
+# ── Correction — build shared automatique ────────────────────
+
+git add package.json
+git commit -m "chore(root): add concurrently and prebuild script for shared_jer"
+
+# ── Backend — Jour 3 (jdebrull) ──────────────────────────────
+
+git add backend/prisma/schema.prisma
+git commit -m "feat(prisma): ensure grid_json as String type and add score perf index_jer"
+
+git add backend/src/middleware/admin.middleware.ts \
+  backend/src/__tests__/admin.middleware.test.ts
+git commit -m "feat(backend): add admin middleware with is_admin check_jer"
+
+git add backend/src/routes/admin.routes.ts \
+  backend/src/__tests__/admin.routes.test.ts
+git commit -m "feat(backend): add admin tower GET and PUT routes with grid validation_jer"
+
+git add backend/prisma/seed-tower.ts
+git commit -m "feat(prisma): add seed-tower with 8 themed admin maps_jer"
+
+git add backend/src/routes/tower.routes.ts \
+  backend/src/__tests__/tower.complete.test.ts
+git commit -m "feat(backend): add tower complete route with progression and diamonds_jer"
+
+git add backend/src/routes/auth.routes.ts \
+  backend/src/routes/index.ts
+git commit -m "feat(backend): add auto-admin promotion and is_admin in toUserPublic_jer"
+
+# ── Shared types — Jour 4 (jpaulis) ─────────────────────────
+
+git add shared/src/types/user.types.ts
+git commit -m "feat(shared): add is_admin field to UserPublic_jen"
+
+# ── Frontend — Jour 4 (jpaulis) ──────────────────────────────
+
+git add frontend/src/services/api.service.ts
+git commit -m "feat(frontend): add admin namespace and tower.complete to api service_jen"
+
+git add frontend/src/App.tsx
+git commit -m "feat(frontend): declare tower route before play for correct matching_jen"
+
+# ── Frontend — Jour 4 (evan-dro) ─────────────────────────────
+
+git add frontend/src/components/tower/CongratulatoryModal.tsx
+git commit -m "feat(frontend): add CongratulatoryModal with animated diamond counter_eli"
+
+# ── Frontend — Jour 4 (malafont) ─────────────────────────────
+
+git add frontend/src/pages/game/TowerGamePage.tsx
+git commit -m "feat(frontend): add TowerGamePage with complete and congratulatory flow_mar"
+
+git add frontend/src/pages/TowerPage.tsx
+git commit -m "feat(frontend): update TowerPage with 8 levels and progress tracking_mar"
+
+git add frontend/src/pages/editor/EditorPage.tsx
+git commit -m "feat(frontend): add admin mode to EditorPage with level management_mar"
+
+
+# ═══════════════════════════════════════════════════════════════
 # ÉTAPE 5 — Multiplayer Socket.IO
 # ⚠️  Ces fichiers n'existent pas encore — commandes à exécuter
 #     après implémentation. Les chemins sont conventionnels.
@@ -244,3 +309,21 @@ git add history_debug/2026-05-16_carte-perdue-et-non-publiable.md \
   history_debug/2026-05-16_login-400-toast-invisible.md
 git commit -m "docs(root): add debug history for 2026-05-16 bug fixes_mar"
 
+git add history_debug/2026-05-17_mode-tour-admin-backend.md \
+  history_debug/2026-05-17_mode-tour-admin-frontend.md
+git commit -m "docs(root): add debug history for 2026-05-17 tour admin session_jer"
+
+git add background_doc/backend_middleware_express.md \
+  background_doc/backend_prisma_seed_grilles.md \
+  background_doc/frontend_contexte_auth_tour.md
+git commit -m "docs(root): add background documentation for middleware and auth tour_jer"
+
+git add probleme_rencontre/corrections.md \
+  probleme_rencontre/schema_prisma.md
+git commit -m "docs(root): add troubleshooting notes for corrections and schema_jer"
+
+git add CLAUDE.md CONTEXT.md
+git commit -m "docs(root): add CLAUDE.md and CONTEXT.md for session context_jer"
+
+git add ordre_de_commit.txt organisation_role_push.md
+git commit -m "docs(root): update commit order and organisation documentation_jer"
