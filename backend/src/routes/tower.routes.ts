@@ -59,4 +59,41 @@ router.get('/:order_index', authMiddleware, async (req: Request, res: Response) 
   sendSuccess(res, { ...level, grid_json: JSON.parse(level.grid_json) });
 });
 
+// POST /api/v1/tower/:order_index/complete — validate level completion
+router.post('/:order_index/complete', authMiddleware, async (req: Request, res: Response) => {
+  const orderIndex = parseInt(req.params.order_index, 10);
+
+  if (isNaN(orderIndex) || orderIndex < 1) {
+    sendError(res, 'Invalid level index', 400);
+    return;
+  }
+
+  if (orderIndex > 8) {
+    sendError(res, 'Tower only has 8 levels', 400);
+    return;
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+
+  if (!user) {
+    sendError(res, 'User not found', 404);
+    return;
+  }
+
+  if (orderIndex !== user.tower_progress + 1) {
+    sendError(res, 'You must complete levels in order', 403);
+    return;
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      tower_progress: orderIndex,
+      diamonds: { increment: 1 },
+    },
+  });
+
+  sendSuccess(res, { tower_progress: updated.tower_progress, diamonds: updated.diamonds });
+});
+
 export default router;
