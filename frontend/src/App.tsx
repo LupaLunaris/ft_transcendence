@@ -6,7 +6,7 @@
 /* By: jpaulis <jpaulis@student.42belgium.be        +#+  +:+       +#+       */
 /*                                                +#+#+#+#+#+   +#+           */
 /* Created: 2026/05/15 00:00:00 by jpaulis         #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jpaulis        ###   ########.fr          */
+/* Updated: 2026/05/17 00:00:00 by jpaulis        ###   ########.fr          */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ import { TowerPage }     from '@/pages/TowerPage';
 import { EditorPage }    from '@/pages/editor/EditorPage';
 import { GamePage }      from '@/pages/game/GamePage';
 import { RacePage }      from '@/pages/game/RacePage';
+import { TowerGamePage } from '@/pages/game/TowerGamePage';
 import { NotFoundPage }  from '@/pages/NotFoundPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -58,8 +59,9 @@ function AppRoutes() {
       <Route path="/editor/:id"       element={<ProtectedRoute><EditorPage /></ProtectedRoute>} />
       <Route path="/train"            element={<ProtectedRoute><TrainingPage /></ProtectedRoute>} />
       <Route path="/tower"            element={<ProtectedRoute><TowerPage /></ProtectedRoute>} />
-      <Route path="/play/:map_id"     element={<ProtectedRoute><GamePage /></ProtectedRoute>} />
-      <Route path="/play/:map_id/race" element={<ProtectedRoute><RacePage /></ProtectedRoute>} />
+      <Route path="/play/tower/:order_index" element={<ProtectedRoute><TowerGamePage /></ProtectedRoute>} />
+      <Route path="/play/:map_id"            element={<ProtectedRoute><GamePage /></ProtectedRoute>} />
+      <Route path="/play/:map_id/race"       element={<ProtectedRoute><RacePage /></ProtectedRoute>} />
 
       {/* 404 */}
       <Route path="*" element={<NotFoundPage />} />
