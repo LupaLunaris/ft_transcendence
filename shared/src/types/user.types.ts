@@ -6,7 +6,7 @@
 /* By: jpaulis <jpaulis@student.42be                 +#+  +:+       +#+       */
 /*                                                +#+#+#+#+#+   +#+           */
 /* Created: 2026/05/15 00:00:00 by jpaulis           #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jpaulis         ###   ########.fr          */
+/* Updated: 2026/05/17 00:00:00 by jpaulis         ###   ########.fr          */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ export interface UserPublic {
   diamonds: number;
   tower_progress: number;
   created_maps_count: number;
+  is_admin: boolean;
   created_at: string;
 }
 
