@@ -23,7 +23,7 @@
 
 ### Martin — `malafont`
 *Infrastructure, configuration projet & DevOps*
-*A REDISTRIBUER*]\
+*A REDISTRIBUER*\
 
 #### Commit 1 — 2026-05-13 15:43:57
 | Fichier | Description |

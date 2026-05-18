@@ -15,11 +15,11 @@ import { useAuth } from '@/context/auth.context';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 
-const LORE = `Dans les abysses oubliées des mers du Nord, des guildes rivales s'affrontent pour
-la maîtrise des Donjons des Profondeurs. Chaque aventurier construit ses propres
-labyrinthes et défie ses rivaux à les traverser plus vite que lui. Seul celui qui
-connaît parfaitement ses propres couloirs peut prétendre au titre de Maître des
-Profondeurs.`;
+const LORE = `Quelque part sous la terre, dans des mines oubliées, une résistance s'est formée.
+D'anciens mineurs et bâtisseurs t'ont recueilli et t'entraînent dans leurs labyrinthes
+pour faire de toi un vrai aventurier. Ton but : gravir la tour et affronter la sorcière
+Meduza qui règne sur les profondeurs. Apprends à construire tes propres couloirs,
+entraîne-toi, et prépare-toi à l'ascension.`;
 
 export function HomePage() {
   const { user } = useAuth();

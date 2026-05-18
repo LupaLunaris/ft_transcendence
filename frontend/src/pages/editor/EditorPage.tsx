@@ -25,13 +25,17 @@ import { EditorGrid } from '@/components/editor/EditorGrid';
 import { TileSelector } from '@/components/editor/TileSelector';
 
 function makeEmptyGrid(): Grid {
-  return Array.from({ length: GRID_SIZE }, (_, row) =>
+  const grid = Array.from({ length: GRID_SIZE }, (_, row) =>
     Array.from({ length: GRID_SIZE }, (__, col) => {
       if (row === 0 || row === GRID_SIZE - 1 || col === 0 || col === GRID_SIZE - 1)
-        return TILE.WALL;
-      return TILE.EMPTY;
+        return TILE.WALL as TileValue;
+      return TILE.EMPTY as TileValue;
     }),
   ) as Grid;
+  // validateGrid requires exactly 1 SPAWN and 1 EXIT — mirror backend defaults
+  grid[1][1] = TILE.SPAWN;
+  grid[GRID_SIZE - 2][GRID_SIZE - 2] = TILE.EXIT;
+  return grid;
 }
 
 export function EditorPage() {
@@ -51,8 +55,9 @@ export function EditorPage() {
   const [publishing, setPublishing] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
 
-  // Admin mode state
-  const [adminMode, setAdminMode] = useState(false);
+  // Admin mode — initialized directly from user.is_admin (ProtectedRoute guarantees user
+  // is non-null at mount time, so no extra render cycle is needed)
+  const [adminMode, setAdminMode] = useState(() => !!user?.is_admin);
   const [adminLevels, setAdminLevels] = useState<AdminMap[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [loadingAdminLevels, setLoadingAdminLevels] = useState(false);
@@ -114,10 +119,13 @@ export function EditorPage() {
           name: mapName || `Niveau ${selectedLevel}`,
           grid_json: JSON.stringify(grid),
         });
-        // Sync local cache
-        setAdminLevels((prev) =>
-          prev.map((l) => (l.order_index === selectedLevel ? updated : l)),
-        );
+        // Sync local cache — upsert: replace if exists, append if new
+        setAdminLevels((prev) => {
+          const exists = prev.some((l) => l.order_index === selectedLevel);
+          return exists
+            ? prev.map((l) => (l.order_index === selectedLevel ? updated : l))
+            : [...prev, updated].sort((a, b) => a.order_index - b.order_index);
+        });
         showToast(`Niveau ${selectedLevel} sauvegardé !`, 'success');
       } catch (err) {
         const msg = err && typeof err === 'object' && 'error' in err
@@ -203,7 +211,7 @@ export function EditorPage() {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <h1 className="text-2xl font-semibold font-fantasy text-white tracking-wide flex items-center gap-3">
             {adminMode
-              ? `Éditeur admin${selectedLevel ? ` — Niveau ${selectedLevel}` : ''}`
+              ? `Éditeur admin${selectedLevel !== null ? ` — Niveau ${selectedLevel}` : ''}`
               : mapId ? (isPublished ? 'Map publiée' : 'Modifier la map') : 'Nouvelle map'}
             {!adminMode && isPublished && (
               <span className="text-xs font-sans font-medium bg-deep-600 text-deep-200 px-2 py-0.5 rounded-full">

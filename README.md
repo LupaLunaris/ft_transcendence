@@ -1,58 +1,102 @@
 # ft_transcendence — Guilds of the Deep
 
-*This project has been created as part of the 42 curriculum by [martin_login], [jerem_login], [jennifer_login], [elise_login].*
+*This project has been created as part of the 42 curriculum by malafont, jdebrull, jpaulis, evan-dro.*
 
 ## Description
 
-A real-time multiplayer Pong game with a deep-sea fantasy theme, built for the 42 School ft_transcendence project.
+The game targets players under 15 years old.
+
+Core pillars:
+
+- exploration
+- labyrinth creation
+- progression
+- multiplayer races
+- community-created maps
+
+The player is an adventurer rescued by a resistance made of former miners and builders. They train the player inside labyrinths before attempting to climb the tower controlled by the witch Meduza.
 Players join guilds, climb leaderboards, and compete in ranked matches — all playable in the browser with no installation required.
 
 ## Quick Start
 
 ```bash
-# 1. Copy environment variables and fill in your values
-cp .env.example .env
-
-# 2. Build and start all services (postgres + backend + frontend)
-docker-compose up --build
-
-# Frontend → http://localhost:5173
-# Backend  → http://localhost:3001
-# API health →;ake
-```
-
-### Local development (without Docker)
-
-```bash
-# Install all workspace dependencies from the root
+# 1. Install all workspace dependencies
 npm install
 
-# Run backend + frontend in parallel
+# 2. Set up backend environment variables
+cp backend/.env.example backend/.env
+
+# 3. Generate Prisma client + create/migrate SQLite database
+npm run db:generate --workspace=backend
+npm run db:migrate --workspace=backend
+
+# 4. (optional) Seed the DB with test users
+npm run db:seed --workspace=backend
+
+# 5. Build and start backend + frontend in parallel
 npm run dev
 ```
 
-> The backend requires a running PostgreSQL instance. Set `DATABASE_URL` in your `.env` accordingly.
+Frontend → http://localhost:5173  
+Backend  → http://localhost:3001
+
+### Makefile shortcuts (from repo root)
+
+```bash
+make start         # install + build shared + dev (recommended entry point)
+make dev           # backend + frontend in parallel
+make test          # all tests (backend then frontend)
+make db-migrate    # apply pending Prisma migrations
+make db-seed       # insert test users + AdminMap
+make db-studio     # open Prisma Studio in browser
+make docker-up     # build + start all services via Docker (PostgreSQL mode)
+make help          # list all available commands
+```
+
+### Docker mode (PostgreSQL)
+
+Create a `.env` at the **repo root** (see `README_install_and_start.md` for required variables), then:
+
+```bash
+make docker-up
+```
+
+| Service    | URL              |
+|------------|-----------------|
+| Frontend   | http://localhost:5173 |
+| Backend    | http://localhost:3001 |
+| PostgreSQL | localhost:5432   |
+
+> See [README_install_and_start.md](README_install_and_start.md) for the full reference (env vars, workspace commands, common issues).
 
 ## Team
 
 | Role | Member | Login | Responsibilities |
 |---|---|---|---|
-| PO + Gameplay | Martin | [martin_login] | Phaser game scenes, game logic |
-| PM + Backend/Security | Jerem | [jerem_login] | Express API, auth, Socket.IO, Prisma |
-| Tech Lead + Frontend | Jennifer | [jennifer_login] | Architecture, hooks, shared types, Vite |
-| UI Lead | Élise | [elise_login] | Components, Tailwind design system |
+| PO + Gameplay | Martin | malafont | Phaser game scenes, game logic, map editor |
+| PM + Backend | Jerem | jdebrull | Express API, auth, Socket.IO, Prisma |
+| Tech Lead + Frontend | Jennifer | jpaulis | Architecture, hooks, shared types, Vite |
+| UI Lead | Élise | evan-dro | Components, Tailwind design system |
 
 ## Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18 + TypeScript, Vite 5, Tailwind CSS 3 |
-| Game engine | Phaser 3 |
-| Realtime | Socket.IO 4 |
+| Frontend | React 18 + TypeScript, Vite 8, Tailwind CSS |
+| Game engine | Phaser 3.80 |
+| Realtime | Socket.IO 4.7 |
 | Backend | Node.js + Express 4 + TypeScript |
-| Database | PostgreSQL 16 via Prisma 5 |
-| Auth | JWT (jsonwebtoken) + bcrypt |
-| Infrastructure | Docker + docker-compose |
+| Database | SQLite via Prisma 5 (PostgreSQL in Docker mode) |
+| Auth | JWT (ft_token in localStorage, Bearer header) |
+| Tests | Vitest (frontend) + Jest 30 (backend) |
+
+## Project Status
+
+| Step | Feature | Status |
+|------|---------|--------|
+| 1–4 | Auth, user management, map editor, tower mode | Done |
+| 5 | Socket.IO multiplayer race | To do |
+| — | Admin editor + full tower mode | To do |
 
 ## Modules
 
@@ -60,6 +104,6 @@ npm run dev
 - **Major** — Standard user management, authentication, users across tournaments
 - **Major** — Implementing a remote player (Socket.IO multiplayer)
 - **Minor** — Use a front-end framework or toolkit (React)
-- **Minor** — Use a database for the backend (PostgreSQL + Prisma)
-- **Minor** — Game customisation options (power-ups, maps, difficulty)
+- **Minor** — Use a database for the backend (SQLite + Prisma)
+- **Minor** — Game customisation options (maps, difficulty)
 - **Minor** — Expanding Browser Compatibility (Vite build, modern ES target)

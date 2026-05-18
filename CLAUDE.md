@@ -58,4 +58,55 @@ Les emails suivants ont is_admin=true automatiquement à la création de compte 
 - Étape 5 (Socket.IO race) : à faire
 - Éditeur admin + mode tour complet : à faire
 
+## Documentation de session (obligatoire en fin de conversation)
 
+### history_debug — journal de debug
+Après chaque conversation, créer un fichier dans `history_debug/` si des bugs
+ont été rencontrés ou des corrections effectuées.
+
+Format du nom : `YYYY-MM-DD_sujet-kebab-case.md`
+
+Structure du fichier :
+```
+# Debug history — YYYY-MM-DD : <Titre>
+
+## Contexte
+<Résumé de la session en 2-3 lignes>
+
+---
+
+## Problème N — <Titre court>
+
+### Symptôme
+<Ce que l'utilisateur observait>
+
+### Cause
+<Pourquoi ça arrivait — fichier et ligne si possible>
+
+### Fix
+<Ce qui a été changé, avec extrait de code si utile>
+
+### Fichiers impliqués
+- `chemin/vers/fichier.ts`
+
+---
+
+## Notes architecture
+<Invariants ou comportements non évidents découverts pendant la session>
+```
+
+### backend_doc / frontend_doc — documentation technique de référence
+Compléter `backend_doc/` et `frontend_doc/` au fil des sessions.
+Créer `frontend_doc/` s'il n'existe pas encore.
+
+Modèle appliqué (voir `backend_doc/cycle-de-vie-map.md` et
+`background_doc/backend_middleware_express.md`) :
+- Un fichier par concept ou sous-système (`auth-flow.md`, `socket-events.md`, etc.)
+- Structure : titre → stack concernée → schéma ASCII ou code → explication
+  des invariants → tableau des cas limites si utile
+- Jamais de prose inutile : chaque phrase doit apporter une information
+  qu'on ne peut pas déduire en lisant le code
+- Mettre à jour le fichier existant plutôt qu'en créer un doublon
+
+## context
+mets a jour le fichier context.md entre chaque prompt si pertinent.
