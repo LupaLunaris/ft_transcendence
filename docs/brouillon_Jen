@@ -1,0 +1,30 @@
+Vite
+= outil qui prépare automatiquement un projet React moderne.
+
+Il crée :
+React
+TypeScript
+package.json
+config
+scripts
+build system
+
+Sans ça :
+React ne peut pas démarrer
+npm ne sait pas quoi installer
+le projet frontend n’existe techniquement pas encore
+
+
+
+
+npm run dev
+veut dire :
+“démarre le frontend en mode développement”
+
+
+Vite
+surveille les fichiers.
+Quand tu modifies un fichier :
+le navigateur se met à jour automatiquement.
+
+

@@ -20,7 +20,7 @@ export default function Layout() {
         </nav>
       </header>
       <main>
-        <Outlet />
+        <Outlet /> // Render the page content for the current route
       </main>
     </>
   );

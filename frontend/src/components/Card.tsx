@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react'; // PropsWithChildren = component can resceive children as props
 
 type CardProps = PropsWithChildren<{
   title?: string;
@@ -6,9 +6,9 @@ type CardProps = PropsWithChildren<{
 
 export default function Card({ children, title }: CardProps) {
   return (
-    <section>
-      {title ? <h1>{title}</h1> : null}
-      {children}
-    </section>
+	<section>
+	  {title ? <h1>{title}</h1> : null}
+	  {children}
+	</section>
   );
 }

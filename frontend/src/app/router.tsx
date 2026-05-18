@@ -1,3 +1,5 @@
+// Defines the frontend application routes and page navigation using React Router.
+
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import EditorPage from '../pages/EditorPage';
