@@ -10,13 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth.context';
 import { useMap } from '@/hooks/useMap';
 import { useToast } from '@/components/ui/useToast';
 import { Spinner } from '@/components/ui/Spinner';
 import { GameCanvas } from '@/game/GameCanvas';
+import { GameOverModal } from '@/components/game/GameOverModal';
 import { api } from '@/services/api.service';
 
 export function GamePage() {
@@ -25,6 +26,25 @@ export function GamePage() {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const { map, loading, error } = useMap(map_id);
+  const [dead, setDead] = useState(false);
+  const [gameKey, setGameKey] = useState(0);
+
+  const handleDeath = useCallback(() => {
+    setDead(true);
+  }, []);
+
+  const handleRestart = useCallback(() => {
+    setDead(false);
+    setGameKey((k) => k + 1);
+  }, []);
+
+  const handleBack = useCallback(() => {
+    if (map && user && map.creator_id === user.id) {
+      navigate(`/editor/${map_id}`);
+    } else {
+      navigate('/train');
+    }
+  }, [map, user, map_id, navigate]);
 
   const handleExit = useCallback(
     async (time_ms: number) => {
@@ -66,19 +86,34 @@ export function GamePage() {
     );
   }
 
+  const backLabel = map && user && map.creator_id === user.id
+    ? 'Retour à l\'éditeur'
+    : 'Retour aux entraînements';
+
   return (
-    <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-4 p-4">
-      <h2 className="text-xl font-semibold text-white font-fantasy tracking-wide">
-        {map.name}
-      </h2>
-      <GameCanvas
-        grid={map.grid}
-        player_id={user!.id}
-        onExit={handleExit}
+    <>
+      <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-4 p-4">
+        <h2 className="text-xl font-semibold text-white font-fantasy tracking-wide">
+          {map.name}
+        </h2>
+        <GameCanvas
+          key={gameKey}
+          grid={map.grid}
+          player_id={user!.id}
+          onExit={handleExit}
+          onDeath={handleDeath}
+        />
+        <p className="text-white/40 text-sm">
+          Utilisez les flèches ou WASD pour vous déplacer
+        </p>
+      </div>
+
+      <GameOverModal
+        isOpen={dead}
+        backLabel={backLabel}
+        onRestart={handleRestart}
+        onBack={handleBack}
       />
-      <p className="text-white/40 text-sm">
-        Utilisez les flèches ou WASD pour vous déplacer
-      </p>
-    </div>
+    </>
   );
 }

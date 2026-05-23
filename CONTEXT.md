@@ -28,7 +28,7 @@ Socket.IO : io.on('connection') présent mais vide — auth JWT absente
 Sprint actuel :
 1. Corrections pré-étape-5 (double type, shared build, Zod, Socket auth)
 2. Éditeur admin + mode tour complet
-3. Étape 5 Socket.IO race
+3. Étape 5 Socket.IO race pas encore implementer
 
 Génère les deux fichiers avec ce contenu exact.
 Pas de header 42 sur ces fichiers (ce sont des fichiers de config, pas des fichiers source).

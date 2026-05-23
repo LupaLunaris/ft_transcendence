@@ -6,7 +6,7 @@
 /* By: evan-dro <evan-dro@student.42belgium.be      +#+  +:+       +#+       */
 /*                                                +#+#+#+#+#+   +#+           */
 /* Created: 2026/05/15 00:00:00 by evan-dro        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by evan-dro       ###   ########.fr          */
+/* Updated: 2026/05/21 00:00:00 by evan-dro       ###   ########.fr          */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,9 @@ const TILE_OPTIONS: Array<{ value: TileValue; label: string; color: string; desc
   { value: TILE.EMPTY, label: 'Sol',     color: '#2a2a3e', description: 'Case vide' },
   { value: TILE.WALL,  label: 'Mur',     color: '#5c3d8f', description: 'Obstacle' },
   { value: TILE.EXIT,  label: 'Sortie',  color: '#00e5a0', description: 'Fin du niveau' },
-  { value: TILE.SPAWN, label: 'Spawn',   color: '#f4511e', description: 'Départ du joueur' },
-  { value: TILE.ENEMY, label: 'Ennemi',  color: '#e53935', description: 'Case ennemie' },
+  { value: TILE.SPAWN,   label: 'Spawn',    color: '#f4511e', description: 'Départ du joueur' },
+  { value: TILE.ENEMY_H, label: 'Ennemi H', color: '#e53935', description: 'Ennemi horizontal' },
+  { value: TILE.ENEMY_V, label: 'Ennemi V', color: '#ff8c00', description: 'Ennemi vertical' },
 ];
 
 export function TileSelector({ selected, onChange }: TileSelectorProps) {

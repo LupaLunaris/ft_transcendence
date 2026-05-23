@@ -6,7 +6,7 @@
 /* By: evan-dro <evan-dro@student.42belgium.be      +#+  +:+       +#+       */
 /*                                                +#+#+#+#+#+   +#+           */
 /* Created: 2026/05/15 00:00:00 by evan-dro        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by evan-dro       ###   ########.fr          */
+/* Updated: 2026/05/21 00:00:00 by evan-dro       ###   ########.fr          */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,10 @@ function tileColor(tile: TileValue): string {
   switch (tile) {
     case TILE.WALL:  return '#5c3d8f';
     case TILE.EXIT:  return '#00e5a0';
-    case TILE.SPAWN: return '#f4511e';
-    case TILE.ENEMY: return '#e53935';
-    default:         return '#2a2a3e'; // EMPTY
+    case TILE.SPAWN:   return '#f4511e';
+    case TILE.ENEMY_H: return '#e53935';
+    case TILE.ENEMY_V: return '#ff8c00';
+    default:           return '#2a2a3e'; // EMPTY
   }
 }
 

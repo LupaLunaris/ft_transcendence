@@ -6,7 +6,7 @@
 /* By: malafont <malafont@student.42belgium.be       +#+  +:+       +#+       */
 /*                                                +#+#+#+#+#+   +#+           */
 /* Created: 2026/05/15 00:00:00 by malafont        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by malafont       ###   ########.fr          */
+/* Updated: 2026/05/22 12:00:00 by malafont       ###   ########.fr          */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,19 @@ interface GameCanvasProps {
   grid: Grid;
   player_id: string;
   onExit: (time_ms: number) => void;
+  onDeath?: () => void;
 }
 
 const CANVAS_WIDTH  = 800;
 const CANVAS_HEIGHT = 600;
 
-export function GameCanvas({ grid, player_id, onExit }: GameCanvasProps) {
+export function GameCanvas({ grid, player_id, onExit, onDeath }: GameCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  // Keep onExit stable so the effect doesn't re-run when parent re-renders
+  // Keep callbacks stable so the effect doesn't re-run when parent re-renders
   const onExitRef = useRef(onExit);
   useEffect(() => { onExitRef.current = onExit; }, [onExit]);
+  const onDeathRef = useRef(onDeath);
+  useEffect(() => { onDeathRef.current = onDeath; }, [onDeath]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -40,7 +43,8 @@ export function GameCanvas({ grid, player_id, onExit }: GameCanvasProps) {
       parent: containerRef.current,
       width:  CANVAS_WIDTH,
       height: CANVAS_HEIGHT,
-      backgroundColor: '#0d1117',
+		backgroundColor: '#0d1117',
+	  pixelArt: true,
       physics: {
         default: 'arcade',
         arcade: { gravity: { x: 0, y: 0 }, debug: false },
@@ -54,6 +58,10 @@ export function GameCanvas({ grid, player_id, onExit }: GameCanvasProps) {
     // Listen for the exit event on the global game emitter (no timing issue)
     game.events.on('player_reached_exit', (time_ms: number) => {
       onExitRef.current(time_ms);
+    });
+
+    game.events.on('player_caught', () => {
+      onDeathRef.current?.();
     });
 
     game.events.once('ready', () => {

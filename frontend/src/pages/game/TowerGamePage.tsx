@@ -18,6 +18,7 @@ import { api, type TowerLevelFull } from '@/services/api.service';
 import { Spinner } from '@/components/ui/Spinner';
 import { GameCanvas } from '@/game/GameCanvas';
 import { CongratulatoryModal } from '@/components/tower/CongratulatoryModal';
+import { GameOverModal } from '@/components/game/GameOverModal';
 
 export function TowerGamePage() {
   const { order_index: orderIndexParam } = useParams<{ order_index: string }>();
@@ -25,6 +26,8 @@ export function TowerGamePage() {
   const navigate = useNavigate();
   const { user, updateUser } = useAuth();
 
+  const [dead, setDead] = useState(false);
+  const [gameKey, setGameKey] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [completionData, setCompletionData] = useState<{
     tower_progress: number;
@@ -34,6 +37,15 @@ export function TowerGamePage() {
   const { data: level, loading, error } = useApi<TowerLevelFull>(
     () => api.tower.getLevel(orderIndex),
   );
+
+  const handleDeath = useCallback(() => {
+    setDead(true);
+  }, []);
+
+  const handleRestart = useCallback(() => {
+    setDead(false);
+    setGameKey((k) => k + 1);
+  }, []);
 
   const handleExit = useCallback(
     async (_time_ms: number) => {
@@ -92,14 +104,23 @@ export function TowerGamePage() {
           Niveau {orderIndex} / 8
         </p>
         <GameCanvas
+          key={gameKey}
           grid={level.grid_json}
           player_id={user!.id}
           onExit={handleExit}
+          onDeath={handleDeath}
         />
         <p className="text-white/40 text-sm">
           Utilisez les flèches ou WASD pour vous déplacer
         </p>
       </div>
+
+      <GameOverModal
+        isOpen={dead}
+        backLabel="Retour à la tour"
+        onRestart={handleRestart}
+        onBack={() => navigate('/tower')}
+      />
 
       <CongratulatoryModal
         isOpen={showModal}

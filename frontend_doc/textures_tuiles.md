@@ -1,296 +1,156 @@
-# Ajouter des textures aux tuiles
+# Textures et sprites — pipeline de chargement
 
-Remplacement des carrés colorés (MVP) par des sprites PNG.  
-**Impact backend : aucun** — le grid stocke des entiers `0–4`, les textures sont 100 % frontend.
+Remplacement des carrés colorés (MVP) par des PNG dans les scènes de jeu.  
+**Impact backend : aucun** — `grid` stocke des entiers `0–5`, les textures sont 100 % frontend.
 
 ---
 
-## Arborescence des fichiers concernés
+## Invariant fondamental
+
+> Les textures sont utilisées **uniquement** dans `GameScene` et `TowerGamePage`.  
+> Jamais dans `EditorPage`, `EditorGrid`, ni `TileSelector`.
+
+L'éditeur admin et l'éditeur joueur conservent leurs couleurs CSS (`backgroundColor`).
+
+---
+
+## État actuel (session 2026-05-21)
+
+Implémenté :
+- `assets.ts` — constantes `KEY_*` (clés Phaser) et `ASSET_*` (chemins `public/`)
+- `BaseScene.ts` — `preloadTileAssets()` + `buildTilemap()` avec fallback
+- `GameScene.ts` — `preload()`, joueur sprite/fallback, ennemis sprite/fallback
+- `Enemy.ts` — `rect` accepte `Rectangle | Image` via `EnemyGameObject`
+
+En attente :
+- Fournir les PNG dans `public/assets/tiles/` et `public/assets/sprites/`
+
+---
+
+## Arborescence des fichiers
 
 ```
-shared/src/types/tiles.types.ts       ← définit TILE et Grid (lecture seule)
 frontend/
-├── public/assets/tiles/              ← à créer : sprites PNG (servis statiquement)
-└── src/
-    ├── game/
-    │   ├── GameCanvas.tsx            ← monte le jeu Phaser (aucun changement)
-    │   └── scenes/
-    │       ├── BaseScene.ts          ← drawMap : TILE_COLORS + graphics → sprites
-    │       └── GameScene.ts          ← preload() : charger les textures
-    └── components/editor/
-        ├── EditorGrid.tsx            ← tileColor() : backgroundColor → backgroundImage
-        └── TileSelector.tsx          ← TILE_OPTIONS[].color → image
+├── public/
+│   └── assets/
+│       ├── tiles/               ← PNG 32×32 par type de tuile
+│       │   ├── .gitkeep
+│       │   ├── floor.png        (TILE.EMPTY = 0)
+│       │   ├── wall.png         (TILE.WALL  = 1)
+│       │   ├── exit.png         (TILE.EXIT  = 2)
+│       │   └── spawn.png        (TILE.SPAWN = 3)
+│       └── sprites/             ← PNG ou spritesheet pour entités animées
+│           ├── .gitkeep
+│           ├── player.png
+│           ├── enemy_h.png      (TILE.ENEMY_H = 4)
+│           └── enemy_v.png      (TILE.ENEMY_V = 5)
+└── src/game/
+    ├── assets.ts                ← clés Phaser + chemins public/
+    ├── entities/
+    │   └── Enemy.ts             ← EnemyGameObject = Rectangle | Image
+    └── scenes/
+        ├── BaseScene.ts         ← preloadTileAssets() + buildTilemap()
+        └── GameScene.ts         ← preload() + sprites joueur/ennemis
 ```
 
 ---
 
-## Étape 0 — Préparer les assets
+## Pourquoi `public/` et non `src/assets/`
 
-Crée `frontend/public/assets/tiles/` avec un PNG 32 × 32 par type de tuile.  
-Phaser charge les assets via URL relative depuis `/public/`, Vite les sert sans import JS.
+Phaser charge les assets via URL HTTP (`this.load.image(key, url)`) — il n'utilise
+pas le module bundler. `public/` est servi par Vite à la racine sans transformation
+ni hachage de nom, ce qui correspond exactement à `this.load.image('key', '/assets/tiles/floor.png')`.
 
-```
-frontend/public/assets/tiles/
-├── floor.png   # TILE.EMPTY = 0
-├── wall.png    # TILE.WALL  = 1
-├── exit.png    # TILE.EXIT  = 2
-├── spawn.png   # TILE.SPAWN = 3
-└── enemy.png   # TILE.ENEMY = 4
-```
-
-> **Taille** : 32 × 32 px (= `TILE_SIZE` défini dans `BaseScene.ts:16`).  
-> **Format** : PNG avec transparence si nécessaire.
+`src/assets/` conviendrait aux imports ES (`import url from './img.png'`) — inutile ici.
 
 ---
 
-## Étape 1 — `GameScene.ts` : charger les textures dans `preload()`
+## Fichier `assets.ts` — constantes
 
-**Fichier** : `frontend/src/game/scenes/GameScene.ts`
-
-La méthode `preload()` (ligne 42) est le hook Phaser exécuté **avant** `create()`.  
-Elle est actuellement vide — c'est là qu'on ajoute `this.load.image()`.
-
-```typescript
-// AVANT (ligne 42-44)
-preload(): void {
-  // Placeholder — real assets loaded here in future sprints
-}
-
-// APRÈS
-preload(): void {
-  this.load.image('tile_floor', 'assets/tiles/floor.png');
-  this.load.image('tile_wall',  'assets/tiles/wall.png');
-  this.load.image('tile_exit',  'assets/tiles/exit.png');
-  this.load.image('tile_spawn', 'assets/tiles/spawn.png');
-  this.load.image('tile_enemy', 'assets/tiles/enemy.png');
-}
-```
-
-- `this.load` → `Phaser.Loader.LoaderPlugin` (disponible dans toute `Phaser.Scene`)
-- Premier argument : **clé interne** utilisée par `this.add.image('tile_wall', ...)`
-- Second argument : chemin relatif depuis `public/` (Vite sert `public/` à la racine)
+| Constante | Valeur | Rôle |
+|-----------|--------|------|
+| `KEY_TILE_FLOOR` | `'tile_floor'` | Clé interne Phaser — argument 1 de `load.image` |
+| `KEY_TILE_WALL` | `'tile_wall'` | idem |
+| `KEY_TILE_EXIT` | `'tile_exit'` | idem |
+| `KEY_TILE_SPAWN` | `'tile_spawn'` | idem |
+| `KEY_SPRITE_PLAYER` | `'sprite_player'` | idem |
+| `KEY_SPRITE_ENEMY_H` | `'sprite_enemy_h'` | idem |
+| `KEY_SPRITE_ENEMY_V` | `'sprite_enemy_v'` | idem |
+| `ASSET_TILE_FLOOR` | `'/assets/tiles/floor.png'` | URL dans `public/` |
+| `ASSET_TILE_WALL` | `'/assets/tiles/wall.png'` | idem |
+| `ASSET_TILE_EXIT` | `'/assets/tiles/exit.png'` | idem |
+| `ASSET_TILE_SPAWN` | `'/assets/tiles/spawn.png'` | idem |
+| `ASSET_SPRITE_PLAYER` | `'/assets/sprites/player.png'` | idem |
+| `ASSET_SPRITE_ENEMY_H` | `'/assets/sprites/enemy_h.png'` | idem |
+| `ASSET_SPRITE_ENEMY_V` | `'/assets/sprites/enemy_v.png'` | idem |
 
 ---
 
-## Étape 2 — `BaseScene.ts` : remplacer `graphics` par des sprites
+## Cycle Phaser : preload → create → fallback
 
-**Fichier** : `frontend/src/game/scenes/BaseScene.ts`
-
-### Variables et fonctions à modifier
-
-| Symbole | Ligne | Rôle actuel | Action |
-|---------|-------|-------------|--------|
-| `TILE_COLORS` | 19–25 | mapping `TileValue → couleur hex` | Remplacer par `TILE_TEXTURE_KEYS` |
-| `buildTilemap()` | 28 | boucle sur `grid`, appelle `graphics.fillRect()` | Remplacer `fillRect` par `this.add.image()` |
-| `graphics` | 29 | objet Phaser Graphics (couleurs) | Supprimer (ou garder uniquement pour les lignes de grille) |
-
-### Modification complète
-
-```typescript
-// AVANT (lignes 19-51)
-const TILE_COLORS: Record<number, number> = {
-  [TILE.EMPTY]: 0x2a2a3e,
-  [TILE.WALL]:  0x5c3d8f,
-  [TILE.EXIT]:  0x00e5a0,
-  [TILE.SPAWN]: 0x2a2a3e,
-  [TILE.ENEMY]: 0xe53935,
-};
-
-export abstract class BaseScene extends Phaser.Scene {
-  protected buildTilemap(grid: Grid): void {
-    const graphics = this.add.graphics();
-    for (let row = 0; row < GRID_SIZE; row++) {
-      for (let col = 0; col < GRID_SIZE; col++) {
-        const tile = grid[row][col];
-        const color = TILE_COLORS[tile] ?? TILE_COLORS[TILE.EMPTY];
-        graphics.fillStyle(color, 1);
-        graphics.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-      }
-    }
-    // lignes de grille...
-  }
-}
-
-// APRÈS
-const TILE_TEXTURE_KEYS: Record<number, string> = {
-  [TILE.EMPTY]: 'tile_floor',
-  [TILE.WALL]:  'tile_wall',
-  [TILE.EXIT]:  'tile_exit',
-  [TILE.SPAWN]: 'tile_spawn',
-  [TILE.ENEMY]: 'tile_enemy',
-};
-
-export abstract class BaseScene extends Phaser.Scene {
-  protected buildTilemap(grid: Grid): void {
-    for (let row = 0; row < GRID_SIZE; row++) {
-      for (let col = 0; col < GRID_SIZE; col++) {
-        const tile  = grid[row][col];
-        const key   = TILE_TEXTURE_KEYS[tile] ?? TILE_TEXTURE_KEYS[TILE.EMPTY];
-        const px    = col * TILE_SIZE;
-        const py    = row * TILE_SIZE;
-        this.add.image(px, py, key).setOrigin(0).setDisplaySize(TILE_SIZE, TILE_SIZE);
-      }
-    }
-
-    // Lignes de grille (optionnel — supprimer si le sprite intègre ses propres bordures)
-    const graphics = this.add.graphics();
-    graphics.lineStyle(1, 0x000000, 0.15);
-    for (let i = 0; i <= GRID_SIZE; i++) {
-      graphics.strokeLineShape(
-        new Phaser.Geom.Line(i * TILE_SIZE, 0, i * TILE_SIZE, GRID_SIZE * TILE_SIZE),
-      );
-      graphics.strokeLineShape(
-        new Phaser.Geom.Line(0, i * TILE_SIZE, GRID_SIZE * TILE_SIZE, i * TILE_SIZE),
-      );
-    }
-  }
-}
+```
+GameScene.preload()
+  └─ this.preloadTileAssets()     [BaseScene]  ← load.image × 4 (sol/mur/sortie/spawn)
+  └─ this.load.image(player...)                ← load.image × 1
+  └─ this.load.image(enemy_h...)               ← load.image × 1
+  └─ this.load.image(enemy_v...)               ← load.image × 1
+        ↓ Phaser attend la fin du chargement HTTP
+GameScene.create()
+  └─ this.buildTilemap(grid)      [BaseScene]
+        pour chaque tuile :
+          if this.textures.exists(key) → this.add.image()    ← texture PNG
+          else                         → graphics.fillRect() ← couleur fallback
+  └─ makeGameObject(joueur)
+        if textures.exists('sprite_player') → add.image()
+        else                                → add.rectangle() (orange #f4511e)
+  └─ this.spawnEnemies(grid)
+        pour chaque ENEMY_H/ENEMY_V :
+          makeGameObject() → add.image ou add.rectangle
 ```
 
-**Points clés :**
-- `this.add.image(px, py, key)` → crée un `Phaser.GameObjects.Image` à la position pixel
-- `.setOrigin(0)` → ancre en haut-gauche (comportement identique à `fillRect`)
-- `.setDisplaySize(TILE_SIZE, TILE_SIZE)` → force 32 × 32 quel que soit le PNG source
-- `px = col * TILE_SIZE`, `py = row * TILE_SIZE` → même calcul qu'avant (inchangé)
-
-> **Note** : `this.add.image()` utilise les textures chargées dans `preload()` de `GameScene.ts`.  
-> `BaseScene` est `abstract` — elle n'a pas de `preload()` propre, elle hérite du cycle Phaser via `GameScene`.
+**Règle clé** : `buildTilemap` dessine les cases `ENEMY_H`/`ENEMY_V` comme du sol
+(même texture/couleur que `TILE.EMPTY`). `spawnEnemies` place le sprite ennemi
+par-dessus — l'ordre d'ajout garantit que l'ennemi est devant le sol.
 
 ---
 
-## Étape 3 — `EditorGrid.tsx` : aperçu dans la grille éditeur
+## Tableau de fallback
 
-**Fichier** : `frontend/src/components/editor/EditorGrid.tsx`
+| Clé texture | Constante ASSET | Fichier attendu | Fallback couleur |
+|-------------|-----------------|-----------------|------------------|
+| `tile_floor` | `ASSET_TILE_FLOOR` | `public/assets/tiles/floor.png` | `#2a2a3e` |
+| `tile_wall` | `ASSET_TILE_WALL` | `public/assets/tiles/wall.png` | `#5c3d8f` |
+| `tile_exit` | `ASSET_TILE_EXIT` | `public/assets/tiles/exit.png` | `#00e5a0` |
+| `tile_spawn` | `ASSET_TILE_SPAWN` | `public/assets/tiles/spawn.png` | `#2a2a3e` |
+| `sprite_player` | `ASSET_SPRITE_PLAYER` | `public/assets/sprites/player.png` | `#f4511e` (Rectangle) |
+| `sprite_enemy_h` | `ASSET_SPRITE_ENEMY_H` | `public/assets/sprites/enemy_h.png` | `#e53935` (Rectangle) |
+| `sprite_enemy_v` | `ASSET_SPRITE_ENEMY_V` | `public/assets/sprites/enemy_v.png` | `#ff8c00` (Rectangle) |
 
-### Fonction à modifier : `tileColor()` (ligne 21)
-
-```typescript
-// AVANT
-function tileColor(tile: TileValue): string {
-  switch (tile) {
-    case TILE.WALL:  return '#5c3d8f';
-    case TILE.EXIT:  return '#00e5a0';
-    case TILE.SPAWN: return '#f4511e';
-    case TILE.ENEMY: return '#e53935';
-    default:         return '#2a2a3e';
-  }
-}
-```
-
-```typescript
-// APRÈS — remplace la fonction et le style dans le JSX
-
-const TILE_TEXTURE_URL: Record<number, string> = {
-  [TILE.EMPTY]: '/assets/tiles/floor.png',
-  [TILE.WALL]:  '/assets/tiles/wall.png',
-  [TILE.EXIT]:  '/assets/tiles/exit.png',
-  [TILE.SPAWN]: '/assets/tiles/spawn.png',
-  [TILE.ENEMY]: '/assets/tiles/enemy.png',
-};
-```
-
-Et dans le JSX (ligne 52–58), remplacer `backgroundColor` :
-
-```tsx
-// AVANT
-style={{
-  width: 22,
-  height: 22,
-  backgroundColor: tileColor(tile),
-  border: tileBorder(tile),
-  transition: 'opacity 0.05s',
-}}
-
-// APRÈS
-style={{
-  width: 22,
-  height: 22,
-  backgroundImage: `url('${TILE_TEXTURE_URL[tile] ?? TILE_TEXTURE_URL[TILE.EMPTY]}')`,
-  backgroundSize: 'cover',
-  border: tileBorder(tile),
-  transition: 'opacity 0.05s',
-}}
-```
-
-> Tu peux aussi garder un `backgroundColor` de fallback (couleur de la version MVP) en cas d'image non chargée.
+Si un fichier PNG est absent, `this.textures.exists(key)` retourne `false` et le jeu
+utilise le Rectangle coloré — **aucun crash, aucune erreur bloquante**.
 
 ---
 
-## Étape 4 — `TileSelector.tsx` : pastille de prévisualisation
-
-**Fichier** : `frontend/src/components/editor/TileSelector.tsx`
-
-### Constante à modifier : `TILE_OPTIONS` (ligne 20)
+## Détail `Enemy.ts` — type union
 
 ```typescript
-// AVANT
-const TILE_OPTIONS = [
-  { value: TILE.EMPTY, label: 'Sol',    color: '#2a2a3e', description: 'Case vide' },
-  { value: TILE.WALL,  label: 'Mur',    color: '#5c3d8f', description: 'Obstacle' },
-  // ...
-];
+// Avant : rect: Phaser.GameObjects.Rectangle
+// Après :
+export type EnemyGameObject = Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
 ```
 
-```typescript
-// APRÈS — ajouter un champ `texture`
-const TILE_OPTIONS = [
-  { value: TILE.EMPTY, label: 'Sol',    color: '#2a2a3e', texture: '/assets/tiles/floor.png', description: 'Case vide' },
-  { value: TILE.WALL,  label: 'Mur',    color: '#5c3d8f', texture: '/assets/tiles/wall.png',  description: 'Obstacle' },
-  { value: TILE.EXIT,  label: 'Sortie', color: '#00e5a0', texture: '/assets/tiles/exit.png',  description: 'Fin du niveau' },
-  { value: TILE.SPAWN, label: 'Spawn',  color: '#f4511e', texture: '/assets/tiles/spawn.png', description: 'Départ du joueur' },
-  { value: TILE.ENEMY, label: 'Ennemi', color: '#e53935', texture: '/assets/tiles/enemy.png', description: 'Case ennemie' },
-];
-```
-
-Et dans le JSX (ligne 47–49), remplacer le `<span>` coloré :
-
-```tsx
-// AVANT
-<span
-  className="w-5 h-5 rounded shrink-0 border border-black/20"
-  style={{ backgroundColor: color }}
-/>
-
-// APRÈS
-<span
-  className="w-5 h-5 rounded shrink-0 border border-black/20"
-  style={{
-    backgroundImage: `url('${texture}')`,
-    backgroundSize: 'cover',
-    backgroundColor: color, // fallback si image non chargée
-  }}
-/>
-```
-
----
-
-## Récapitulatif des dépendances entre fichiers
-
-```
-shared/src/types/tiles.types.ts
-  └─ exporte TILE, TileValue, Grid, GRID_SIZE
-        ├─ importé par BaseScene.ts      (TILE, GRID_SIZE, Grid)
-        ├─ importé par GameScene.ts      (TILE, GRID_SIZE, Grid)
-        ├─ importé par EditorGrid.tsx    (TILE, GRID_SIZE, Grid, TileValue)
-        └─ importé par TileSelector.tsx  (TILE, TileValue)
-
-frontend/public/assets/tiles/*.png
-  ├─ chargé par GameScene.ts via this.load.image() (Phaser loader, URL)
-  ├─ référencé par EditorGrid.tsx via CSS backgroundImage (URL)
-  └─ référencé par TileSelector.tsx via CSS backgroundImage (URL)
-
-BaseScene.ts
-  └─ importé par GameScene.ts (héritage — GameScene extends BaseScene)
-       └─ importé par GameCanvas.tsx (instanciation Phaser)
-```
+`applyPosition()` appelle `this.rect.setPosition(x, y)` — les deux types implémentent
+`Phaser.GameObjects.Components.Transform`, donc l'appel est valide sans casting.
 
 ---
 
 ## Checklist d'implémentation
 
-- [ ] Créer `frontend/public/assets/tiles/` avec 5 PNG (32 × 32 px)
-- [ ] `GameScene.ts` — remplir `preload()` avec 5 appels `this.load.image()`
-- [ ] `BaseScene.ts` — remplacer `TILE_COLORS` + `graphics.fillRect()` par `TILE_TEXTURE_KEYS` + `this.add.image()`
-- [ ] `EditorGrid.tsx` — remplacer `tileColor()` et `backgroundColor` par `backgroundImage`
-- [ ] `TileSelector.tsx` — ajouter `texture` dans `TILE_OPTIONS` et mettre à jour le `<span>`
-- [ ] Vérifier visuellement : éditeur, jeu, sélecteur de tuile
+- [x] Créer `frontend/public/assets/tiles/` + `sprites/` (`.gitkeep`)
+- [x] Créer `frontend/src/game/assets.ts` — constantes `KEY_*` et `ASSET_*`
+- [x] `Enemy.ts` — `EnemyGameObject = Rectangle | Image`
+- [x] `BaseScene.ts` — `preloadTileAssets()` + `buildTilemap()` avec fallback
+- [x] `GameScene.ts` — `preload()`, joueur et ennemis sprite/fallback
+- [ ] Fournir les PNG : `floor`, `wall`, `exit`, `spawn` (32×32 px)
+- [ ] Fournir les PNG/spritesheets : `player`, `enemy_h`, `enemy_v`
+- [ ] Vérifier visuellement : mode entraînement + mode tour
