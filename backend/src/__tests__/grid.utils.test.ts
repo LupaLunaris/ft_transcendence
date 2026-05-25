@@ -91,11 +91,11 @@ describe('hasPath', () => {
     expect(hasPath(grid)).toBe(false);
   });
 
-  it('finds path through ENEMY tiles', () => {
+  it('finds path through ENEMY_H tiles', () => {
     const grid = makeValidGrid();
     // Place enemies on the path — should still be walkable
-    grid[1][5] = TILE.ENEMY;
-    grid[1][10] = TILE.ENEMY;
+    grid[1][5] = TILE.ENEMY_H;
+    grid[1][10] = TILE.ENEMY_H;
     expect(hasPath(grid)).toBe(true);
   });
 });
