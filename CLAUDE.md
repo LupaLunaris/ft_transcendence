@@ -12,10 +12,20 @@
 - Frontend : React 18 + TypeScript + Vite 8 + Phaser 3.80 + Tailwind CSS
 - Backend  : Node.js + Express 4 + TypeScript
 - Auth     : JWT (localStorage clé ft_token, header Authorization: Bearer)
-- ORM      : Prisma 5 + SQLite (DATABASE_URL="file:./data.db")
+- ORM      : Prisma 5 + PostgreSQL (provider = "postgresql", DATABASE_URL=postgresql://...)
 - Realtime : Socket.IO 4.7
 - Tests    : Vitest (frontend) + Jest 30 (backend)
 - Zod      : v4 — utiliser .issues[0].message (pas .errors)
+- Deploy   : Docker Compose (services : postgres, backend, frontend)
+
+## Déploiement Docker
+- Fichier racine `.env` obligatoire (variables POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, DATABASE_URL, JWT_SECRET, JWT_EXPIRES_IN, FRONTEND_URL, BACKEND_URL, NODE_ENV)
+- Volume Docker `postgres_data` → persistance locale par collaborateur
+- Ordre de démarrage : postgres (healthcheck) → backend (migrate + seed) → frontend
+- `make docker-up` : point d'entrée unique
+- `make docker-down` : arrêt sans perte de données
+- `make docker-down-v` : arrêt + suppression des volumes (reset DB)
+- Mode dev local sans Docker : possible via `make dev` avec une instance Postgres locale (DATABASE_URL dans backend/.env)
 
 ## Structure monorepo
 /frontend   → React + Phaser
@@ -28,7 +38,7 @@
 - Socket events : snake_case
 - Client→Server : player_input, join_lobby, leave_lobby
 - Server→Client : game_state, race_finished, player_joined, player_left, error_event
-- Grille : TileValue[][] 25x25 — EMPTY=0 WALL=1 EXIT=2 SPAWN=3 ENEMY=4
+- Grille : TileValue[][] 25x25 — EMPTY=0 WALL=1 EXIT=2 SPAWN=3 ENEMY_H=4 ENEMY_V=5
 - Phaser→React : this.game.events.emit(eventName, payload) — pas d'EventBus séparé
 - Composants : fonctionnels + hooks, TypeScript strict, jamais de any
 - Jamais de logique Phaser dans les composants React
@@ -55,8 +65,46 @@ Les emails suivants ont is_admin=true automatiquement à la création de compte 
 
 ## État du projet
 - Étapes 1-4 complètes
-- Étape 5 (Socket.IO race) : à faire
+- Migration SQLite → PostgreSQL : à implémenter (schema.prisma + migrations + .env.example)
+- Étape 5 (Socket.IO race multijoueur) : à implémenter
 - Éditeur admin + mode tour complet : à faire
+
+## Plan d'implémentation PostgreSQL + Multijoueur
+
+### 1 — Migration PostgreSQL (backend)
+Fichiers à modifier :
+- `backend/prisma/schema.prisma` : `provider = "sqlite"` → `"postgresql"`
+- `backend/prisma/migrations/` : supprimer l'historique SQLite, recréer avec `prisma migrate dev --name init_postgres`
+- `backend/.env.example` : remplacer `DATABASE_URL="file:./dev.db"` par le format PostgreSQL
+- `backend/src/` : aucun changement — Prisma Client est identique côté code
+
+Points d'attention lors de la migration :
+- `grid_json String` → reste `TEXT` en PostgreSQL, aucun changement de code
+- `DateTime` → devient `TIMESTAMPTZ` natif (transparent via Prisma)
+- Les seeds existants (`seed.ts`, `seed-tower.ts`) sont compatibles sans modification
+
+### 2 — Étape 5 : Socket.IO race multijoueur
+Architecture cible :
+- `backend/src/game/` → nouveau dossier : logique de lobby et de course
+  - `lobby.manager.ts` : gestion des rooms Socket.IO (join/leave/start)
+  - `race.handler.ts` : enregistrement des handlers socket par connexion
+  - `race.state.ts` : état en mémoire de la course (positions, timer, statuts)
+- `backend/src/server.ts` : brancher `registerRaceHandlers(io, socket, user)` dans `io.on('connection')`
+
+Events Socket.IO à implémenter :
+- Client → Server : `join_lobby`, `leave_lobby`, `player_input`
+- Server → Client : `game_state`, `race_finished`, `player_joined`, `player_left`, `error_event`
+
+Persistance en fin de course :
+- Créer un `Score` (completion_time_ms) pour chaque joueur qui termine
+- Incrémenter `User.diamonds` du gagnant (+1)
+
+### 3 — Fichiers à mettre à jour (docs + config)
+- `README.md` : section stack → PostgreSQL, section démarrage → Docker en premier
+- `README_install_and_start.md` : supprimer la section "Démarrage rapide SQLite", Docker devient le mode principal
+- `Makefile` : vérifier que `db-migrate` fonctionne en mode PostgreSQL local (variable DATABASE_URL à passer)
+- `docker-compose.yml` : déjà configuré — vérifier que le backend lance `prisma migrate deploy` au démarrage
+- `.env.example` (racine) : créer s'il n'existe pas
 
 ## Documentation de session (obligatoire en fin de conversation)
 

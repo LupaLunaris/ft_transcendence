@@ -34,6 +34,6 @@ export const ASSET_TILE_EXIT       = '/assets/tiles/exit.png';
 export const ASSET_TILE_SPAWN      = '/assets/tiles/spawn.png';
 export const ASSET_TILE_WALL_SHEET = '/assets/tiles/sprite tuile/titleSheet.png';//titleSheet.png
 
-export const ASSET_SPRITE_PLAYER  = '/assets/sprites/JenTopBiche.png'; // JenTopBiche.png //martinPlayer.png
+export const ASSET_SPRITE_PLAYER  = '/assets/sprites/martinPlayer.png'; // JenTopBiche.png //martinPlayer.png
 export const ASSET_SPRITE_ENEMY_H = '/assets/sprites/enemy_h.png';
 export const ASSET_SPRITE_ENEMY_V = '/assets/sprites/enemy_v.png';
