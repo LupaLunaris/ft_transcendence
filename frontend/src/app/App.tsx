@@ -1,6 +1,71 @@
-import { RouterProvider } from 'react-router-dom';
-import { router } from './router';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import { ToastProvider } from '@/components/ui/useToast';
+import { ToastContainer } from '@/components/ui/Toast';
+import { AuthProvider, useAuth } from '@/context/auth.context';
+import { Spinner } from '@/components/ui/Spinner';
+
+// Pages
+import { HomePage }      from '@/pages/HomePage';
+import { LoginPage }     from '@/pages/auth/LoginPage';
+import { RegisterPage }  from '@/pages/auth/RegisterPage';
+import { ProfilePage }   from '@/pages/ProfilePage';
+import { TrainingPage }  from '@/pages/TrainingPage';
+import { TowerPage }     from '@/pages/TowerPage';
+import { EditorPage }    from '@/pages/editor/EditorPage';
+import { GamePage }      from '@/pages/game/GamePage';
+import { RacePage }      from '@/pages/game/RacePage';
+import { TowerGamePage } from '@/pages/game/TowerGamePage';
+import { NotFoundPage }  from '@/pages/NotFoundPage';
+
+function ProtectedRoute({ children }: { children: ReactNode }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <Spinner size="lg" className="text-deep-400" />
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public */}
+      <Route path="/"         element={<HomePage />} />
+      <Route path="/login"    element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      {/* Protected */}
+      <Route path="/profile"          element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/editor"           element={<ProtectedRoute><EditorPage /></ProtectedRoute>} />
+      <Route path="/editor/:id"       element={<ProtectedRoute><EditorPage /></ProtectedRoute>} />
+      <Route path="/train"            element={<ProtectedRoute><TrainingPage /></ProtectedRoute>} />
+      <Route path="/tower"            element={<ProtectedRoute><TowerPage /></ProtectedRoute>} />
+      <Route path="/play/tower/:order_index" element={<ProtectedRoute><TowerGamePage /></ProtectedRoute>} />
+      <Route path="/play/:map_id"            element={<ProtectedRoute><GamePage /></ProtectedRoute>} />
+      <Route path="/play/:map_id/race"       element={<ProtectedRoute><RacePage /></ProtectedRoute>} />
+
+      {/* 404 */}
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ToastProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+      <ToastContainer />
+    </ToastProvider>
+  );
 }
