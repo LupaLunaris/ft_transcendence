@@ -18,7 +18,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
-    setupFiles: "./src/__tests__/setup.ts",
+    setupFiles: "./tests/setup.ts",
     alias: {
       "@ft/shared": path.resolve(__dirname, "../shared/src/index.ts"),
       "@": path.resolve(__dirname, "src"),
