@@ -12,6 +12,8 @@
 
 import { PrismaClient } from '@prisma/client';
 
+const prisma = new PrismaClient();
+
 const W = 1; // WALL
 const E = 0; // EMPTY
 const X = 2; // EXIT
@@ -232,7 +234,7 @@ const LEVELS: Array<{ order_index: number; name: string; grid: number[][] }> = [
   { order_index: 8, name: 'L\'Abîme Final', grid: level8() },
 ];
 
-export async function seedTower(prisma: PrismaClient): Promise<void> {
+async function main(): Promise<void> {
   for (const level of LEVELS) {
     await prisma.adminMap.upsert({
       where: { order_index: level.order_index },
@@ -250,10 +252,6 @@ export async function seedTower(prisma: PrismaClient): Promise<void> {
   }
 }
 
-// Exécution standalone : npx ts-node prisma/seed-tower.ts
-if (require.main === module) {
-  const prisma = new PrismaClient();
-  seedTower(prisma)
-    .catch((e) => { console.error(e); process.exit(1); })
-    .finally(() => prisma.$disconnect());
-}
+main()
+  .catch((e) => { console.error(e); process.exit(1); })
+  .finally(() => prisma.$disconnect());

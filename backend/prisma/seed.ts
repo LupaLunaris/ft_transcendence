@@ -12,7 +12,6 @@
 
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { seedTower } from './seed-tower';
 
 const prisma = new PrismaClient();
 
@@ -75,8 +74,6 @@ async function main(): Promise<void> {
 
   console.log('Seeded users:', user1.username, user2.username);
   console.log('Seeded admin map:', adminMap.name);
-
-  await seedTower(prisma);
 }
 
 main()
