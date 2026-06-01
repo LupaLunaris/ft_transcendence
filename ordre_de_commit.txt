@@ -1,0 +1,329 @@
+
+
+# ═══════════════════════════════════════════════════════════════
+# ÉTAPE 1 — Scaffold
+# ═══════════════════════════════════════════════════════════════
+
+git add docker-compose.yml .env.example \
+  backend/Dockerfile frontend/Dockerfile Makefile
+git commit -m "chore(docker): add docker-compose and environment config_jer"
+
+git add .gitignore package.json package-lock.json \
+  backend/package.json backend/tsconfig.json backend/.gitignore \
+  shared/package.json shared/tsconfig.json \
+  frontend/package.json frontend/tsconfig.json \
+  frontend/vite.config.ts frontend/tailwind.config.ts frontend/postcss.config.cjs \
+  frontend/index.html frontend/src/main.tsx frontend/src/index.css
+git commit -m "chore(root): init monorepo with workspaces and gitignore_jer"
+
+git add README.md organisation_role_push.md
+git commit -m "docs(root): add README with team, stack and modules sections_jer"
+
+
+# ═══════════════════════════════════════════════════════════════
+# ÉTAPE 2 — Types partagés + Prisma
+# ═══════════════════════════════════════════════════════════════
+
+git add shared/src/types/tiles.types.ts shared/src/types/game.types.ts
+git commit -m "feat(shared): add tile, grid and game state types_jen"
+
+git add shared/src/types/user.types.ts shared/src/types/auth.types.ts \
+  shared/src/types/api.types.ts shared/src/types/map.types.ts
+git commit -m "feat(shared): add user, auth and api response types_jen"
+
+git add shared/src/types/socket.types.ts shared/src/index.ts
+git commit -m "feat(shared): add socket event type contracts_jen"
+
+git add backend/prisma/schema.prisma \
+  backend/prisma/migrations/migration_lock.toml \
+  "backend/prisma/migrations/20260515205156_sqlite_init/migration.sql" \
+  backend/prisma.config.ts \
+  backend/src/lib/prisma.ts
+git commit -m "feat(prisma): add User, Map, AdminMap and Score models_jer"
+
+git add backend/prisma/seed.ts backend/prisma/tsconfig.json
+git commit -m "feat(prisma): add seed script with test users and admin map_jer"
+
+
+# ═══════════════════════════════════════════════════════════════
+# ÉTAPE 3 — Backend REST
+# ═══════════════════════════════════════════════════════════════
+
+git add backend/src/middleware/auth.middleware.ts \
+  backend/src/middleware/validate.middleware.ts \
+  backend/src/schemas/auth.schemas.ts \
+  backend/src/schemas/map.schemas.ts \
+  backend/src/__tests__/auth.middleware.test.ts
+git commit -m "feat(backend): add JWT auth middleware and zod validation_jer"
+
+git add backend/src/utils/response.utils.ts \
+  backend/src/utils/grid.utils.ts \
+  backend/src/__tests__/grid.utils.test.ts \
+  backend/src/__tests__/helpers/grid.helper.ts
+git commit -m "feat(backend): add response utils and grid validation helpers_jer"
+
+git add backend/src/routes/auth.routes.ts \
+  backend/src/__tests__/auth.routes.test.ts
+git commit -m "feat(backend): add register and login routes_jer"
+
+git add backend/src/routes/maps.routes.ts
+git commit -m "feat(backend): add map CRUD routes with ownership checks_jer"
+
+git add backend/src/__tests__/maps.routes.test.ts
+git commit -m "feat(backend): add map publish and complete validation routes_jer"
+
+git add backend/src/routes/tower.routes.ts
+git commit -m "feat(backend): add tower routes with progression gating_jer"
+
+git add backend/src/routes/scores.routes.ts
+git commit -m "feat(backend): add score submission and leaderboard routes_jer"
+
+git add backend/src/routes/index.ts backend/src/server.ts
+git commit -m "chore(backend): wire all routes and global error handler_jer"
+
+
+# ═══════════════════════════════════════════════════════════════
+# ÉTAPE 4 — Frontend
+# ═══════════════════════════════════════════════════════════════
+
+git add frontend/src/services/api.service.ts \
+  frontend/src/__tests__/api.service.test.ts
+git commit -m "feat(frontend): add api service with typed fetch wrapper_jen"
+
+git add frontend/src/context/auth.context.tsx
+git commit -m "feat(frontend): add auth context and useAuth hook_jen"
+
+git add frontend/src/hooks/useApi.ts \
+  frontend/src/hooks/useMap.ts \
+  frontend/src/__tests__/useApi.test.tsx
+git commit -m "feat(frontend): add useApi and useMap hooks_jen"
+
+git add frontend/src/App.tsx
+git commit -m "feat(frontend): add app routing with protected routes_jen"
+
+git add frontend/src/components/ui/Button.tsx \
+  frontend/src/components/ui/Input.tsx \
+  frontend/src/components/ui/Modal.tsx \
+  frontend/src/components/ui/Spinner.tsx \
+  frontend/src/components/ui/Toast.tsx \
+  frontend/src/components/ui/useToast.ts \
+  frontend/src/__tests__/setup.ts \
+  frontend/src/__tests__/Button.test.tsx \
+  frontend/src/__tests__/Input.test.tsx \
+  frontend/src/__tests__/Modal.test.tsx \
+  frontend/src/__tests__/useToast.test.tsx
+git commit -m "feat(frontend): add Button, Input, Modal and Toast components_eli"
+
+git add frontend/src/components/layout/Layout.tsx \
+  frontend/src/components/layout/Navbar.tsx
+git commit -m "feat(frontend): add Navbar and Layout components_eli"
+
+git add frontend/src/pages/auth/LoginPage.tsx \
+  frontend/src/pages/auth/RegisterPage.tsx \
+  frontend/src/pages/NotFoundPage.tsx \
+  frontend/src/__tests__/LoginPage.test.tsx \
+  frontend/src/__tests__/LoginPage.toast.test.tsx
+git commit -m "feat(frontend): add login and register pages_eli"
+
+git add frontend/src/pages/HomePage.tsx \
+  frontend/src/pages/ProfilePage.tsx \
+  frontend/src/pages/TowerPage.tsx \
+  frontend/src/pages/TrainingPage.tsx
+git commit -m "feat(frontend): add home page with player info and navigation_eli"
+
+git add frontend/src/game/scenes/BaseScene.ts
+git commit -m "feat(frontend): add Phaser BaseScene with tilemap builder_mar"
+
+git add frontend/src/game/scenes/GameScene.ts
+git commit -m "feat(frontend): add GameScene with movement and collision_mar"
+
+git add frontend/src/game/GameCanvas.tsx
+git commit -m "feat(frontend): add GameCanvas React container for Phaser_mar"
+
+git add frontend/src/pages/game/GamePage.tsx \
+  frontend/src/__tests__/GamePage.test.tsx
+git commit -m "feat(frontend): add GamePage fetching map and submitting score_mar"
+
+git add frontend/src/components/editor/EditorGrid.tsx \
+  frontend/src/components/editor/TileSelector.tsx \
+  frontend/src/__tests__/EditorGrid.test.tsx
+git commit -m "feat(frontend): add EditorGrid and TileSelector components_eli"
+
+git add frontend/src/pages/editor/EditorPage.tsx \
+  frontend/src/__tests__/EditorPage.test.tsx
+git commit -m "feat(frontend): add EditorPage with save and publish flow_mar"
+
+
+# ═══════════════════════════════════════════════════════════════
+# ÉTAPE 4.5 — Mode Tour Admin
+# ═══════════════════════════════════════════════════════════════
+
+# ── Correction — build shared automatique ────────────────────
+
+git add package.json
+git commit -m "chore(root): add concurrently and prebuild script for shared_jer"
+
+# ── Backend — Jour 3 (jdebrull) ──────────────────────────────
+
+git add backend/prisma/schema.prisma
+git commit -m "feat(prisma): ensure grid_json as String type and add score perf index_jer"
+
+git add backend/src/middleware/admin.middleware.ts \
+  backend/src/__tests__/admin.middleware.test.ts
+git commit -m "feat(backend): add admin middleware with is_admin check_jer"
+
+git add backend/src/routes/admin.routes.ts \
+  backend/src/__tests__/admin.routes.test.ts
+git commit -m "feat(backend): add admin tower GET and PUT routes with grid validation_jer"
+
+git add backend/prisma/seed-tower.ts
+git commit -m "feat(prisma): add seed-tower with 8 themed admin maps_jer"
+
+git add backend/src/routes/tower.routes.ts \
+  backend/src/__tests__/tower.complete.test.ts
+git commit -m "feat(backend): add tower complete route with progression and diamonds_jer"
+
+git add backend/src/routes/auth.routes.ts \
+  backend/src/routes/index.ts
+git commit -m "feat(backend): add auto-admin promotion and is_admin in toUserPublic_jer"
+
+# ── Shared types — Jour 4 (jpaulis) ─────────────────────────
+
+git add shared/src/types/user.types.ts
+git commit -m "feat(shared): add is_admin field to UserPublic_jen"
+
+# ── Frontend — Jour 4 (jpaulis) ──────────────────────────────
+
+git add frontend/src/services/api.service.ts
+git commit -m "feat(frontend): add admin namespace and tower.complete to api service_jen"
+
+git add frontend/src/App.tsx
+git commit -m "feat(frontend): declare tower route before play for correct matching_jen"
+
+# ── Frontend — Jour 4 (evan-dro) ─────────────────────────────
+
+git add frontend/src/components/tower/CongratulatoryModal.tsx
+git commit -m "feat(frontend): add CongratulatoryModal with animated diamond counter_eli"
+
+# ── Frontend — Jour 4 (malafont) ─────────────────────────────
+
+git add frontend/src/pages/game/TowerGamePage.tsx
+git commit -m "feat(frontend): add TowerGamePage with complete and congratulatory flow_mar"
+
+git add frontend/src/pages/TowerPage.tsx
+git commit -m "feat(frontend): update TowerPage with 8 levels and progress tracking_mar"
+
+git add frontend/src/pages/editor/EditorPage.tsx
+git commit -m "feat(frontend): add admin mode to EditorPage with level management_mar"
+
+
+# ═══════════════════════════════════════════════════════════════
+# ÉTAPE 5 — Multiplayer Socket.IO
+# ⚠️  Ces fichiers n'existent pas encore — commandes à exécuter
+#     après implémentation. Les chemins sont conventionnels.
+# ═══════════════════════════════════════════════════════════════
+
+# ⚠️ créer : backend/src/services/race.service.ts
+git add backend/src/services/race.service.ts
+git commit -m "feat(socket): add RaceService with tick loop and collision_jer"
+
+# ⚠️ créer : backend/src/services/lobby.service.ts
+git add backend/src/services/lobby.service.ts
+git commit -m "feat(socket): add LobbyService with matchmaking queue_jer"
+
+# ⚠️ créer : backend/src/sockets/race.handlers.ts
+#             backend/src/middleware/socket.auth.middleware.ts
+git add backend/src/sockets/race.handlers.ts \
+  backend/src/middleware/socket.auth.middleware.ts
+git commit -m "feat(socket): add Socket.IO race handlers and auth middleware_jer"
+
+# backend/src/server.ts est déjà commité en étape 3 — ce commit
+# représente la modification qui attache socket.io à l'httpServer
+git add backend/src/server.ts
+git commit -m "chore(backend): attach Socket.IO to http server_jer"
+
+# ⚠️ créer : frontend/src/services/socket.service.ts
+git add frontend/src/services/socket.service.ts
+git commit -m "feat(frontend): add SocketService singleton_jen"
+
+# ⚠️ créer : frontend/src/hooks/useRace.ts
+git add frontend/src/hooks/useRace.ts
+git commit -m "feat(frontend): add useRace hook bridging socket and ui state_jen"
+
+# ⚠️ créer : frontend/src/game/EventBus.ts
+git add frontend/src/game/EventBus.ts
+git commit -m "feat(game): add EventBus as bridge between React and Phaser_mar"
+
+# ⚠️ créer : frontend/src/game/scenes/RaceScene.ts
+git add frontend/src/game/scenes/RaceScene.ts
+git commit -m "feat(game): add RaceScene with server state interpolation_mar"
+
+# ⚠️ créer : frontend/src/game/RaceCanvas.tsx
+git add frontend/src/game/RaceCanvas.tsx
+git commit -m "feat(game): add RaceCanvas mounting RaceScene_mar"
+
+# ⚠️ créer : frontend/src/components/lobby/LobbyScreen.tsx
+git add frontend/src/components/lobby/LobbyScreen.tsx
+git commit -m "feat(frontend): add LobbyScreen with all race phase states_eli"
+
+# frontend/src/pages/game/RacePage.tsx existe (stub) — à modifier
+# quand LobbyScreen et useRace sont disponibles
+git add frontend/src/pages/game/RacePage.tsx
+git commit -m "feat(frontend): add RacePage orchestrating race flow_mar"
+
+# ⚠️ créer : backend/src/__tests__/race.service.test.ts
+git add backend/src/__tests__/race.service.test.ts
+git commit -m "test(backend): add RaceService unit tests with fake timers_jer"
+
+
+# ═══════════════════════════════════════════════════════════════
+# DOCUMENTATION — produite pendant les sessions de debug
+# ═══════════════════════════════════════════════════════════════
+
+git add backend_doc/cycle-de-vie-map.md \
+  backend_doc/difficulty_enum.md \
+  backend_doc/grille_seed.md \
+  backend_doc/prisma_client.md \
+  backend_doc/seed_ts_node.md
+git commit -m "docs(backend): add backend reference documentation_jer"
+
+git add frontend/frontend_doc/animation_joueur.md \
+  frontend/frontend_doc/authentification-jwt-context.md \
+  frontend/frontend_doc/css_grid_react.md \
+  frontend/frontend_doc/flux-editeur-gamepage.md \
+  frontend/frontend_doc/modifier_la_grille.md \
+  frontend/frontend_doc/textures_tuiles.md \
+  frontend/frontend_doc/toast-provider-container-pattern.md
+git commit -m "docs(frontend): add frontend reference documentation_jen"
+
+git add history_debug/2026-05-15_backend-routes-setup.md \
+  history_debug/2026-05-15_frontend-setup.md \
+  history_debug/2026-05-15_migration-js-vers-typescript.md \
+  history_debug/2026-05-15_npm-vulnerabilities.md \
+  history_debug/2026-05-15_types-schema-seed.md
+git commit -m "docs(root): add debug history for initial setup session_jer"
+
+git add history_debug/2026-05-16_carte-perdue-et-non-publiable.md \
+  history_debug/2026-05-16_editor-grid-colonnes-vides.md \
+  history_debug/2026-05-16_reconnexion-impossible-apres-fermeture.md \
+  history_debug/2026-05-16_login-400-toast-invisible.md
+git commit -m "docs(root): add debug history for 2026-05-16 bug fixes_mar"
+
+git add history_debug/2026-05-17_mode-tour-admin-backend.md \
+  history_debug/2026-05-17_mode-tour-admin-frontend.md
+git commit -m "docs(root): add debug history for 2026-05-17 tour admin session_jer"
+
+git add background_doc/backend_middleware_express.md \
+  background_doc/backend_prisma_seed_grilles.md \
+  background_doc/frontend_contexte_auth_tour.md
+git commit -m "docs(root): add background documentation for middleware and auth tour_jer"
+
+git add probleme_rencontre/corrections.md \
+  probleme_rencontre/schema_prisma.md
+git commit -m "docs(root): add troubleshooting notes for corrections and schema_jer"
+
+git add CLAUDE.md CONTEXT.md
+git commit -m "docs(root): add CLAUDE.md and CONTEXT.md for session context_jer"
+
+git add ordre_de_commit.txt organisation_role_push.md
+git commit -m "docs(root): update commit order and organisation documentation_jer"

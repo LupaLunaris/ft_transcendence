@@ -1,0 +1,770 @@
+MARTIN — Gameplay / règles
+
+11 tickets
+
+⸻
+
+TICKET M1 — Réécrire et simplifier le lore
+
+Description
+
+Réécrire l’histoire d’introduction du jeu.
+
+On veut exactement
+
+* texte plus court
+* lecture max 30–45 secondes
+* cohérent avec :
+    * tour
+    * diamants
+    * labyrinthe
+    * progression
+
+Livrable
+
+* texte final
+* version EN + FR + DE
+
+⸻
+
+TICKET M2 — Diapo introduction lore
+
+Description
+
+Créer une séquence avant le menu principal.
+
+On veut exactement
+
+* 2–4 slides maximum
+* image + texte
+* bouton :
+    * suivant
+    * précédent
+    * passer
+
+Fin
+
+Dernière slide :
+
+“Commencer l’aventure”
+
+⸻
+
+TICKET M3 — Tutoriel joueur
+
+Description
+
+Créer tutoriel première connexion.
+
+On veut exactement
+
+Écrans :
+
+1. déplacement
+2. ennemis
+3. sortie
+4. progression tour
+5. cartes personnalisées
+
+Conditions
+
+* affiché première connexion
+* rejouable depuis paramètres
+
+⸻
+
+TICKET M4 — Limite cartes
+
+Description
+
+Limiter quantité de maps.
+
+On veut exactement
+
+MVP :
+
+* maximum 5 cartes par joueur
+
+Message :
+
+“Limite atteinte”
+
+⸻
+
+TICKET M5 — Limite ennemis
+
+Description
+
+Limiter ennemis plaçables.
+
+On veut exactement
+
+Affichage :
+
+Enemy H : X/5
+
+Enemy V : X/5
+
+⸻
+
+TICKET M6 — Déblocage ennemis
+
+Description
+
+Débloquer ennemis selon progression.
+
+MVP
+
+Niveau tour :
+
+* 1 → Enemy H
+* 3 → Enemy V
+* 5 → nouveau type
+
+⸻
+
+TICKET M7 — Étoiles progression
+
+Description
+
+Attribuer étoiles selon temps.
+
+MVP
+
+* ★★★ rapide
+* ★★ moyen
+* ★ lent
+
+⸻
+
+TICKET M8 — Séparer mode solo et race
+
+Description
+
+Séparer clairement logique des deux modes.
+
+On veut exactement
+
+Menu :
+
+Entraînement :
+
+* Solo
+* Duo race
+
+Solo :
+
+* progression personnelle
+
+Duo :
+
+* système attente joueur
+
+⸻
+
+TICKET M9 — Gameplay race
+
+Description
+
+Définir logique complète race.
+
+On veut exactement
+
+* départ
+* victoire
+* défaite
+* abandon
+* déconnexion
+* rematch
+
+⸻
+
+TICKET M10 — Synchronisation gameplay multijoueur
+
+Description
+
+Martin gère logique gameplay multi.
+
+Synchroniser
+
+* victoire
+* défaite
+* état partie
+* événements gameplay
+* fin partie
+
+⸻
+
+TICKET M11 — Progression sauvegardée pendant race
+
+Description
+
+Si joueur quitte temporairement tour.
+
+On veut exactement
+
+Sauvegarder :
+
+* niveau tour actuel
+* progression
+
+Puis reprendre exactement après race.
+
+⸻
+
+JEREM — Backend / WebSocket / DB
+
+15 tickets
+
+⸻
+
+TICKET B1 — Migration SQLite → PostgreSQL
+
+Description
+
+Remplacer SQLite.
+
+On veut exactement
+
+* PostgreSQL
+* Prisma
+* Docker compatible
+* migration propre
+
+⸻
+
+TICKET B2 — Supprimer une map
+
+Description
+
+Permettre suppression map créée.
+
+On veut exactement
+
+Actions :
+
+* bouton supprimer
+* popup confirmation
+
+Message :
+
+“Supprimer définitivement ?”
+
+Conditions :
+
+* uniquement propriétaire
+
+⸻
+
+TICKET B3 — Dépublier map
+
+Description
+
+Retirer map publique.
+
+On veut exactement
+
+La map :
+
+* reste sauvegardée
+* disparaît d’explore
+
+⸻
+
+TICKET B4 — Sauvegarde statistiques map
+
+Description
+
+Stocker :
+
+* nombre réussites
+* temps records
+
+⸻
+
+TICKET B5 — Top 3 records
+
+On veut exactement
+
+Pour chaque map :
+
+1. joueur + temps
+2. joueur + temps
+3. joueur + temps
+
+⸻
+
+TICKET B6 — Système attente race
+
+Description
+
+Permettre rejoindre une file.
+
+On veut exactement
+
+Actions :
+
+* rejoindre file
+* quitter file
+
+Etat :
+
+“1 joueur attend”
+
+⸻
+
+TICKET B7 — Détection joueur disponible
+
+Description
+
+Afficher attente joueurs.
+
+Exemple :
+
+Map X :
+
+2 joueurs attendent
+
+⸻
+
+TICKET B8 — Création room automatique
+
+Description
+
+Quand second joueur rejoint :
+
+Créer room automatiquement.
+
+⸻
+
+TICKET B9 — Synchronisation WebSocket
+
+Synchroniser
+
+* positions
+* déplacements
+* connexion
+* déconnexion
+
+⸻
+
+TICKET B10 — Système amis
+
+Description
+
+Ajouter :
+
+* ajouter
+* supprimer
+* statut online
+
+⸻
+
+TICKET B11 — Statistiques joueur
+
+Description
+
+Stocker :
+
+* niveau
+* niveau tour
+* maps créées
+* maps terminées
+
+⸻
+
+TICKET B12 — Chat basique
+
+Description
+
+Chat obligatoire pour module interaction.
+
+MVP
+
+* envoyer message
+* recevoir message
+* historique simple
+
+Pas maintenant :
+
+* réactions
+* GIF
+* typing
+
+⸻
+
+TICKET B13 — Sécurité mots de passe
+
+Description
+
+Sécuriser authentification.
+
+On veut exactement
+
+* bcrypt
+* hash
+* salt
+* expiration JWT
+* jamais mot de passe brut
+
+⸻
+
+TICKET B14 — Validation backend
+
+Description
+
+Valider :
+
+* email
+* pseudo
+* mots de passe
+* formulaires
+
+⸻
+
+TICKET B15 — HTTPS + variables sensibles
+
+Description
+
+Sécuriser environnement.
+
+On veut exactement
+
+* HTTPS
+* .env
+* .env.example
+
+⸻
+
+JENNIFER — Architecture / rendu / assets
+
+11 tickets
+
+⸻
+
+TICKET J1 — Direction visuelle globale
+
+Description
+
+Définir identité visuelle.
+
+On veut exactement
+
+* palette couleurs
+* ambiance
+* style cohérent
+
+⸻
+
+TICKET J2 — Logos cohérents
+
+Description
+
+Créer identité graphique.
+
+⸻
+
+TICKET J3 — Fonds ambiance
+
+Description
+
+Ajouter fonds sobres.
+
+⸻
+
+TICKET J4 — Refonte sprites joueurs
+
+Description
+
+Améliorer animations.
+
+On veut
+
+* marche
+* victoire
+* game over
+
+⸻
+
+TICKET J5 — Refonte textures
+
+Description
+
+Créer :
+
+* murs
+* sol
+* escaliers
+* sortie
+
+⸻
+
+TICKET J6 — Murs auto-connectés
+
+Description
+
+Adapter automatiquement texture.
+
+Exemple :
+
+Mur seul :
+
+□
+
+Mur connecté :
+
+╬
+
+Coins :
+
+arrondis
+
+⸻
+
+TICKET J7 — Profondeur 3D
+
+Description
+
+Donner impression relief.
+
+⸻
+
+TICKET J8 — Profondeur personnages/ennemis
+
+Description
+
+Gérer ordre affichage.
+
+On veut exactement
+
+Si personnage plus bas :
+
+personnage devant
+
+Sinon :
+
+ennemi devant
+
+⸻
+
+TICKET J9 — Miniatures cartes
+
+Description
+
+Créer aperçu auto.
+
+⸻
+
+TICKET J10 — Architecture frontend
+
+Description
+
+Maintenir :
+
+* routing
+* types partagés
+* cohérence frontend/backend
+
+⸻
+
+TICKET J11 — Intégration realtime frontend
+
+Description
+
+Intégrer websocket frontend.
+
+⸻
+
+ÉLISE — UI / composants / intégration
+
+13 tickets
+
+⸻
+
+TICKET E1 — Inverser login/register
+
+⸻
+
+TICKET E2 — Nouvelle homepage connecté
+
+On veut exactement
+
+Boutons :
+
+* Jouer
+* Créer
+* Explorer
+* Profil
+
+⸻
+
+TICKET E3 — Page profil
+
+On veut
+
+* avatar
+* pseudo
+* niveau
+* niveau tour
+* statistiques
+
+⸻
+
+TICKET E4 — Modifier profil
+
+On veut
+
+* changer avatar
+* changer pseudo
+
+⸻
+
+TICKET E5 — Interface cartes
+
+On veut
+
+* miniature
+* statut publié/non publié
+* modifier
+* supprimer
+
+⸻
+
+TICKET E6 — Affichage records
+
+On veut
+
+* top 3
+* nombre réussites
+
+⸻
+
+TICKET E7 — Boutons dynamiques
+
+On veut
+
+Activer/désactiver selon :
+
+* progression
+* mode disponible
+
+⸻
+
+TICKET E8 — i18n
+
+On veut exactement
+
+Langues :
+
+* FR
+* EN
+* DE
+
+Tous textes traduisibles
+
+⸻
+
+TICKET E9 — Design system
+
+Composants MVP
+
+1. Button
+2. Card
+3. Input
+4. Modal
+5. Avatar
+6. Badge
+7. Tabs
+8. Toast
+9. Navbar
+10. LoadingState
+
+⸻
+
+TICKET E10 — Notifications frontend
+
+On veut
+
+Toast :
+
+* succès
+* erreur
+* avertissement
+
+⸻
+
+TICKET E11 — Nommage composants HTML
+
+Ajouter
+
+* aria-label
+* id
+* noms explicites
+
+⸻
+
+TICKET E12 — Validation frontend
+
+Valider
+
+* formulaires
+* erreurs utilisateur
+
+⸻
+
+TICKET E13 — États loading / erreur
+
+Ajouter
+
+* spinner
+* écran chargement
+* erreurs utilisateur propres
+
+⸻
+
+TICKETS TRANSVERSAUX
+
+⸻
+
+T1 — Privacy Policy + Terms of Service
+
+Responsables
+
+Jennifer + Jerem
+
+Créer
+
+* Privacy Policy
+* Terms of Service
+
+⸻
+
+T2 — README complet
+
+Responsable coordination
+
+Jennifer
+
+Contient
+
+* équipe
+* rôles
+* modules
+* stack
+* architecture
+* schéma DB
+* contributions
+
+⸻
+
+T3 — Tests continus
+
+Responsables
+
+Tous
+
+On veut
+
+* tests avant merge
+* bugs documentés
+* éviter accumulation fin projet
