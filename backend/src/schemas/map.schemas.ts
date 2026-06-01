@@ -14,15 +14,10 @@ import { z } from 'zod';
 import { Grid } from '@ft/shared';
 import { validateGrid, hasPath } from '../utils/grid.utils';
 
-const gridSchema = z
-  .custom<Grid>(
-    validateGrid,
-    'Invalid grid: must be 25x25 with WALL borders, valid tile values, exactly 1 SPAWN and 1 EXIT',
-  )
-  .refine(
-    (val) => !validateGrid(val) || hasPath(val as Grid),
-    'No clear path from SPAWN to EXIT',
-  );
+const gridSchema = z.custom<Grid>(
+  (val) => validateGrid(val) && hasPath(val as Grid),
+  'Grid must be a valid 25x25 map with WALL borders, exactly one SPAWN and one EXIT, and a clear path between them',
+);
 
 export const createMapSchema = z.object({
   name: z.string().min(1, 'Name is required').max(50, 'Name must be at most 50 characters'),
