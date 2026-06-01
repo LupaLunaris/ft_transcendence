@@ -20,7 +20,7 @@ interface EditorGridProps {
 
 function tileColor(tile: TileValue): string {
   switch (tile) {
-    case TILE.WALL:  return '#8f533d';
+    case TILE.WALL:  return '#5c3d8f';
     case TILE.EXIT:  return '#00e5a0';
     case TILE.SPAWN:   return '#f4511e';
     case TILE.ENEMY_H: return '#e53935';

@@ -18,7 +18,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
-    setupFiles: "./src/__tests__/setup.ts",
+    setupFiles: "./tests/setup.ts",
     alias: {
       "@ft/shared": path.resolve(__dirname, "../shared/src/index.ts"),
       "@": path.resolve(__dirname, "src"),
@@ -41,15 +41,14 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    host: "0.0.0.0",
     proxy: {
       "/api": {
-        target: process.env.BACKEND_INTERNAL_URL ?? "http://localhost:3001",
+        target: "http://localhost:3001",
         changeOrigin: true,
         secure: false,
       },
       "/socket.io": {
-        target: process.env.BACKEND_INTERNAL_URL ?? "http://localhost:3001",
+        target: "http://localhost:3001",
         changeOrigin: true,
         ws: true,
       },

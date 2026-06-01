@@ -59,7 +59,7 @@ export function HomePage() {
             </div>
 
             {/* Action buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Link to="/editor">
                 <button className="w-full bg-surface-raised hover:bg-surface-muted border border-surface-border rounded-xl p-6 text-left transition-all group">
                   <div className="text-3xl mb-3">🗺</div>
@@ -92,18 +92,6 @@ export function HomePage() {
                   </h3>
                   <p className="text-xs text-white/40 mt-1">
                     8 niveaux officiels à conquérir
-                  </p>
-                </button>
-              </Link>
-
-              <Link to="/duel">
-                <button className="w-full bg-surface-raised hover:bg-surface-muted border border-surface-border rounded-xl p-6 text-left transition-all group">
-                  <div className="text-3xl mb-3">🥊</div>
-                  <h3 className="font-semibold text-white group-hover:text-deep-300 transition-colors">
-                    Duel
-                  </h3>
-                  <p className="text-xs text-white/40 mt-1">
-                    Affronte un joueur en temps réel
                   </p>
                 </button>
               </Link>

@@ -19,8 +19,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import apiRouter from './routes/index';
-import { registerDuelHandlers } from './socket/duelHandler';
-import type { ClientToServerEvents, ServerToClientEvents } from '@ft/shared';
 
 const PORT = process.env.PORT ?? 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:5173';
@@ -28,7 +26,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:5173';
 const app = express();
 const httpServer = createServer(app);
 
-const io = new SocketIOServer<ClientToServerEvents, ServerToClientEvents>(httpServer, {
+const io = new SocketIOServer(httpServer, {
   cors: {
     origin: FRONTEND_URL,
     methods: ['GET', 'POST'],
@@ -80,7 +78,13 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 
 // ─── Socket.IO ───────────────────────────────────────────────────────────────
 
-registerDuelHandlers(io);
+io.on('connection', (socket) => {
+  console.log(`[socket] client connected: ${socket.id}`);
+
+  socket.on('disconnect', (reason) => {
+    console.log(`[socket] client disconnected: ${socket.id} (${reason})`);
+  });
+});
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 
