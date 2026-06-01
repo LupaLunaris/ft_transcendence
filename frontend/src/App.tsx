@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/* App.tsx                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/* By: jpaulis <jpaulis@student.42belgium.be        +#+  +:+       +#+       */
+/*                                                +#+#+#+#+#+   +#+           */
+/* Created: 2026/05/15 00:00:00 by jpaulis         #+#    #+#               */
+/* Updated: 2026/05/17 00:00:00 by jpaulis        ###   ########.fr          */
+/*                                                                            */
+/* ************************************************************************** */
+
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { ToastProvider } from '@/components/ui/useToast';
@@ -16,6 +28,8 @@ import { EditorPage }    from '@/pages/editor/EditorPage';
 import { GamePage }      from '@/pages/game/GamePage';
 import { RacePage }      from '@/pages/game/RacePage';
 import { TowerGamePage } from '@/pages/game/TowerGamePage';
+import { DuelPage }      from '@/pages/duel/DuelPage';
+import { DuelGamePage }  from '@/pages/duel/DuelGamePage';
 import { NotFoundPage }  from '@/pages/NotFoundPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -50,6 +64,8 @@ function AppRoutes() {
       <Route path="/play/tower/:order_index" element={<ProtectedRoute><TowerGamePage /></ProtectedRoute>} />
       <Route path="/play/:map_id"            element={<ProtectedRoute><GamePage /></ProtectedRoute>} />
       <Route path="/play/:map_id/race"       element={<ProtectedRoute><RacePage /></ProtectedRoute>} />
+      <Route path="/duel"                    element={<ProtectedRoute><DuelPage /></ProtectedRoute>} />
+      <Route path="/duel/game"               element={<ProtectedRoute><DuelGamePage /></ProtectedRoute>} />
 
       {/* 404 */}
       <Route path="*" element={<NotFoundPage />} />

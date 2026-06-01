@@ -50,9 +50,9 @@ build: ## Build shared → backend → frontend
 build-shared: ## Build only @ft/shared (required before running backend/frontend)
 	npm run build --workspace=shared
 
-start: docker-up ## Start full Docker/nginx stack
+start: install build-shared dev ## Install, build shared, then start dev servers (quick entry point)
 
-dev: ## Start local Vite/nodemon development servers
+dev: ## Start backend + frontend dev servers concurrently
 	@printf "$(YELLOW)Starting dev servers (Ctrl-C to stop both)...$(RESET)\n"
 	@printf "  Backend:  $(BOLD)http://localhost:3001$(RESET)\n"
 	@printf "  Frontend: $(BOLD)http://localhost:5173$(RESET)\n\n"
@@ -84,34 +84,34 @@ test-frontend: ## Run frontend tests (Vitest + Testing Library)
 # Note: requires a .env at the project root (copy .env.example and fill values)
 
 docker-build: ## Build Docker images (no cache)
-	docker-compose build --no-cache
+	docker compose build --no-cache
 
 docker-up: ## Build and start all services in detached mode
 	@if [ ! -f .env ]; then \
 		printf "$(RED)Error: .env not found. Copy .env.example and fill in values.$(RESET)\n"; \
 		exit 1; \
 	fi
-	docker-compose up --build -d
+	docker compose up --build -d
 	@printf "$(GREEN)Services running:$(RESET)\n"
-	@printf "  Frontend: https://localhost:8443\n"
+	@printf "  Frontend: http://localhost:5173\n"
 	@printf "  Backend:  http://localhost:3001/api/v1/health\n"
 	@printf "  Postgres: localhost:5432\n"
 
 docker-down: ## Stop and remove containers (keeps volumes)
-	docker-compose down
+	docker compose down
 
 docker-down-v: ## Stop and remove containers AND volumes (wipes DB data)
-	docker-compose down -v
+	docker compose down -v
 
 docker-logs: ## Stream logs from all services
-	docker-compose logs -f
+	docker compose logs -f
 
 docker-logs-backend: ## Stream backend logs only
-	docker-compose logs -f backend
+	docker compose logs -f backend
 
 docker-restart: ## Tear down, rebuild, and restart all services
-	docker-compose down
-	docker-compose up --build -d
+	docker compose down
+	docker compose up --build -d
 
 # ─────────────────────────────────────────────────────────────────────────────
 # DATABASE — local Prisma dev server (prisma+postgres://localhost:51213)
@@ -138,7 +138,6 @@ clean: ## Remove build artifacts (dist folders, Vite cache)
 	rm -rf frontend/.vite backend/.cache
 
 fclean: clean ## Remove build artifacts + all node_modules
-	docker-compose down -v --remove-orphans
 	rm -rf node_modules
 	rm -rf backend/node_modules frontend/node_modules shared/node_modules
 

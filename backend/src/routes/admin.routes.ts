@@ -50,7 +50,7 @@ router.put('/tower/:order_index', async (req: Request, res: Response) => {
       return;
     }
     if (!validateGrid(parsed)) {
-      sendError(res, 'grid_json must be a valid 25x25 grid (borders WALL, 1 SPAWN, 1 EXIT)', 400);
+      sendError(res, 'grid_json must be a valid 25x25 grid (valid tile values, borders WALL, 1 SPAWN, 1 EXIT)', 400);
       return;
     }
   }
