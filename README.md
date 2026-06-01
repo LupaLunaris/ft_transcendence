@@ -1,143 +1,109 @@
-# ft_transcendence
+# ft_transcendence — Guilds of the Deep
+
+*This project has been created as part of the 42 curriculum by malafont, jdebrull, jpaulis, evan-dro.*
 
 ## Description
 
-This project is a web application developed as part of the 42 curriculum.
+The game targets players under 15 years old.
 
-The goal is to build a collaborative online game designed around exploration, progression, and world creation. Users will be able to unlock map elements, build their own labyrinth-like environments, complete challenges, and interact with worlds created by other players.
+Core pillars:
 
-The application combines gameplay, progression systems, and controlled social interaction in a secure web environment.
+- exploration
+- labyrinth creation
+- progression
+- multiplayer races
+- community-created maps
 
----
+The player is an adventurer rescued by a resistance made of former miners and builders. They train the player inside labyrinths before attempting to climb the tower controlled by the witch Meduza.
+Players join guilds, climb leaderboards, and compete in ranked matches — all playable in the browser with no installation required.
 
-## Core Game Principle
+## Quick Start (Docker — recommandé)
 
-Each player progressively unlocks map elements by completing actions such as:
+```bash
+# 1. Copier et remplir les variables d'environnement
+cp .env.example .env
 
-* solving questions or challenges,
-* exploring existing worlds,
-* testing other players' creations,
-* completing objectives.
+# 2. Lancer tous les services (PostgreSQL + backend + frontend)
+make docker-up
+```
 
-Unlocked elements can then be used to build a personal world made of modular map pieces.
+Frontend → http://localhost:5173  
+Backend  → http://localhost:3001
 
-Players can:
+### Mode local sans Docker (PostgreSQL requis)
 
-* create their own labyrinth,
-* test their own world,
-* explore worlds created by others,
-* receive rewards through progression,
-* use virtual currency to unlock decorative or gameplay elements.
+```bash
+npm install
+cp .env.example backend/.env   # adapter DATABASE_URL vers localhost
+npm run build --workspace=shared
+npm run db:migrate --workspace=backend
+npm run dev
+```
 
-User interaction will remain controlled through predefined communication systems to avoid unsafe free messaging.
+### Makefile shortcuts (from repo root)
 
----
+```bash
+make start         # install + build shared + dev (recommended entry point)
+make dev           # backend + frontend in parallel
+make test          # all tests (backend then frontend)
+make db-migrate    # apply pending Prisma migrations
+make db-seed       # insert test users + AdminMap
+make db-studio     # open Prisma Studio in browser
+make docker-up     # build + start all services via Docker (PostgreSQL mode)
+make help          # list all available commands
+```
 
-## Project Structure
+### Docker mode (PostgreSQL)
 
-### frontend/
+Create a `.env` at the **repo root** (see `README_install_and_start.md` for required variables), then:
 
-Contains the client-side application.
+```bash
+make docker-up
+```
 
-This part will handle:
+| Service    | URL              |
+|------------|-----------------|
+| Frontend   | http://localhost:5173 |
+| Backend    | http://localhost:3001 |
+| PostgreSQL | localhost:5432   |
 
-* user interface,
-* game rendering,
-* navigation,
-* interaction with backend APIs,
-* responsive design.
+> See [README_install_and_start.md](README_install_and_start.md) for the full reference (env vars, workspace commands, common issues).
 
-Planned technologies: frontend framework, reusable components, game UI logic.
+## Team
 
----
+| Role | Member | Login | Responsibilities |
+|---|---|---|---|
+| PO + Gameplay | Martin | malafont | Phaser game scenes, game logic, map editor |
+| PM + Backend | Jerem | jdebrull | Express API, auth, Socket.IO, Prisma |
+| Tech Lead + Frontend | Jennifer | jpaulis | Architecture, hooks, shared types, Vite |
+| UI Lead | Élise | evan-dro | Components, Tailwind design system |
 
-### backend/
+## Stack
 
-Contains the server-side application.
+| Layer | Technology |
+|---|---|
+| Frontend | React 18 + TypeScript, Vite 8, Tailwind CSS |
+| Game engine | Phaser 3.80 |
+| Realtime | Socket.IO 4.7 |
+| Backend | Node.js + Express 4 + TypeScript |
+| Database | PostgreSQL 16 via Prisma 5 (Docker Compose) |
+| Auth | JWT (ft_token in localStorage, Bearer header) |
+| Tests | Vitest (frontend) + Jest 30 (backend) |
 
-This part will handle:
+## Project Status
 
-* authentication,
-* API routes,
-* business logic,
-* game rules,
-* rewards system,
-* interaction with database.
+| Step | Feature | Status |
+|------|---------|--------|
+| 1–4 | Auth, user management, map editor, tower mode | Done |
+| 5 | Socket.IO multiplayer race | To do |
+| — | Admin editor + full tower mode | To do |
 
-Planned technologies: backend framework, secure REST API, websocket features.
+## Modules
 
----
-
-### database/
-
-Contains database-related resources.
-
-This part will include:
-
-* schema design,
-* migrations,
-* relations between users, worlds, tiles, rewards and interactions.
-
-Main entities expected:
-
-* users
-* worlds
-* tiles
-* inventory
-* rewards
-* interactions
-
----
-
-### docker/
-
-Contains containerization and environment setup.
-
-This part will define:
-
-* service containers,
-* development environment,
-* database service,
-* backend service,
-* frontend service.
-
-Goal: full project startup with one command.
-
----
-
-### docs/
-
-Contains technical and project documentation.
-
-This part may include:
-
-* architecture diagrams,
-* module planning,
-* task organization,
-* database diagrams,
-* technical decisions.
-
----
-
-## Initial Technical Goal
-
-The first objective is to establish a clean working base:
-
-* repository structure,
-* protected branches,
-* frontend and backend startup,
-* database connection,
-* Docker orchestration.
-
----
-
-## Development Approach
-
-The project will first focus on a minimal playable version:
-
-* user login,
-* basic world grid,
-* tile placement,
-* simple progression loop.
-
-Additional systems will be added progressively afterward.
+- **Major** — Use a Framework as backend (Express + Node.js)
+- **Major** — Standard user management, authentication, users across tournaments
+- **Major** — Implementing a remote player (Socket.IO multiplayer)
+- **Minor** — Use a front-end framework or toolkit (React)
+- **Minor** — Use a database for the backend (PostgreSQL + Prisma)
+- **Minor** — Game customisation options (maps, difficulty)
+- **Minor** — Expanding Browser Compatibility (Vite build, modern ES target)
