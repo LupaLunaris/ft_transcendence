@@ -3,7 +3,14 @@
     "allow": [
       "Bash(npx tsc *)",
       "Bash(npx prisma *)",
-      "Bash(DATABASE_URL=\"postgresql://ft_user:change_me_in_prod@localhost:5432/ft_transcendence\" npx prisma generate)"
+      "Bash(DATABASE_URL=\"postgresql://ft_user:change_me_in_prod@localhost:5432/ft_transcendence\" npx prisma generate)",
+      "Read(//home/belou/0ft_transcendence/backend/**)",
+      "Read(//home/belou/0ft_transcendence/**)",
+      "Bash(ls /home/belou/ | grep transcendence)",
+      "Read(//home/belou/**)",
+      "Bash(git push *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   }
 }
