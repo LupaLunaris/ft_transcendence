@@ -1,5 +1,3 @@
-version: "3.9"
-
 networks:
   ft_network:
     driver: bridge
@@ -60,6 +58,7 @@ services:
     environment:
       VITE_API_URL: /api/v1
       VITE_BACKEND_URL: ${BACKEND_URL}
+      BACKEND_INTERNAL_URL: http://backend:3001
       NODE_ENV: ${NODE_ENV}
     ports:
       - "5173:5173"

@@ -44,7 +44,7 @@ export function GameCanvas({ grid, player_id, onExit, onDeath }: GameCanvasProps
       width:  CANVAS_WIDTH,
       height: CANVAS_HEIGHT,
 		backgroundColor: '#0d1117',
-	  pixelArt: true,
+	  pixelArt: false,
       physics: {
         default: 'arcade',
         arcade: { gravity: { x: 0, y: 0 }, debug: false },

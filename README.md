@@ -17,28 +17,28 @@ Core pillars:
 The player is an adventurer rescued by a resistance made of former miners and builders. They train the player inside labyrinths before attempting to climb the tower controlled by the witch Meduza.
 Players join guilds, climb leaderboards, and compete in ranked matches — all playable in the browser with no installation required.
 
-## Quick Start
+## Quick Start (Docker — recommandé)
 
 ```bash
-# 1. Install all workspace dependencies
-npm install
+# 1. Copier et remplir les variables d'environnement
+cp .env.example .env
 
-# 2. Set up backend environment variables
-cp backend/.env.example backend/.env
-
-# 3. Generate Prisma client + create/migrate SQLite database
-npm run db:generate --workspace=backend
-npm run db:migrate --workspace=backend
-
-# 4. (optional) Seed the DB with test users
-npm run db:seed --workspace=backend
-
-# 5. Build and start backend + frontend in parallel
-npm run dev
+# 2. Lancer tous les services (PostgreSQL + backend + frontend)
+make docker-up
 ```
 
 Frontend → http://localhost:5173  
 Backend  → http://localhost:3001
+
+### Mode local sans Docker (PostgreSQL requis)
+
+```bash
+npm install
+cp .env.example backend/.env   # adapter DATABASE_URL vers localhost
+npm run build --workspace=shared
+npm run db:migrate --workspace=backend
+npm run dev
+```
 
 ### Makefile shortcuts (from repo root)
 
@@ -86,7 +86,7 @@ make docker-up
 | Game engine | Phaser 3.80 |
 | Realtime | Socket.IO 4.7 |
 | Backend | Node.js + Express 4 + TypeScript |
-| Database | SQLite via Prisma 5 (PostgreSQL in Docker mode) |
+| Database | PostgreSQL 16 via Prisma 5 (Docker Compose) |
 | Auth | JWT (ft_token in localStorage, Bearer header) |
 | Tests | Vitest (frontend) + Jest 30 (backend) |
 
@@ -104,6 +104,6 @@ make docker-up
 - **Major** — Standard user management, authentication, users across tournaments
 - **Major** — Implementing a remote player (Socket.IO multiplayer)
 - **Minor** — Use a front-end framework or toolkit (React)
-- **Minor** — Use a database for the backend (SQLite + Prisma)
+- **Minor** — Use a database for the backend (PostgreSQL + Prisma)
 - **Minor** — Game customisation options (maps, difficulty)
 - **Minor** — Expanding Browser Compatibility (Vite build, modern ES target)

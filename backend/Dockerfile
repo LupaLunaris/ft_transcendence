@@ -1,6 +1,8 @@
 # Build context: monorepo root (docker-compose sets context: .)
 FROM node:20-alpine
 
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
 # Copy workspace manifests for layer caching
@@ -21,6 +23,8 @@ COPY backend/ ./backend/
 
 WORKDIR /app/backend
 
+RUN npx prisma generate
+
 EXPOSE 3001
 
-CMD ["npm", "run", "dev"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run db:seed && npm run dev"]
