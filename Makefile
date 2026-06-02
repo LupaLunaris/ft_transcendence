@@ -3,9 +3,9 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 .PHONY: help install build start dev test test-backend test-frontend \
-        docker-build docker-up docker-down docker-logs docker-restart \
-        db-generate db-migrate db-seed db-studio \
-        clean fclean re
+		docker-build docker-up docker-down docker-logs docker-restart \
+		db-generate db-migrate db-seed db-studio \
+		clean fclean re
 
 # ── Colors ────────────────────────────────────────────────────────────────────
 RESET  := \033[0m
