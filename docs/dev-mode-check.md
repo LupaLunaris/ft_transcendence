@@ -6,18 +6,19 @@ Check if the project starts locally from a clean install.
 
 ## Commands tested
 
-```bash
-rm -rf node_modules
-npm install
-npm run dev
-Problem found
+    rm -rf node_modules
+    npm install
+    npm run dev
+
+## Problem found
 
 After a clean install, the backend initially failed because Prisma Client was not generated before starting the backend.
 
 Error:
 
-Module '"@prisma/client"' has no exported member 'User'.
-Fix applied
+    Module '"@prisma/client"' has no exported member 'User'.
+
+## Fix applied
 
 Added a root script:
 
