@@ -22,25 +22,25 @@ Error:
 
 Added a root script:
 
-"prisma:generate": "prisma generate --schema backend/prisma/schema.prisma"
+    "prisma:generate": "prisma generate --schema backend/prisma/schema.prisma"
 
 Updated the root dev script to run Prisma generation before starting the app:
 
-"dev": "npm run build -w shared && npm run prisma:generate && concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\""
-Final result
+    "dev": "npm run build -w shared && npm run prisma:generate && concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\""
+
+## Final result
 
 After the fix, the clean test works.
 
-Frontend:
-
-http://localhost:5173/
+Frontend: http://localhost:5173/
 
 Backend:
 
-[server] listening on http://localhost:3001
-[server] NODE_ENV=development
-Notes
+    [server] listening on http://localhost:3001
+    [server] NODE_ENV=development
 
-npm install shows deprecated package warnings and 5 moderate vulnerabilities.
+## Notes
+
+`npm install` shows deprecated package warnings and 5 moderate vulnerabilities.
 
 This does not block dev mode startup, but should be reviewed later.
