@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth.context';
 import { useApi } from '@/hooks/useApi';
@@ -34,9 +34,19 @@ export function TowerGamePage() {
     diamonds: number;
   } | null>(null);
 
-  const { data: level, loading, error } = useApi<TowerLevelFull>(
+  const { data: level, loading, error, refetch } = useApi<TowerLevelFull>(
     () => api.tower.getLevel(orderIndex),
   );
+
+  const isMounted = useRef(false);
+  useEffect(() => {
+    if (!isMounted.current) { isMounted.current = true; return; }
+    setDead(false);
+    setShowModal(false);
+    setCompletionData(null);
+    setGameKey((k) => k + 1);
+    refetch();
+  }, [orderIndex, refetch]);
 
   const handleDeath = useCallback(() => {
     setDead(true);
