@@ -28,17 +28,30 @@ make docker-up
 ```
 
 Frontend → http://localhost:5173  
-Backend  → http://localhost:3001
+Backend  → http://localhost:3001/api/health
+
+Le fichier `.env.example` à la racine est prévu pour Docker Compose. Il contient aussi les variables PostgreSQL utilisées par le service `postgres`.
 
 ### Mode local sans Docker (PostgreSQL requis)
 
 ```bash
 npm install
-cp .env.example backend/.env   # adapter DATABASE_URL vers localhost
+cp backend/.env.example backend/.env
 npm run build --workspace=shared
 npm run db:migrate --workspace=backend
 npm run dev
 ```
+
+Le fichier `backend/.env.example` est prévu pour le backend lancé localement avec `make dev` ou `npm run dev --workspace=backend`; sa `DATABASE_URL` pointe vers `localhost`.
+
+Avant `make dev`, arrêter les conteneurs Docker frontend/backend s'ils tournent déjà:
+
+```bash
+make docker-down
+make dev
+```
+
+Sinon les ports `5173` et `3001` seront déjà occupés.
 
 ### Makefile shortcuts (from repo root)
 
@@ -50,12 +63,13 @@ make db-migrate    # apply pending Prisma migrations
 make db-seed       # insert test users + AdminMap
 make db-studio     # open Prisma Studio in browser
 make docker-up     # build + start all services via Docker (PostgreSQL mode)
+make docker-down   # stop Docker containers before local dev
 make help          # list all available commands
 ```
 
 ### Docker mode (PostgreSQL)
 
-Create a `.env` at the **repo root** (see `README_install_and_start.md` for required variables), then:
+Create a `.env` at the **repo root** from `.env.example` (see `README_install_and_start.md` for details), then:
 
 ```bash
 make docker-up

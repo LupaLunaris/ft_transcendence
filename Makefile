@@ -2,8 +2,9 @@
 # Makefile — Guilds of the Deep (ft_transcendence)
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help install build start dev test test-backend test-frontend \
-		docker-build docker-up docker-down docker-logs docker-restart \
+.PHONY: help install build build-shared start dev dev-backend dev-frontend \
+		test test-backend test-frontend \
+		docker-build docker-up docker-down docker-down-v docker-logs docker-logs-backend docker-restart \
 		db-generate db-migrate db-seed db-studio \
 		clean fclean re
 
@@ -94,7 +95,7 @@ docker-up: ## Build and start all services in detached mode
 	docker compose up --build -d
 	@printf "$(GREEN)Services running:$(RESET)\n"
 	@printf "  Frontend: http://localhost:5173\n"
-	@printf "  Backend:  http://localhost:3001/api/v1/health\n"
+	@printf "  Backend:  http://localhost:3001/api/health\n"
 	@printf "  Postgres: localhost:5432\n"
 
 docker-down: ## Stop and remove containers (keeps volumes)

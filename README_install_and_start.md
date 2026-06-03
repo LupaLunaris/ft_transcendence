@@ -94,7 +94,7 @@ C'est la méthode la plus simple : Docker gère PostgreSQL, le backend et le fro
 
 ```bash
 # 1. Créer le fichier de variables d'environnement
-cp ".env .example" .env
+cp ".env.example" .env
 
 # 2. (Optionnel) Éditer .env pour personnaliser les mots de passe
 #    Les valeurs par défaut fonctionnent directement pour un usage local
@@ -117,7 +117,7 @@ Le backend applique automatiquement les migrations Prisma au démarrage — aucu
 
 ## Variables d'environnement (`.env` à la racine)
 
-Le fichier `.env .example` contient des valeurs prêtes à l'emploi pour un usage local :
+Le fichier `.env.example` à la racine contient des valeurs prêtes à l'emploi pour Docker Compose :
 
 ```dotenv
 # ─── PostgreSQL ───────────────────────────────────────────────────────────────
@@ -140,6 +140,15 @@ NODE_ENV=development
 ```
 
 > En production, remplacer toutes les valeurs `change_me_in_prod` par des secrets forts.
+
+### Différence entre les fichiers `.env.example`
+
+| Fichier | Usage | Hôte PostgreSQL attendu |
+|---------|-------|--------------------------|
+| `.env.example` | À copier en `.env` à la racine pour `make docker-up` | `postgres` |
+| `backend/.env.example` | À copier en `backend/.env` pour `make dev` sans Docker | `localhost` |
+
+Ne copiez pas le `.env` racine dans `backend/.env` sans adapter `DATABASE_URL`, car `@postgres` fonctionne dans le réseau Docker mais pas depuis le backend lancé localement.
 
 ---
 
@@ -175,11 +184,19 @@ Services exposés :
 Nécessite un PostgreSQL installé et démarré localement. Adapter `DATABASE_URL` dans `backend/.env` (utiliser `@localhost` à la place de `@postgres`).
 
 ```bash
+cp backend/.env.example backend/.env
 make install       # npm install (toutes les workspaces)
 make build         # Build shared → backend → frontend
 make dev           # Lance backend + frontend en parallèle (Ctrl-C pour arrêter)
 make dev-backend   # Lance uniquement le serveur backend (port 3001)
 make dev-frontend  # Lance uniquement le serveur frontend (port 5173)
+```
+
+Ne lancez pas `make dev` pendant que les conteneurs Docker `frontend` et `backend` sont déjà démarrés: ils utilisent les mêmes ports `5173` et `3001`. Arrêtez-les d'abord avec:
+
+```bash
+make docker-down
+make dev
 ```
 
 ### Tests
@@ -314,8 +331,8 @@ Joueur atteint EXIT ──►       race_finished ──► 2 joueurs
 |----------|----------------|----------|
 | `Cannot find module '@ft/shared'` | shared non compilé | `npm run build --workspace=shared` |
 | `PrismaClientInitializationError` | DB non démarrée ou non migrée | `make docker-up` ou `make db-migrate` |
-| Port 3001 ou 5173 déjà utilisé | processus en arrière-plan | `lsof -i :3001` puis `kill <PID>` |
-| `.env not found` | fichier .env absent à la racine | `cp ".env .example" .env` |
+| Port 3001 ou 5173 déjà utilisé | processus local ou conteneurs Docker déjà actifs | `make docker-down`, puis relancer `make dev`; sinon `lsof -i :3001` ou `lsof -i :5173` |
+| `.env not found` | fichier .env absent à la racine | `cp .env.example .env` |
 | `prisma generate` échoue | node_modules absent | `make install` |
 | Postgres ne démarre pas | port 5432 déjà utilisé | `lsof -i :5432` puis `kill <PID>` |
 | Données perdues après `docker compose down -v` | volumes supprimés explicitement | utiliser `make docker-down` (sans `-v`) |
