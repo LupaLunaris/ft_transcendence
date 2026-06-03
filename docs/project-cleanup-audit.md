@@ -4,7 +4,7 @@ Date: 2026-06-03
 
 Scope: unused files, duplicated documentation, obsolete documents, unused React components/hooks/services/assets, unused npm dependencies, dead exports, and duplicated configuration files.
 
-No files were deleted during this audit.
+This PR includes the cleanup actions taken based on this audit (see git history for the exact deletions).
 
 ## Summary
 
