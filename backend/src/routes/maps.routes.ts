@@ -18,6 +18,12 @@ import { authMiddleware } from '../middleware/auth.middleware';
 import { validateBody } from '../middleware/validate.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
 import { createMapSchema, updateMapSchema } from '../schemas/map.schemas';
+import { NextFunction } from 'express';
+import { AppError, ForbiddenError, NotFoundError } from '../errors';
+
+const asyncHandler = (fn: (req: Request, res: Response) => Promise<void>) =>
+  (req: Request, res: Response, next: NextFunction) =>
+    fn(req, res).catch(next);
 
 const router = Router();
 
@@ -35,7 +41,7 @@ function toMapData(map: PrismaMap): MapData {
     creator_id: map.creator_id,
     published: map.published,
     creator_completed: map.creator_completed,
-    difficulty: map.difficulty.toLowerCase() as Difficulty,
+    difficulty: parseDifficulty(map.difficulty),
     play_count: map.play_count,
     created_at: map.created_at.toISOString(),
   };
@@ -47,32 +53,46 @@ function toMapSummary(map: PrismaMap): MapSummary {
     name: map.name,
     creator_id: map.creator_id,
     published: map.published,
-    difficulty: map.difficulty.toLowerCase() as Difficulty,
+    difficulty: parseDifficulty(map.difficulty),
     play_count: map.play_count,
   };
 }
 
+function parseDifficulty(value: string): Difficulty {
+  const lower = value.toLowerCase();
+  if (!(lower in DIFFICULTY_TO_DB)) {
+    throw new Error(`Unexpected difficulty value: ${value}`);
+  }
+  return lower as Difficulty;
+}
+
+async function requireMapOwner(id: string, userId: string) {
+  const map = await prisma.map.findUnique({ where: { id } });
+  if (!map) 
+    throw new NotFoundError('Map not found');
+  if (map.creator_id !== userId)
+    throw new ForbiddenError();
+  return map;
+}
+
 // GET /api/v1/maps/my — must be defined BEFORE /:id
-router.get('/my', authMiddleware, async (req: Request, res: Response) => {
+router.get('/my', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
   const maps = await prisma.map.findMany({
     where: { creator_id: req.user!.id },
     orderBy: { created_at: 'desc' },
   });
 
   sendSuccess(res, maps.map(toMapData));
-});
+}));
 
 // GET /api/v1/maps
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', asyncHandler(async (req: Request, res: Response) => {
   const page = Math.max(1, parseInt(req.query.page as string) || 1);
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
   const skip = (page - 1) * limit;
 
   const difficultyParam = req.query.difficulty as string | undefined;
-  const difficultyFilter =
-    difficultyParam && difficultyParam in DIFFICULTY_TO_DB
-      ? { difficulty: DIFFICULTY_TO_DB[difficultyParam as Difficulty] }
-      : {};
+  const difficultyFilter = difficultyParam && difficultyParam in DIFFICULTY_TO_DB ? { difficulty: DIFFICULTY_TO_DB[difficultyParam as Difficulty] } : {};
 
   const [maps, total] = await prisma.$transaction([
     prisma.map.findMany({
@@ -85,10 +105,10 @@ router.get('/', async (req: Request, res: Response) => {
   ]);
 
   res.json({ data: maps.map(toMapSummary), total, page, limit });
-});
+}));
 
 // GET /api/v1/maps/:id — accessible by UUID (published or creator testing)
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
   const map = await prisma.map.findUnique({
     where: { id: req.params.id },
   });
@@ -98,11 +118,16 @@ router.get('/:id', async (req: Request, res: Response) => {
     return;
   }
 
+  if (!map.published && map.creator_id !== req.user?.id) {
+    sendError(res, 'Map not found', 404);
+    return;
+  }
+
   sendSuccess(res, toMapData(map));
-});
+}));
 
 // POST /api/v1/maps
-router.post('/', authMiddleware, validateBody(createMapSchema), async (req: Request, res: Response) => {
+router.post('/', authMiddleware, validateBody(createMapSchema), asyncHandler(async (req: Request, res: Response) => {
   const { name, grid } = req.body as { name: string; grid: Grid };
 
   const [map] = await prisma.$transaction([
@@ -120,22 +145,14 @@ router.post('/', authMiddleware, validateBody(createMapSchema), async (req: Requ
   ]);
 
   sendSuccess(res, toMapData(map), 201);
-});
+}));
 
 // PUT /api/v1/maps/:id
-router.put('/:id', authMiddleware, validateBody(updateMapSchema), async (req: Request, res: Response) => {
+router.put('/:id', authMiddleware, validateBody(updateMapSchema), asyncHandler(async (req: Request, res: Response) => {
   const { name, grid } = req.body as { name?: string; grid?: Grid };
 
-  const map = await prisma.map.findUnique({ where: { id: req.params.id } });
-
-  if (!map) {
-    sendError(res, 'Map not found', 404);
-    return;
-  }
-  if (map.creator_id !== req.user!.id) {
-    sendError(res, 'Forbidden', 403);
-    return;
-  }
+  const map = await requireMapOwner(req.params.id, req.user!.id);
+  
   if (map.published) {
     sendError(res, 'Published maps cannot be modified', 400);
     return;
@@ -150,20 +167,11 @@ router.put('/:id', authMiddleware, validateBody(updateMapSchema), async (req: Re
   });
 
   sendSuccess(res, toMapData(updated));
-});
+}));
 
 // DELETE /api/v1/maps/:id
-router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
-  const map = await prisma.map.findUnique({ where: { id: req.params.id } });
-
-  if (!map) {
-    sendError(res, 'Map not found', 404);
-    return;
-  }
-  if (map.creator_id !== req.user!.id) {
-    sendError(res, 'Forbidden', 403);
-    return;
-  }
+router.delete('/:id', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
+  await requireMapOwner(req.params.id, req.user!.id);
 
   await prisma.$transaction([
     prisma.score.deleteMany({ where: { map_id: req.params.id } }),
@@ -175,20 +183,11 @@ router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
   ]);
 
   res.status(204).send();
-});
+}));
 
 // POST /api/v1/maps/:id/complete
-router.post('/:id/complete', authMiddleware, async (req: Request, res: Response) => {
-  const map = await prisma.map.findUnique({ where: { id: req.params.id } });
-
-  if (!map) {
-    sendError(res, 'Map not found', 404);
-    return;
-  }
-  if (map.creator_id !== req.user!.id) {
-    sendError(res, 'Only the creator can mark a map as completed', 403);
-    return;
-  }
+router.post('/:id/complete', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
+  await requireMapOwner(req.params.id, req.user!.id);
 
   const updated = await prisma.map.update({
     where: { id: req.params.id },
@@ -196,20 +195,12 @@ router.post('/:id/complete', authMiddleware, async (req: Request, res: Response)
   });
 
   sendSuccess(res, toMapData(updated));
-});
+}));
 
 // POST /api/v1/maps/:id/publish
-router.post('/:id/publish', authMiddleware, async (req: Request, res: Response) => {
-  const map = await prisma.map.findUnique({ where: { id: req.params.id } });
+router.post('/:id/publish', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
+  const map = await requireMapOwner(req.params.id, req.user!.id);
 
-  if (!map) {
-    sendError(res, 'Map not found', 404);
-    return;
-  }
-  if (map.creator_id !== req.user!.id) {
-    sendError(res, 'Forbidden', 403);
-    return;
-  }
   if (!map.creator_completed) {
     sendError(res, 'You must complete your own map before publishing it', 400);
     return;
@@ -221,6 +212,27 @@ router.post('/:id/publish', authMiddleware, async (req: Request, res: Response) 
   });
 
   sendSuccess(res, toMapData(updated));
+}));
+
+// POST /api/v1/maps/:id/unpublish
+router.post('/:id/unpublish', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
+  await requireMapOwner(req.params.id, req.user!.id);
+
+  const updated = await prisma.map.update({
+    where: { id: req.params.id },
+    data: { published: false},
+  });
+
+  sendSuccess(res, toMapData(updated));
+}));
+
+router.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof AppError) {
+    sendError(res, err.message, err.statusCode);
+    return;
+  }
+  console.error(err);
+  sendError(res, 'Internal server error', 500);
 });
 
 export default router;
