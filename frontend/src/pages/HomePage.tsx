@@ -112,15 +112,15 @@ export function HomePage() {
         ) : (
           /* Non-connected CTA */
           <div className="text-center">
-            <Link to="/register">
+            <Link to="/login">
               <Button size="lg" className="shadow-glow">
                 Jouer maintenant
               </Button>
             </Link>
             <p className="mt-3 text-sm text-white/40">
-              Déjà inscrit ?{' '}
-              <Link to="/login" className="text-deep-300 hover:text-deep-200 transition-colors">
-                Se connecter
+              Pas encore de compte ?{' '}
+              <Link to="/register" className="text-deep-300 hover:text-deep-200 transition-colors">
+                S'inscrire
               </Link>
             </p>
           </div>
