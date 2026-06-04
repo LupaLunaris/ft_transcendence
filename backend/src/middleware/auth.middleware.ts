@@ -31,14 +31,11 @@ declare global {
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
-
   if (!authHeader?.startsWith('Bearer ')) {
     sendError(res, 'Unauthorized', 401);
     return;
   }
-
   const token = authHeader.slice(7);
-
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtUser;
     req.user = payload;
@@ -46,4 +43,20 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   } catch {
     sendError(res, 'Unauthorized', 401);
   }
+}
+
+export function optionalAuthMiddleware(req: Request, res: Response, next: NextFunction): void {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) {
+    next();
+    return;
+  }
+  const token = authHeader.slice(7);
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtUser;
+    req.user = payload;
+  } catch {
+    // invalid token — just ignore it
+  }
+  next();
 }

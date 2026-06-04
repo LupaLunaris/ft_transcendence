@@ -19,11 +19,21 @@ import prisma from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { validateBody } from '../middleware/validate.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
+import { NextFunction } from 'express';
+import { AppError } from '../errors';
 import {
   registerSchema,
   loginSchema,
   updateProfileSchema,
 } from '../schemas/auth.schemas';
+
+const asyncHandler = (fn: (req: Request, res: Response) => Promise<void>) =>
+  (req: Request, res: Response, next: NextFunction) =>
+    fn(req, res).catch(next);
+
+const JWT_SECRET = process.env.JWT_SECRET as string;
+if (!JWT_SECRET)
+  throw new Error('JWT_SECRET is not set');
 
 const router = Router();
 
@@ -42,21 +52,15 @@ function toUserPublic(user: User): UserPublic {
 
 function signToken(user: User): string {
   return jwt.sign(
-    { id: user.id, email: user.email, is_admin: user.is_admin },
-    process.env.JWT_SECRET!,
+    { id: user.id, email: user.email, is_admin: user.is_admin }, JWT_SECRET,
     { expiresIn: (process.env.JWT_EXPIRES_IN ?? '7d') as jwt.SignOptions['expiresIn'] },
   );
 }
 
-const ADMIN_EMAILS = [
-  'malafont@student.42belgium.be',
-  'jdebrull@student.42belgium.be',
-  'jpaulis@student.42belgium.be',
-  'evan-dro@student.42belgium.be',
-];
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim());
 
 // POST /api/v1/auth/register
-router.post('/register', validateBody(registerSchema), async (req: Request, res: Response) => {
+router.post('/register', validateBody(registerSchema), asyncHandler(async (req: Request, res: Response) => {
   const { email, username, password } = req.body as { email: string; username: string; password: string };
 
   const existing = await prisma.user.findFirst({
@@ -78,15 +82,25 @@ router.post('/register', validateBody(registerSchema), async (req: Request, res:
 
   const response: AuthResponse = { user: toUserPublic(user), token: signToken(user) };
   sendSuccess(res, response, 201);
-});
+}));
 
 // POST /api/v1/auth/login
-router.post('/login', validateBody(loginSchema), async (req: Request, res: Response) => {
-  const { email, password } = req.body as { email: string; password: string };
+router.post('/login', validateBody(loginSchema), asyncHandler(async (req: Request, res: Response) => {
+  const { identifier, password } = req.body as {
+    identifier: string;
+    password: string;
+  };
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { email: identifier },
+        { username: identifier },
+      ],
+    },
+  });
 
-  // Generic message prevents email enumeration
+  // Generic message prevents email/username enumeration
   if (!user || !(await bcrypt.compare(password, user.password_hash))) {
     sendError(res, 'Invalid credentials', 401);
     return;
@@ -94,10 +108,10 @@ router.post('/login', validateBody(loginSchema), async (req: Request, res: Respo
 
   const response: AuthResponse = { user: toUserPublic(user), token: signToken(user) };
   sendSuccess(res, response);
-});
+}));
 
 // GET /api/v1/auth/me
-router.get('/me', authMiddleware, async (req: Request, res: Response) => {
+router.get('/me', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
   const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
 
   if (!user) {
@@ -106,10 +120,10 @@ router.get('/me', authMiddleware, async (req: Request, res: Response) => {
   }
 
   sendSuccess(res, toUserPublic(user));
-});
+}));
 
 // PUT /api/v1/auth/profile
-router.put('/profile', authMiddleware, validateBody(updateProfileSchema), async (req: Request, res: Response) => {
+router.put('/profile', authMiddleware, validateBody(updateProfileSchema), asyncHandler(async (req: Request, res: Response) => {
   const { username, avatar } = req.body as { username?: string; avatar?: string };
 
   if (username) {
@@ -131,6 +145,15 @@ router.put('/profile', authMiddleware, validateBody(updateProfileSchema), async 
   });
 
   sendSuccess(res, toUserPublic(user));
+}));
+
+router.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof AppError) {
+    sendError(res, err.message, err.statusCode);
+    return;
+  }
+  console.error(err);
+  sendError(res, 'Internal server error', 500);
 });
 
 export default router;

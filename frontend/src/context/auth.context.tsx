@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const { user: me, token: jwt } = await api.auth.login({ email, password });
+    const { user: me, token: jwt } = await api.auth.login({ identifier: email, password });
     localStorage.setItem(TOKEN_KEY, jwt);
     setToken(jwt);
     setUser(me);
