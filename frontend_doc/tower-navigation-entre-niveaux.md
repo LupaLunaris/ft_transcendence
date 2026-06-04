@@ -69,5 +69,5 @@ navigate('/play/tower/2')
 | Situation | Comportement |
 |-----------|-------------|
 | Retour arrière navigateur (2→1) | Même mécanisme, le fix couvre aussi ce cas |
-| Replay du niveau (même `orderIndex`) | `orderIndex` ne change pas → l'effect ne se déclenche pas → comportement normal |
+| Replay du niveau (même `orderIndex`) | `orderIndex` ne change pas → l'effet ne se déclenche pas → comportement normal |
 | Dernier niveau (8→accueil) | `navigate('/')` → composant démonté → pas de problème |
