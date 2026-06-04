@@ -2,9 +2,11 @@
 
 Date: 2026-06-03
 
+> Historical note: this is a cleanup audit snapshot from an earlier pass. Some listed files have already been removed or changed. For current documentation sources of truth, see [README.md](README.md).
+
 Scope: unused files, duplicated documentation, obsolete documents, unused React components/hooks/services/assets, unused npm dependencies, dead exports, and duplicated configuration files.
 
-This PR includes the cleanup actions taken based on this audit (see git history for the exact deletions).
+This document is kept for team memory and should not be treated as the current cleanup plan without re-checking the file tree.
 
 ## Summary
 
