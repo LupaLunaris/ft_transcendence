@@ -39,7 +39,7 @@ export function TowerGamePage() {
   );
 
   const isMounted = useRef(false);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isMounted.current) { isMounted.current = true; return; }
     setDead(false);
     setShowModal(false);
