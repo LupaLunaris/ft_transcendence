@@ -12,7 +12,7 @@ This repository contains both canonical documentation and historical/team notes.
 
 If another document contradicts one of these, prefer the canonical document.
 
-## Supporting Team Documents
+## Useful Support Documents
 
 These documents can still be useful, but they are not startup sources of truth:
 
@@ -28,7 +28,7 @@ These documents can still be useful, but they are not startup sources of truth:
 | [ticket.txt](ticket.txt) | Historical ticket/planning notes |
 | [42 EvalHub.pdf](42%20EvalHub.pdf), [ft_transcendence.subject.pdf](ft_transcendence.subject.pdf) | Evaluation and subject references |
 
-## Historical Note Folders
+## Historical And Supporting Note Folders
 
 These folders are kept for team memory. They should not be used as current setup or architecture references unless they are explicitly updated and linked from the canonical docs.
 

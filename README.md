@@ -19,62 +19,26 @@ Older notes still exist in the repository for team memory, but they should not o
 
 ## Quick Start
 
-First setup:
+For the complete install/start procedure, use [README_install_and_start.md](README_install_and_start.md).
 
 ```bash
 cp .env.example .env
 make install
-```
-
-Local development:
-
-```bash
 make dev
 ```
 
-Docker demo/evaluation mode:
+For Docker demo/evaluation mode:
 
 ```bash
 make docker-up
 ```
 
-Shutdown:
-
-```bash
-make docker-down
-```
-
-Useful URLs:
+Main URLs:
 
 | Service | URL |
 |---|---|
 | Frontend | http://localhost:5173 |
 | Backend health | http://localhost:3001/api/health |
-| PostgreSQL | localhost:5432 |
-
-For full setup details and common mistakes, read [README_install_and_start.md](README_install_and_start.md).
-
-## Runtime Modes
-
-| Mode | Command | What runs |
-|---|---|---|
-| Local development | `make dev` | PostgreSQL in Docker, backend locally, frontend locally |
-| Docker demo/evaluation | `make docker-up` | PostgreSQL, backend, and frontend all in Docker |
-
-Do not run both modes at the same time because they use the same ports.
-
-## Makefile Commands
-
-```bash
-make help         # show grouped command help
-make install      # install all workspace dependencies
-make dev          # local development mode
-make docker-up    # full Docker demo/evaluation mode
-make docker-down  # stop Docker services
-make start        # print startup guidance only
-```
-
-`make start` does not start the project. It only points to the explicit startup commands.
 
 ## Stack
 

@@ -1,8 +1,6 @@
 # Architecture Reference
 
-This document is the canonical architecture reference for the repository. It describes the current project layout and runtime boundaries without replacing the startup guide.
-
-For installation and launch commands, use [../README_install_and_start.md](../README_install_and_start.md).
+This document is the canonical architecture reference for the repository. It describes the current project layout and runtime boundaries.
 
 ## Runtime Overview
 
