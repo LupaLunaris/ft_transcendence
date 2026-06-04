@@ -1,342 +1,241 @@
-# Installation & démarrage — Guilds of the Deep
+# Install and Start Guide - Guilds of the Deep
 
-## Prérequis
+This project has two startup modes:
 
-### Outils nécessaires
+| Mode | Command | What runs |
+|------|---------|-----------|
+| Local development | `make dev` | PostgreSQL in Docker, backend locally, frontend locally |
+| Docker demo/evaluation | `make docker-up` | PostgreSQL, backend, and frontend all in Docker |
 
-| Outil | Version minimale | Vérification |
-|-------|-----------------|--------------|
-| Git | toute version récente | `git --version` |
-| Docker Desktop (inclut Compose) | 24+ | `docker --version` |
-| Node.js | 20+ (testé v24) | `node --version` |
-| npm | 10+ (testé v11) | `npm --version` |
-
-> **Node.js et npm sont uniquement nécessaires pour le mode développement local (sans Docker).**
-> Pour simplement lancer le projet, seuls Git et Docker suffisent.
+Do not run both modes at the same time. They use the same ports.
 
 ---
-**macOS :**
+
+## First Setup
+
+From the project root:
+
 ```bash
-# Avec Homebrew (https://brew.sh)
-brew install git
-# Ou directement depuis Xcode Command Line Tools
-xcode-select --install
+cp .env.example .env
+make install
 ```
 
-**Windows :** Télécharger et installer depuis [git-scm.com](https://git-scm.com/download/win).
+`make install` installs all npm workspace dependencies.
+
+For local backend development, `make dev` will also create `backend/.env` from `backend/.env.example` if it is missing. The backend env file points to PostgreSQL on `localhost`, because the backend runs locally in development mode.
 
 ---
 
-### Installer Docker Desktop
+## Local Development
 
-Docker Desktop inclut Docker Engine **et** Docker Compose — un seul installeur suffit.
+Use this while coding:
 
-**Linux (Ubuntu/Debian) :**
 ```bash
-# Désinstaller d'éventuelles anciennes versions
-sudo apt remove docker docker-engine docker.io containerd runc
-
-# Installer via le script officiel
-curl -fsSL https://get.docker.com | sh
-
-# Ajouter votre utilisateur au groupe docker (évite sudo à chaque commande)
-sudo usermod -aG docker $USER
-newgrp docker
-
-# Vérifier
-docker --version
-docker compose version
+make dev
 ```
 
-**macOS :** Télécharger Docker Desktop depuis [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/) et lancer l'installeur `.dmg`.
+This starts the full local development environment:
 
-**Windows :** Télécharger Docker Desktop depuis [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/) et lancer l'installeur `.exe`.
-> Sur Windows, Docker Desktop nécessite WSL 2 (activé automatiquement par l'installeur).
+| Service | How it runs | URL |
+|---------|-------------|-----|
+| PostgreSQL | Docker | localhost:5432 |
+| Backend | local reload | http://localhost:3001 |
+| Frontend | local reload | http://localhost:5173 |
 
-Après installation, ouvrir Docker Desktop et attendre que le moteur démarre (icône baleine dans la barre des tâches = vert).
+Before starting the servers, `make dev` also:
 
----
+1. Checks that `.env` exists.
+2. Creates `backend/.env` if missing.
+3. Refuses to run if Docker backend/frontend are already running.
+4. Refuses to run if ports `3001` or `5173` are already busy.
+5. Starts PostgreSQL in Docker.
+6. Waits until PostgreSQL is ready.
+7. Builds the shared package.
+8. Generates the Prisma client.
 
-### Installer Node.js et npm (mode développement local uniquement)
+Stop local backend/frontend with `Ctrl-C`.
 
-**Linux / macOS — via nvm (recommandé) :**
-```bash
-# Installer nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-# Recharger le terminal
-source ~/.bashrc   # ou ~/.zshrc
-
-# Installer Node.js 20 LTS
-nvm install 20
-nvm use 20
-
-# Vérifier
-node --version
-npm --version
-```
-
-**Ou via le site officiel :** Télécharger l'installeur LTS depuis [nodejs.org](https://nodejs.org).
-
----
-
-## Cloner le projet
+To stop PostgreSQL too:
 
 ```bash
-git clone <url-du-repo>
-cd ft_transcendence
+make docker-down
 ```
 
 ---
 
-## Démarrage rapide (mode Docker — recommandé)
+## Docker Demo/Evaluation Mode
 
-C'est la méthode la plus simple : Docker gère PostgreSQL, le backend et le frontend automatiquement.
+Use this for a demo or 42 evaluation:
 
 ```bash
-# 1. Créer le fichier de variables d'environnement
-cp ".env.example" .env
-
-# 2. (Optionnel) Éditer .env pour personnaliser les mots de passe
-#    Les valeurs par défaut fonctionnent directement pour un usage local
-nano .env   # ou code .env, vim .env, etc.
-
-# 3. Lancer tous les services
 make docker-up
 ```
 
-Attendre environ 30 secondes le temps que les conteneurs démarrent, puis ouvrir :
+This starts the complete stack in Docker:
 
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:5173 |
-| Backend (API) | http://localhost:3001 |
+| Service | How it runs | URL |
+|---------|-------------|-----|
+| PostgreSQL | Docker | localhost:5432 |
+| Backend | Docker | http://localhost:3001 |
+| Frontend | Docker | http://localhost:5173 |
 
-Le backend applique automatiquement les migrations Prisma au démarrage — aucune action manuelle sur la base de données n'est nécessaire.
+Stop Docker mode:
+
+```bash
+make docker-down
+```
+
+Delete containers and Docker database data:
+
+```bash
+make docker-down-v
+```
+
+Use `make docker-down-v` only when you really want to reset the Docker database volume.
 
 ---
 
-## Variables d'environnement (`.env` à la racine)
+## Main Commands
 
-Le fichier `.env.example` à la racine contient des valeurs prêtes à l'emploi pour Docker Compose :
+Run:
 
-```dotenv
-# ─── PostgreSQL ───────────────────────────────────────────────────────────────
-POSTGRES_USER=ft_user
-POSTGRES_PASSWORD=change_me_in_prod
-POSTGRES_DB=ft_transcendence
-
-# ─── Backend ──────────────────────────────────────────────────────────────────
-# "@postgres" = nom du service Docker ; remplacer par "@localhost" pour un postgres local
-DATABASE_URL=postgresql://ft_user:change_me_in_prod@postgres:5432/ft_transcendence
-
-# ─── Auth ─────────────────────────────────────────────────────────────────────
-JWT_SECRET=change_me_in_prod_use_at_least_64_random_chars
-JWT_EXPIRES_IN=7d
-
-# ─── URLs ─────────────────────────────────────────────────────────────────────
-FRONTEND_URL=http://localhost:5173
-BACKEND_URL=http://localhost:3001
-NODE_ENV=development
+```bash
+make help
 ```
 
-> En production, remplacer toutes les valeurs `change_me_in_prod` par des secrets forts.
+The daily commands are:
 
-### Différence entre les fichiers `.env.example`
+```bash
+make install      # install all workspace dependencies
+make dev          # local dev: Docker PostgreSQL + local backend/frontend
+make docker-up    # demo/evaluation: complete stack in Docker
+make docker-down  # stop Docker services
+make start        # print startup guidance only
+```
 
-| Fichier | Usage | Hôte PostgreSQL attendu |
-|---------|-------|--------------------------|
-| `.env.example` | À copier en `.env` à la racine pour `make docker-up` | `postgres` |
-| `backend/.env.example` | À copier en `backend/.env` pour `make dev` sans Docker | `localhost` |
+`make start` does not start anything. It exists only to point you to the explicit command:
 
-Ne copiez pas le `.env` racine dans `backend/.env` sans adapter `DATABASE_URL`, car `@postgres` fonctionne dans le réseau Docker mais pas depuis le backend lancé localement.
+```bash
+make dev          # local development
+make docker-up    # Docker demo/evaluation
+```
 
 ---
 
-## Makefile — référence complète
-
-Toutes les commandes s'exécutent depuis la **racine** du repo (`ft_transcendence/`).
+## Useful Secondary Commands
 
 ```bash
-make help          # Affiche la liste des commandes disponibles
+make dev-backend       # backend only; PostgreSQL must already be running
+make dev-frontend      # frontend only; backend must already be running for API calls
+make build             # build shared, backend, frontend
+make test              # run backend and frontend tests
+make db-generate       # regenerate Prisma client
+make db-migrate        # run Prisma migrations
+make db-seed           # seed database
+make db-studio         # open Prisma Studio
+make docker-logs       # follow Docker logs
+make docker-restart    # restart full Docker stack
+make clean             # remove build artifacts
+make fclean            # clean + remove node_modules
 ```
 
-### Docker (mode principal)
+---
 
-```bash
-make docker-up        # Build + démarre tous les services en arrière-plan
-make docker-down      # Arrête et supprime les conteneurs (conserve les volumes)
-make docker-down-v    # Arrête + supprime conteneurs ET volumes (efface la DB)
-make docker-logs      # Suit les logs de tous les services
-make docker-logs-backend  # Suit uniquement les logs backend
-make docker-restart   # Arrête, rebuild et redémarre tout
+## Common Mistakes
+
+### Running `make dev` and `make docker-up` together
+
+Do not do this. Both modes use:
+
+```text
+backend  -> port 3001
+frontend -> port 5173
+postgres -> port 5432
 ```
 
-Services exposés :
-
-| Service | URL / hôte |
-|---------|------------|
-| Frontend | http://localhost:5173 |
-| Backend | http://localhost:3001 |
-| PostgreSQL | localhost:5432 |
-
-### Développement local (sans Docker)
-
-Nécessite un PostgreSQL installé et démarré localement. Adapter `DATABASE_URL` dans `backend/.env` (utiliser `@localhost` à la place de `@postgres`).
-
-```bash
-cp backend/.env.example backend/.env
-make install       # npm install (toutes les workspaces)
-make build         # Build shared → backend → frontend
-make dev           # Lance backend + frontend en parallèle (Ctrl-C pour arrêter)
-make dev-backend   # Lance uniquement le serveur backend (port 3001)
-make dev-frontend  # Lance uniquement le serveur frontend (port 5173)
-```
-
-Ne lancez pas `make dev` pendant que les conteneurs Docker `frontend` et `backend` sont déjà démarrés: ils utilisent les mêmes ports `5173` et `3001`. Arrêtez-les d'abord avec:
+Switch modes cleanly:
 
 ```bash
 make docker-down
 make dev
 ```
 
-### Tests
+or:
 
 ```bash
-make test          # Lance tous les tests (backend puis frontend)
-make test-backend  # Tests backend — Jest + supertest
-make test-frontend # Tests frontend — Vitest + Testing Library
+make docker-down
+make docker-up
 ```
 
-### Base de données (Prisma)
+### `EADDRINUSE :3001`
+
+The backend port is already used. Another backend process or Docker backend is probably running.
+
+Fix:
 
 ```bash
-make db-generate   # Régénère le client Prisma après un changement de schema.prisma
-make db-migrate    # Applique les migrations en attente (crée la DB si absente)
-make db-seed       # Insère des utilisateurs de test + AdminMap (order 1)
-make db-studio     # Ouvre Prisma Studio dans le navigateur
+make docker-down
+lsof -i :3001
 ```
 
-### Nettoyage
+Stop the process using the port, then rerun the command you wanted.
+
+### `EADDRINUSE :5173`
+
+The frontend port is already used. Another Vite/frontend process or Docker frontend is probably running.
+
+Fix:
 
 ```bash
-make clean         # Supprime les dossiers dist/ et le cache Vite
-make fclean        # clean + supprime tous les node_modules
-make re            # Reconstruction complète : fclean → install → build
+make docker-down
+lsof -i :5173
 ```
----
 
-## Commandes npm par workspace
+Stop the process using the port, then rerun the command you wanted.
 
-Si tu préfères ne pas utiliser le Makefile :
+### `Can't reach database server at localhost:5432`
+
+PostgreSQL is not running, or the backend is using the wrong database URL.
+
+For normal local development, run:
 
 ```bash
-# Shared (compiler en premier — backend et frontend en dépendent)
-npm run build --workspace=shared
-
-# Backend
-npm run dev --workspace=backend       # Serveur de développement (nodemon)
-npm run build --workspace=backend     # Compilation TypeScript
-npm run start --workspace=backend     # Serveur de production (dist/)
-npm test --workspace=backend          # Tests Jest
-npm run db:generate --workspace=backend
-npm run db:migrate --workspace=backend
-npm run db:seed --workspace=backend
-npm run db:studio --workspace=backend
-
-# Frontend
-npm run dev --workspace=frontend      # Serveur Vite (HMR)
-npm run build --workspace=frontend    # Build de production
-npm run preview --workspace=frontend  # Prévisualise le build de prod
-npm test --workspace=frontend         # Tests Vitest
-```
----
-
-## Ordre de build obligatoire
-
-Le workspace `shared` exporte les types TypeScript partagés. Il doit toujours être compilé **avant** backend et frontend, sinon les imports `@ft/shared` échouent.
-
-```
-shared (build) → backend (dev/build) + frontend (dev/build)
+make dev
 ```
 
-Le script `npm run dev` à la racine s'en charge automatiquement.
+Check that `backend/.env` uses `localhost`, not `postgres`:
 
----
+```dotenv
+DATABASE_URL=postgresql://ft_user:change_me_in_prod@localhost:5432/ft_transcendence
+```
 
-## Workflow collaboratif (après un `git pull`)
+### Temporary `ECONNREFUSED 127.0.0.1:3001` from Vite
+
+This can happen once if the frontend starts before the backend is ready.
+
+Wait until the backend prints that it is listening on `http://localhost:3001`, then refresh the browser once.
+
+### Docker says `.env not found`
+
+Create the root env file:
 
 ```bash
-# Avec Docker — rebuild + migrate deploy automatique au démarrage
-make docker-restart
-
-# En mode local
-npm run db:migrate --workspace=backend
+cp .env.example .env
 ```
 
-Les migrations Prisma sont incrémentales et idempotentes — relancer `migrate deploy` après un pull est toujours sans risque.
+Then rerun:
 
----
-
-## Mode Duel (multijoueur temps réel)
-
-Le mode Duel utilise **Socket.IO** pour synchroniser deux joueurs en temps réel.
-
-### Prérequis
-
-- Deux comptes joueurs distincts (créés via `/register`)
-- Backend démarré
-
-### Tester en local avec deux fenêtres
-
-```
-Fenêtre A : Chrome          →  http://localhost:5173  (compte joueur 1)
-Fenêtre B : Chrome privé    →  http://localhost:5173  (compte joueur 2)
-           ou Firefox
-```
-
-1. Se connecter sur chaque fenêtre avec un compte différent
-2. Naviguer vers **Duel** (bouton sur la page d'accueil ou `/duel`)
-3. Sur la **fenêtre A** — cliquer **S'inscrire** sur une map (le bouton passe à **Inscrit**)
-4. Sur la **fenêtre B** — cliquer **Défier** sur la même map
-5. Les deux fenêtres basculent automatiquement vers la scène de combat
-6. Le premier à atteindre la sortie remporte le duel
-
-### Comportements attendus
-
-| Action | Résultat |
-|--------|----------|
-| S'inscrire sur une map | Bouton → **Inscrit** + pseudo visible par tous |
-| Défier un joueur inscrit | Course démarre immédiatement pour les deux |
-| Inscription sur 3 maps | Bannière d'avertissement, bouton S'inscrire désactivé |
-| Fermer l'onglet pendant une course | L'adversaire reçoit automatiquement la victoire |
-| Atteindre la sortie | Overlay **Victoire / Défaite** avec le temps |
-
-### Architecture socket (résumé)
-
-```
-DuelPage     ──join_lobby──►  Serveur
-                              └─ match trouvé → duel_start ──► 2 joueurs
-DuelGamePage ──join_race──►  Serveur (room race:<id>)
-                              └─ 2 joueurs présents → game_state(started=true)
-Phaser       ──player_input──► Serveur (valide + met à jour position)
-                              └─ game_state ──► 2 joueurs (fantôme bouge)
-Joueur atteint EXIT ──►       race_finished ──► 2 joueurs
+```bash
+make docker-up
 ```
 
 ---
 
-## Problèmes courants
+## Quick Team Summary
 
-| Symptôme | Cause probable | Solution |
-|----------|----------------|----------|
-| `Cannot find module '@ft/shared'` | shared non compilé | `npm run build --workspace=shared` |
-| `PrismaClientInitializationError` | DB non démarrée ou non migrée | `make docker-up` ou `make db-migrate` |
-| Port 3001 ou 5173 déjà utilisé | processus local ou conteneurs Docker déjà actifs | `make docker-down`, puis relancer `make dev`; sinon `lsof -i :3001` ou `lsof -i :5173` |
-| `.env not found` | fichier .env absent à la racine | `cp .env.example .env` |
-| `prisma generate` échoue | node_modules absent | `make install` |
-| Postgres ne démarre pas | port 5432 déjà utilisé | `lsof -i :5432` puis `kill <PID>` |
-| Données perdues après `docker compose down -v` | volumes supprimés explicitement | utiliser `make docker-down` (sans `-v`) |
-| Docker : permission denied sur le socket | utilisateur non dans le groupe docker | `sudo usermod -aG docker $USER` puis se reconnecter |
-| Duel : "En attente" qui ne disparaît jamais | backend pas redémarré après changements socket | `make docker-restart` |
-| Duel : connexion socket refusée (`Authentication required`) | token JWT absent ou expiré | se reconnecter via `/login` |
-| Duel : bouton S'inscrire désactivé | déjà inscrit sur 3 maps | se retirer d'une map ou recharger la page |
+```text
+make install     first setup
+make dev         local coding mode
+make docker-up   Docker demo/evaluation mode
+make docker-down stop Docker services
+```
