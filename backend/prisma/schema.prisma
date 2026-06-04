@@ -50,7 +50,7 @@ model Map {
   updated_at        DateTime @updatedAt
   creator_id        String
 
-  creator User    @relation(fields: [creator_id], references: [id])
+  creator User    @relation(fields: [creator_id], references: [id], onDelete: Cascade)
   scores  Score[]
 }
 

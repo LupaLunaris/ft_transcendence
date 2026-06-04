@@ -14,12 +14,12 @@ import { Router, Request, Response } from 'express';
 import { Map as PrismaMap } from '@prisma/client';
 import { MapData, MapSummary, Grid, Difficulty } from '@ft/shared';
 import prisma from '../lib/prisma';
-import { authMiddleware } from '../middleware/auth.middleware';
 import { validateBody } from '../middleware/validate.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
 import { createMapSchema, updateMapSchema } from '../schemas/map.schemas';
 import { NextFunction } from 'express';
 import { AppError, ForbiddenError, NotFoundError } from '../errors';
+import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth.middleware';
 
 const asyncHandler = (fn: (req: Request, res: Response) => Promise<void>) =>
   (req: Request, res: Response, next: NextFunction) =>
@@ -108,7 +108,7 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
 }));
 
 // GET /api/v1/maps/:id — accessible by UUID (published or creator testing)
-router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
+router.get('/:id', optionalAuthMiddleware, asyncHandler(async (req: Request, res: Response) => {
   const map = await prisma.map.findUnique({
     where: { id: req.params.id },
   });
