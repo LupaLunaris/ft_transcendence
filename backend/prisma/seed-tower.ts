@@ -236,10 +236,7 @@ export async function seedTower(prisma: PrismaClient): Promise<void> {
   for (const level of LEVELS) {
     await prisma.adminMap.upsert({
       where: { order_index: level.order_index },
-      update: {
-        name: level.name,
-        grid_json: JSON.stringify(level.grid),
-      },
+      update: {},
       create: {
         order_index: level.order_index,
         name: level.name,
