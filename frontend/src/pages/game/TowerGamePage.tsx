@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { useCallback, useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth.context';
 import { useApi } from '@/hooks/useApi';
