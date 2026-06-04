@@ -13,7 +13,7 @@
 import { UserPublic } from './user.types';
 
 export interface LoginRequest {
-  email: string;
+  identifier: string;
   password: string;
 }
 
