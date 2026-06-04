@@ -35,6 +35,11 @@ help: ## Show available commands
 	@printf "\n$(CYAN)Cleanup commands$(RESET)\n"
 	@grep -E '^(clean|fclean|re|docker-down-v):.*## ' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS=":.*?## "}; {printf "  $(GREEN)%-22s$(RESET)%s\n", $$1, $$2}'
+	@printf "\n$(CYAN)Documentation$(RESET)\n"
+	@printf "  $(GREEN)README.md$(RESET)              Project overview\n"
+	@printf "  $(GREEN)README_install...$(RESET)      Setup, startup, troubleshooting\n"
+	@printf "  $(GREEN)docs/architecture.md$(RESET)   Architecture reference\n"
+	@printf "  $(GREEN)docs/README.md$(RESET)         Documentation map\n"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # LOCAL DEVELOPMENT

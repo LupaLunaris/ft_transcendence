@@ -1,87 +1,92 @@
-# ft_transcendence — Guilds of the Deep
+# ft_transcendence - Guilds of the Deep
 
-*This project has been created as part of the 42 curriculum by malafont, jdebrull, jpaulis, evan-dro.*
+This project was created as part of the 42 curriculum by malafont, jdebrull, jpaulis, and evan-dro.
 
-## Description
+Guilds of the Deep is a browser game for young players, built around exploration, labyrinth creation, progression, multiplayer races, and community-created maps.
 
-The game targets players under 15 years old.
+## Canonical Documentation
 
-Core pillars:
+Use these documents as the source of truth:
 
-- exploration
-- labyrinth creation
-- progression
-- multiplayer races
-- community-created maps
+| Document | Purpose |
+|---|---|
+| [README.md](README.md) | Project overview, stack, team, module scope |
+| [README_install_and_start.md](README_install_and_start.md) | Installation, local development, Docker demo/evaluation, troubleshooting |
+| [docs/architecture.md](docs/architecture.md) | Architecture reference and folder overview |
+| [docs/README.md](docs/README.md) | Documentation map, including historical/team notes |
 
-The player is an adventurer rescued by a resistance made of former miners and builders. They train the player inside labyrinths before attempting to climb the tower controlled by the witch Meduza.
-Players join guilds, climb leaderboards, and compete in ranked matches — all playable in the browser with no installation required.
+Older notes still exist in the repository for team memory, but they should not override the canonical documents above.
 
-## Quick Start (Docker — recommandé)
+## Quick Start
+
+First setup:
 
 ```bash
-# 1. Copier et remplir les variables d'environnement
 cp .env.example .env
-
-# 2. Lancer tous les services (PostgreSQL + backend + frontend)
-make docker-up
+make install
 ```
 
-Frontend → http://localhost:5173  
-Backend  → http://localhost:3001/api/health
-
-Le fichier `.env.example` à la racine est prévu pour Docker Compose. Il contient aussi les variables PostgreSQL utilisées par le service `postgres`.
-
-### Mode local sans Docker (PostgreSQL requis)
+Local development:
 
 ```bash
-npm install
-cp backend/.env.example backend/.env
-npm run build --workspace=shared
-npm run db:migrate --workspace=backend
-npm run dev
-```
-
-Le fichier `backend/.env.example` est prévu pour le backend lancé localement avec `make dev` ou `npm run dev --workspace=backend`; sa `DATABASE_URL` pointe vers `localhost`.
-
-Avant `make dev`, arrêter les conteneurs Docker frontend/backend s'ils tournent déjà:
-
-```bash
-make docker-down
 make dev
 ```
 
-Sinon les ports `5173` et `3001` seront déjà occupés.
-
-### Makefile shortcuts (from repo root)
-
-```bash
-make start         # install + build shared + dev (recommended entry point)
-make dev           # backend + frontend in parallel
-make test          # all tests (backend then frontend)
-make db-migrate    # apply pending Prisma migrations
-make db-seed       # insert test users + AdminMap
-make db-studio     # open Prisma Studio in browser
-make docker-up     # build + start all services via Docker (PostgreSQL mode)
-make docker-down   # stop Docker containers before local dev
-make help          # list all available commands
-```
-
-### Docker mode (PostgreSQL)
-
-Create a `.env` at the **repo root** from `.env.example` (see `README_install_and_start.md` for details), then:
+Docker demo/evaluation mode:
 
 ```bash
 make docker-up
 ```
 
-| Service    | URL              |
-|------------|-----------------|
-| Frontend   | http://localhost:5173 |
-| Backend    | http://localhost:3001 |
-| PostgreSQL | localhost:5432   |
+Shutdown:
 
-> See [README_install_and_start.md](README_install_and_start.md) for the full reference (env vars, workspace commands, common issues).
+```bash
+make docker-down
+```
+
+Useful URLs:
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:5173 |
+| Backend health | http://localhost:3001/api/health |
+| PostgreSQL | localhost:5432 |
+
+For full setup details and common mistakes, read [README_install_and_start.md](README_install_and_start.md).
+
+## Runtime Modes
+
+| Mode | Command | What runs |
+|---|---|---|
+| Local development | `make dev` | PostgreSQL in Docker, backend locally, frontend locally |
+| Docker demo/evaluation | `make docker-up` | PostgreSQL, backend, and frontend all in Docker |
+
+Do not run both modes at the same time because they use the same ports.
+
+## Makefile Commands
+
+```bash
+make help         # show grouped command help
+make install      # install all workspace dependencies
+make dev          # local development mode
+make docker-up    # full Docker demo/evaluation mode
+make docker-down  # stop Docker services
+make start        # print startup guidance only
+```
+
+`make start` does not start the project. It only points to the explicit startup commands.
+
+## Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18 + TypeScript, Vite, Tailwind CSS |
+| Game engine | Phaser |
+| Realtime | Socket.IO |
+| Backend | Node.js + Express + TypeScript |
+| Database | PostgreSQL via Prisma |
+| Auth | JWT |
+| Tests | Vitest (frontend) + Jest (backend) |
 
 ## Team
 
@@ -90,34 +95,14 @@ make docker-up
 | PO + Gameplay | Martin | malafont | Phaser game scenes, game logic, map editor |
 | PM + Backend | Jerem | jdebrull | Express API, auth, Socket.IO, Prisma |
 | Tech Lead + Frontend | Jennifer | jpaulis | Architecture, hooks, shared types, Vite |
-| UI Lead | Élise | evan-dro | Components, Tailwind design system |
+| UI Lead | Elise | evan-dro | Components, Tailwind design system |
 
-## Stack
+## 42 Module Scope
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 18 + TypeScript, Vite 8, Tailwind CSS |
-| Game engine | Phaser 3.80 |
-| Realtime | Socket.IO 4.7 |
-| Backend | Node.js + Express 4 + TypeScript |
-| Database | PostgreSQL 16 via Prisma 5 (Docker Compose) |
-| Auth | JWT (ft_token in localStorage, Bearer header) |
-| Tests | Vitest (frontend) + Jest 30 (backend) |
-
-## Project Status
-
-| Step | Feature | Status |
-|------|---------|--------|
-| 1–4 | Auth, user management, map editor, tower mode | Done |
-| 5 | Socket.IO multiplayer race | To do |
-| — | Admin editor + full tower mode | To do |
-
-## Modules
-
-- **Major** — Use a Framework as backend (Express + Node.js)
-- **Major** — Standard user management, authentication, users across tournaments
-- **Major** — Implementing a remote player (Socket.IO multiplayer)
-- **Minor** — Use a front-end framework or toolkit (React)
-- **Minor** — Use a database for the backend (PostgreSQL + Prisma)
-- **Minor** — Game customisation options (maps, difficulty)
-- **Minor** — Expanding Browser Compatibility (Vite build, modern ES target)
+- Major - Use a framework as backend: Express + Node.js
+- Major - Standard user management, authentication, users across tournaments
+- Major - Implementing a remote player: Socket.IO multiplayer
+- Minor - Use a front-end framework or toolkit: React
+- Minor - Use a database for the backend: PostgreSQL + Prisma
+- Minor - Game customisation options: maps and difficulty
+- Minor - Expanding browser compatibility: Vite build, modern browser target

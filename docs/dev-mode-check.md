@@ -1,5 +1,7 @@
 # JL1 — Dev Mode Check
 
+> Historical note: this document records an earlier local startup check. Current setup and startup commands live in [../README_install_and_start.md](../README_install_and_start.md).
+
 ## Goal
 
 Check if the project starts locally from a clean install.

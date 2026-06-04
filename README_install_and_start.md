@@ -9,6 +9,14 @@ This project has two startup modes:
 
 Do not run both modes at the same time. They use the same ports.
 
+For project overview and architecture:
+
+| Document | Purpose |
+|---|---|
+| [README.md](README.md) | Project overview |
+| [docs/architecture.md](docs/architecture.md) | Architecture reference |
+| [docs/README.md](docs/README.md) | Documentation map |
+
 ---
 
 ## First Setup
