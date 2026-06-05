@@ -3,13 +3,12 @@
 /*                                                        :::      ::::::::   */
 /* tailwind.config.ts                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/* By: evan-dro <evan-dro@student.42be              +#+  +:+       +#+       */
+/* By: jpaulis <jpaulis@student.42be              +#+  +:+       +#+       */
 /*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by evan-dro        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by evan-dro       ###   ########.fr          */
+/* Created: 2026/05/15 00:00:00 by jpaulis        #+#    #+#               */
+/* Updated: 2026/05/15 00:00:00 by jpaulis       ###   ########.fr          */
 /*                                                                            */
 /* ************************************************************************** */
-
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -17,57 +16,81 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ─── Deep-sea fantasy palette ─────────────────────────────────────
-        abyss: {
-          50:  "#e8eaf6",
-          100: "#c5c9e8",
-          200: "#9fa5d8",
-          300: "#7780c8",
-          400: "#5560bc",
-          500: "#3340b0",
-          600: "#2d39a9",
-          700: "#2530a0",
-          800: "#1c2897",
-          900: "#101887",
+        obsidian: {
+          700: "#27272a",
+          800: "#18181b",
+          900: "#09090b",
         },
-        deep: {
-          50:  "#e0f2f1",
-          100: "#b2dfdb",
-          200: "#80cbc4",
-          300: "#4db6ac",
-          400: "#26a69a",
-          500: "#009688",
-          600: "#00897b",
-          700: "#00796b",
-          800: "#00695c",
-          900: "#004d40",
+
+        silver: {
+          100: "#f3f4f6",
+          200: "#e5e7eb",
+          300: "#d1d5db",
+          400: "#9ca3af",
+          500: "#6b7280",
         },
-        coral: {
-          400: "#ff7043",
-          500: "#f4511e",
-          600: "#e64a19",
+
+        gold: {
+          200: "#fef3c7",
+          300: "#fde68a",
+          400: "#facc15",
+          500: "#d4af37",
+          600: "#b8860b",
         },
-        // Neutral surface tones for the dark UI
+
+        diamond: {
+          300: "#bae6fd",
+          400: "#7dd3fc",
+          500: "#38bdf8",
+        },
+
+        amethyst: {
+          300: "#d8b4fe",
+          400: "#c084fc",
+          500: "#a855f7",
+        },
+
+        torch: {
+          400: "#fb923c",
+          500: "#f97316",
+        },
+
+        ruby: {
+          400: "#f87171",
+          500: "#ef4444",
+        },
+
+        emerald: {
+          400: "#34d399",
+          500: "#10b981",
+        },
+
         surface: {
-          DEFAULT: "#0d1117",
-          raised: "#161b22",
-          border: "#21262d",
-          muted:  "#30363d",
+          DEFAULT: "#09090b",
+          raised: "#18181b",
+          hover: "#242428",
+          border: "#3f3f46",
+          gold: "#3a2f16",
         },
       },
+
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "Fira Code", "monospace"],
         fantasy: ["Cinzel", "Georgia", "serif"],
       },
+
       boxShadow: {
-        glow: "0 0 12px 2px rgba(0, 150, 136, 0.45)",
-        "glow-coral": "0 0 12px 2px rgba(244, 81, 30, 0.45)",
+        "gold-soft": "0 0 12px rgba(212, 175, 55, 0.28)",
+        "gold-button": "0 0 18px rgba(212, 175, 55, 0.35)",
+        "diamond-soft": "0 0 14px rgba(125, 211, 252, 0.28)",
       },
+
       animation: {
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         float: "float 6s ease-in-out infinite",
       },
+
       keyframes: {
         float: {
           "0%, 100%": { transform: "translateY(0px)" },

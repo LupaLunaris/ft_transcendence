@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /* EditorGrid.tsx                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/* By: evan-dro <evan-dro@student.42belgium.be      +#+  +:+       +#+       */
+/* By: jpaulis <jpaulis@student.42belgium.be      +#+  +:+       +#+       */
 /*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by evan-dro        #+#    #+#               */
-/* Updated: 2026/05/21 00:00:00 by evan-dro       ###   ########.fr          */
+/* Created: 2026/05/15 00:00:00 by jpaulis        #+#    #+#               */
+/* Updated: 2026/05/21 00:00:00 by jpaulis       ###   ########.fr          */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,12 @@ interface EditorGridProps {
 
 function tileColor(tile: TileValue): string {
   switch (tile) {
-    case TILE.WALL:  return '#8f533d';
-    case TILE.EXIT:  return '#00e5a0';
-    case TILE.SPAWN:   return '#f4511e';
-    case TILE.ENEMY_H: return '#e53935';
-    case TILE.ENEMY_V: return '#ff8c00';
-    default:           return '#2a2a3e'; // EMPTY
+    case TILE.WALL:  return '#5b4636';
+    case TILE.EXIT:  return '#00b894';
+    case TILE.SPAWN:   return '#2f80ed';
+    case TILE.ENEMY_H: return '#c26a2e';
+    case TILE.ENEMY_V: return '#C2185B';
+    default:           return '#111827'; // EMPTY
   }
 }
 

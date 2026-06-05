@@ -5,10 +5,50 @@
 @layer base {
   html,
   body {
-    @apply bg-surface text-white antialiased;
+    @apply bg-surface text-silver-200 antialiased;
   }
 
   * {
     box-sizing: border-box;
+  }
+}
+
+@layer components {
+  .guild-title {
+    color: #d1d5db;
+    text-shadow:
+      0 0 4px rgba(212, 175, 55, 0.45),
+      0 0 14px rgba(212, 175, 55, 0.22);
+  }
+
+  .guild-title-strong {
+    color: #e5e7eb;
+    text-shadow:
+      0 0 5px rgba(212, 175, 55, 0.55),
+      0 0 18px rgba(212, 175, 55, 0.28),
+      0 0 32px rgba(125, 211, 252, 0.10);
+  }
+
+  .gold-edge {
+    box-shadow:
+      0 0 0 1px rgba(212, 175, 55, 0.25),
+      0 0 16px rgba(212, 175, 55, 0.18);
+  }
+
+  .gold-edge-hover {
+    transition:
+      box-shadow 150ms ease,
+      border-color 150ms ease,
+      background-color 150ms ease,
+      color 150ms ease,
+      transform 150ms ease;
+  }
+
+  .gold-edge-hover:hover {
+    border-color: rgba(212, 175, 55, 0.55);
+    box-shadow:
+      0 0 0 1px rgba(212, 175, 55, 0.35),
+      0 0 18px rgba(212, 175, 55, 0.28);
+    transform: translateY(-1px);
   }
 }

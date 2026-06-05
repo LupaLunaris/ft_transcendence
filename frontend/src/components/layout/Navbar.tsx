@@ -26,11 +26,13 @@ export function Navbar() {
   const { user, logout, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const linkClass = ({ isActive }: { isActive: boolean }) =>
-    [
-      'text-sm font-medium transition-colors',
-      isActive ? 'text-deep-300' : 'text-white/70 hover:text-white',
-    ].join(' ');
+	const linkClass = ({ isActive }: { isActive: boolean }) =>
+	[
+		'text-sm font-medium transition-colors',
+		isActive
+		? 'text-gold-300'
+		: 'text-silver-400 hover:text-gold-300',
+	].join(' ');
 
   return (
     <nav className="sticky top-0 z-30 bg-surface/90 backdrop-blur border-b border-surface-border">
@@ -38,7 +40,7 @@ export function Navbar() {
         {/* Logo */}
         <Link
           to="/"
-          className="font-fantasy text-deep-300 text-xl tracking-widest hover:text-deep-200 transition-colors"
+          className="guild-title font-fantasy text-xl tracking-widest hover:text-gold-300 transition-colors"
         >
           Guilds of the Deep
         </Link>
@@ -60,21 +62,36 @@ export function Navbar() {
             <>
               <Link
                 to="/profile"
-                className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-sm text-silver-300 hover:text-gold-300 transition-colors"
               >
-                <div className="w-7 h-7 rounded-full bg-deep-600 flex items-center justify-center text-xs font-bold uppercase">
+                <div className="
+					w-7 h-7
+					rounded-full
+					bg-gradient-to-br
+					from-diamond-500/20
+					to-surface-muted
+					border border-gold-500/40
+					text-gold-200
+					flex items-center justify-center
+					text-xs font-bold uppercase
+					">
                   {user.avatar ? (
                     <img src={user.avatar} alt={user.username} className="w-full h-full rounded-full object-cover" />
                   ) : (
-                    user.username.slice(0, 2)
+                    user.username.slice(0, 2).toUpperCase()
                   )}
                 </div>
                 <span>{user.username}</span>
               </Link>
-              <Button variant="ghost" size="sm" onClick={logout}>
-                Déconnexion
-              </Button>
-            </>
+              <Button
+				variant="ghost"
+				size="sm"
+				onClick={logout}
+				className="text-silver-300 hover:text-ruby-400"
+				>
+				Déconnexion
+				</Button>
+			</>
           ) : (
             <>
               <Link to="/login">
@@ -89,7 +106,7 @@ export function Navbar() {
 
         {/* Mobile burger */}
         <button
-          className="md:hidden p-2 text-white/70 hover:text-white transition-colors"
+          className="md:hidden p-2 text-silver-300 hover:text-gold-300 transition-colors"
           onClick={() => setMenuOpen((v) => !v)}
           aria-label="Toggle menu"
           aria-expanded={menuOpen}
@@ -122,7 +139,7 @@ export function Navbar() {
               ))}
               <button
                 onClick={() => { logout(); setMenuOpen(false); }}
-                className="text-sm text-coral-400 hover:text-coral-300 text-left transition-colors"
+                className="text-sm text-silver-300 hover:text-ruby-300 text-left transition-colors"
               >
                 Déconnexion
               </button>
