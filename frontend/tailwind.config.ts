@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /* tailwind.config.ts                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/* By: jpaulis <jpaulis@student.42be              +#+  +:+       +#+       */
+/* By: evan-dro <evan-dro@student.42belgium.be      +#+  +:+       +#+       */
 /*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jpaulis        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jpaulis       ###   ########.fr          */
+/* Created: 2026/05/15 00:00:00 by evan-dro        #+#    #+#               */
+/* Updated: 2026/05/15 00:00:00 by evan-dro       ###   ########.fr          */
 /*                                                                            */
 /* ************************************************************************** */
 import type { Config } from "tailwindcss";
