@@ -20,12 +20,12 @@ interface EditorGridProps {
 
 function tileColor(tile: TileValue): string {
   switch (tile) {
-    case TILE.WALL:  return '#8f533d';
-    case TILE.EXIT:  return '#00e5a0';
-    case TILE.SPAWN:   return '#f4511e';
-    case TILE.ENEMY_H: return '#e53935';
-    case TILE.ENEMY_V: return '#ff8c00';
-    default:           return '#2a2a3e'; // EMPTY
+    case TILE.WALL:  return '#5b4636';
+    case TILE.EXIT:  return '#00b894';
+    case TILE.SPAWN:   return '#2f80ed';
+    case TILE.ENEMY_H: return '#c26a2e';
+    case TILE.ENEMY_V: return '#C2185B';
+    default:           return '#111827'; // EMPTY
   }
 }
 

@@ -25,13 +25,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    'bg-deep-500 hover:bg-deep-400 text-white shadow-glow hover:shadow-glow focus:ring-deep-400',
+    'bg-surface-raised border border-gold-500/45 text-silver-100 shadow-gold-button hover:border-gold-300 hover:text-gold-200 hover:bg-surface-gold focus:ring-gold-400',
   secondary:
-    'bg-surface-raised hover:bg-surface-muted text-white border border-surface-border focus:ring-surface-muted',
+    'bg-surface-raised hover:bg-surface-hover text-silver-100 border border-surface-border hover:border-gold-500/50 focus:ring-gold-400',
   danger:
-    'bg-coral-500 hover:bg-coral-400 text-white focus:ring-coral-400',
+    'bg-ruby-500 hover:bg-ruby-400 text-white focus:ring-ruby-400',
   ghost:
-    'bg-transparent hover:bg-surface-raised text-deep-300 hover:text-white focus:ring-deep-400',
+    'bg-transparent hover:bg-surface-raised text-silver-300 hover:text-gold-300 focus:ring-gold-400',
 };
 
 const sizeClasses: Record<Size, string> = {

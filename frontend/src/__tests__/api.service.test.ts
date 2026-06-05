@@ -28,7 +28,7 @@ describe("ApiService", () => {
 
     // Import after mocking fetch so the module picks up the mock
     const { api } = await import("@/services/api.service");
-    const result = await api.auth.login({ email: "a@b.com", password: "pass1234" });
+    const result = await api.auth.login({ identifier: "a@b.com", password: "pass1234" });
 
     expect(result).toEqual(payload);
     expect(global.fetch).toHaveBeenCalledWith(

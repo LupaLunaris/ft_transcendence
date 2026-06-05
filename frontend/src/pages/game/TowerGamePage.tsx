@@ -88,58 +88,62 @@ export function TowerGamePage() {
     navigate('/');
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <Spinner size="lg" className="text-deep-400" />
-      </div>
-    );
-  }
-
-  if (error || !level) {
-    return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <p className="text-coral-400">{error ?? 'Niveau introuvable'}</p>
-      </div>
-    );
-  }
-
+if (loading) {
   return (
-    <>
-      <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-4 p-4">
-        <h2 className="text-xl font-semibold text-white font-fantasy tracking-wide">
-          🗼 {level.name}
-        </h2>
-        <p className="text-white/40 text-xs uppercase tracking-widest">
-          Niveau {orderIndex} / 8
-        </p>
-        <GameCanvas
-          key={gameKey}
-          grid={level.grid_json}
-          player_id={user!.id}
-          onExit={handleExit}
-          onDeath={handleDeath}
-        />
-        <p className="text-white/40 text-sm">
-          Utilisez les flèches ou WASD pour vous déplacer
-        </p>
-      </div>
-
-      <GameOverModal
-        isOpen={dead}
-        backLabel="Retour à la tour"
-        onRestart={handleRestart}
-        onBack={() => navigate('/tower')}
-      />
-
-      <CongratulatoryModal
-        isOpen={showModal}
-        level={orderIndex}
-        diamonds={completionData?.diamonds ?? 0}
-        hasNextLevel={orderIndex < 8}
-        onContinue={handleContinue}
-        onHome={handleHome}
-      />
-    </>
+    <div className="min-h-screen bg-surface flex items-center justify-center">
+      <Spinner size="lg" className="text-gold-400" />
+    </div>
   );
+}
+
+if (error || !level) {
+  return (
+    <div className="min-h-screen bg-surface flex items-center justify-center">
+      <p className="text-ruby-400">{error ?? 'Niveau introuvable'}</p>
+    </div>
+  );
+}
+
+return (
+  <>
+    <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-4 p-4">
+      <h2 className="guild-title font-fantasy text-xl font-semibold tracking-wide flex items-center gap-2">
+        <img src="/assets/icons/tower.svg" alt="" className="h-6 w-6 object-contain opacity-80" />
+        {level.name}
+      </h2>
+
+      <p className="text-silver-400 text-xs uppercase tracking-widest">
+        Niveau {orderIndex} / 8
+      </p>
+
+      <GameCanvas
+        key={gameKey}
+        grid={level.grid_json}
+        player_id={user!.id}
+        onExit={handleExit}
+        onDeath={handleDeath}
+      />
+
+      <p className="text-silver-400 text-sm">
+        Utilisez les flèches ou WASD pour vous déplacer
+      </p>
+    </div>
+
+    <GameOverModal
+      isOpen={dead}
+      backLabel="Retour à la tour"
+      onRestart={handleRestart}
+      onBack={() => navigate('/tower')}
+    />
+
+    <CongratulatoryModal
+      isOpen={showModal}
+      level={orderIndex}
+      diamonds={completionData?.diamonds ?? 0}
+      hasNextLevel={orderIndex < 8}
+      onContinue={handleContinue}
+      onHome={handleHome}
+    />
+  </>
+);
 }
