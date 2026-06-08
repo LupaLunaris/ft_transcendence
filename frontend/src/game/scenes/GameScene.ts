@@ -132,7 +132,7 @@ export class GameScene extends BaseScene {
 
 	// ── create ───────────────────────────────────────────────────────────────────
 
-	create(data: GameSceneData): void {
+	create(data: GameScene): void {
 		this.grid = data.grid;
 		this.finished = false;
 		this.isMoving = false;
@@ -185,7 +185,7 @@ export class GameScene extends BaseScene {
 						repeat: 0,
 					});
 				}
-			});
+			})
 
 		// Idle face caméra au spawn (Row 2 = 'down' = face).
 		this.player.anims.play('idle_down');
