@@ -70,7 +70,7 @@ model Score {
   map_id             String
 
   user User @relation(fields: [user_id], references: [id])
-  map  Map  @relation(fields: [map_id], references: [id])
+  map  Map  @relation(fields: [map_id], references: [id], onDelete: Cascade)
 
   @@index([map_id, completion_time_ms])
 }
