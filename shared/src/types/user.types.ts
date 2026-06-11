@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/* user.types.ts                                        :+:      :+:    :+:   */
+/*   user.types.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/* By: jpaulis <jpaulis@student.42be                 +#+  +:+       +#+       */
+/*   By: jdebrull <jdebrull@students.s42.be>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jpaulis           #+#    #+#               */
-/* Updated: 2026/05/17 00:00:00 by jpaulis         ###   ########.fr          */
+/*   Created: 2026/05/15 00:00:00 by aulis             #+#    #+#             */
+/*   Updated: 2026/06/11 15:16:59 by jdebrull         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,16 @@ export interface UserPublic {
 
 export interface UserProfile extends UserPublic {
   online_status: 'online' | 'offline' | 'in_game';
+  friends_count: number;
+}
+
+export interface FriendPublic {
+  id: string;
+  username: string;
+  avatar: string | null;
+  online_status: 'online' | 'offline' | 'in-game';
+  friendship_id: string;
+  created_at: string;
 }
 
 export interface UpdateProfileRequest {
