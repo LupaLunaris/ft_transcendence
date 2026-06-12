@@ -174,12 +174,11 @@ router.delete('/:id', authMiddleware, asyncHandler(async (req: Request, res: Res
   await requireMapOwner(req.params.id, req.user!.id);
 
   await prisma.$transaction([
-    prisma.score.deleteMany({ where: { map_id: req.params.id } }),
-    prisma.map.delete({ where: { id: req.params.id } }),
-    prisma.user.update({
-      where: { id: req.user!.id },
-      data: { created_maps_count: { decrement: 1 } },
-    }),
+  prisma.map.delete({ where: { id: req.params.id } }),
+  prisma.user.update({
+    where: { id: req.user!.id },
+    data: { created_maps_count: { decrement: 1 } },
+  }),
   ]);
 
   res.status(204).send();
@@ -216,11 +215,16 @@ router.post('/:id/publish', authMiddleware, asyncHandler(async (req: Request, re
 
 // POST /api/v1/maps/:id/unpublish
 router.post('/:id/unpublish', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
-  await requireMapOwner(req.params.id, req.user!.id);
+  const map = await requireMapOwner(req.params.id, req.user!.id);
+
+  if (!map.published) {
+    sendError(res, 'Map is not published', 400);
+    return;
+  }
 
   const updated = await prisma.map.update({
     where: { id: req.params.id },
-    data: { published: false},
+    data: { published: false },
   });
 
   sendSuccess(res, toMapData(updated));
