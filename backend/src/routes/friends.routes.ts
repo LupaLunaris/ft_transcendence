@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   friends.routes.ts                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jdebrull <jdebrull@students.s42.be>        +#+  +:+       +#+        */
+/*   By: Jdebrull <jdebrull@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/11 17:00:15 by jdebrull          #+#    #+#             */
-/*   Updated: 2026/06/11 17:31:05 by jdebrull         ###   ########.fr       */
+/*   Created: 2026/06/12 11:31:40 by Jdebrull          #+#    #+#             */
+/*   Updated: 2026/06/12 11:31:40 by Jdebrull         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,88 @@ router.get('/', authMiddleware, asyncHandler(async (req: Request, res: Response)
 		},
 		orderBy: { created_at: 'desc' },
 	});
+
+	const friends: FriendPublic[] = friendships.map((f) => {
+		const friend = f.requester_id === myId ? f.addressee : f.requester;
+		return {
+			id: friend.id,
+			username: friend.username,
+			avatar: friend.avatar,
+			online_status: resolveStatus(friend.id),
+			friendship_id: f.id,
+			created_at: f.created_at.toISOString(),
+		};
+	});
+
+	sendSuccess(res, friends);
+}));
+
+router.post('/:user_id', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
+	const myId = req.user!.id;
+	const { user_id } = req.params;
+
+	if (myId === user_id) {
+		sendError(res, 'you cannot add yourself as a friend', 400);
+		return ;
+	}
+
+	const target = await prisma.user.findUnique( { where: { id: user_id } })
+	if (!target) {
+		sendError(res, 'User not found', 404);
+		return ;
+	}
+
+	const existing = await prisma.friendship.findFirst({
+		where: {
+			OR: [
+				{ requester_id: myId, addressee_id: user_id },
+				{ requester_id: user_id, addressee_id: myId },
+			],
+		},
+	});
+
+	if (existing) {
+		sendError(res, 'Already friends', 409);
+		return ;
+	}
+
+	const friendship = await prisma.friendship.create({
+		data: { requester_id: myId, addressee_id: user_id },
+	});
 	
+	const result: FriendPublic = {
+		id: target.id,
+		username: target.username,
+		avatar: target.avatar,
+		online_status: resolveStatus(target.id),
+		friendship_id: friendship.id,
+		created_at: friendship.created_at.toISOString(),
+	};
 	
+	sendSuccess(res, result, 201);
+}));
 
+router.delete('/:user_id', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
+	const myId = req.user!.id;
+	const {user_id } = req.params;
 
+	const friendship = await prisma.friendship.findFirst({
+		where: {
+			OR: [
+				{ requester_id: myId, addressee_id: user_id },
+				{ requester_id: user_id, addressee_id: myId },
+			],
+		},
+	});
 
+	if (!friendship) {
+		sendError(res, 'Friendship not found', 404);
+		return ;
+	}
 
-	
-}))
+	await prisma.friendship.delete({ where: { id: friendship.id } });
+
+	sendSuccess(res, { message: 'Friend removed' });
+}));
+
+export default router;
