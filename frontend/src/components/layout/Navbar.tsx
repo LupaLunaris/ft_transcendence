@@ -14,6 +14,8 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '@/context/auth.context';
 import { Button } from '@/components/ui/Button';
+import { useTranslation } from 'react-i18next';
+import { LanguageSelector } from '@/components/ui/LanguageSelector';
 
 const NAV_LINKS = [
   { to: '/', label: 'Home' },
@@ -25,6 +27,7 @@ const NAV_LINKS = [
 export function Navbar() {
   const { user, logout, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t, i18n } = useTranslation();
 
 	const linkClass = ({ isActive }: { isActive: boolean }) =>
 	[
@@ -91,6 +94,7 @@ export function Navbar() {
 				>
 				Déconnexion
 				</Button>
+        <LanguageSelector/>
 			</>
           ) : (
             <>
@@ -143,6 +147,7 @@ export function Navbar() {
               >
                 Déconnexion
               </button>
+              <LanguageSelector/>
             </>
           ) : (
             <div className="flex gap-3">
