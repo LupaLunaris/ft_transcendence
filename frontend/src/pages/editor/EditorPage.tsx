@@ -12,7 +12,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { TILE, GRID_SIZE, type Grid, type TileValue } from '@ft/shared';
+import { TILE, GRID_SIZE, type Grid, type TileValue, type MapData } from '@ft/shared';
 import { api, type AdminMap } from '@/services/api.service';
 import { useAuth } from '@/context/auth.context';
 import { useToast } from '@/components/ui/useToast';
@@ -23,6 +23,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Layout } from '@/components/layout/Layout';
 import { EditorGrid } from '@/components/editor/EditorGrid';
 import { TileSelector } from '@/components/editor/TileSelector';
+import { useMyMaps } from '@/hooks/useMap';
 
 function makeEmptyGrid(): Grid {
   const grid = Array.from({ length: GRID_SIZE }, (_, row) =>
@@ -54,6 +55,10 @@ export function EditorPage() {
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
+  const { maps: myMaps, loading: loadingMyMaps, refetch: refetchMyMaps } = useMyMaps();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [mapToDelete, setMapToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Admin mode — initialized directly from user.is_admin (ProtectedRoute guarantees user
   // is non-null at mount time, so no extra render cycle is needed)
@@ -105,6 +110,39 @@ export function EditorPage() {
     setSelectedLevel(level.order_index);
     setGrid(level.grid_json);
     setMapName(level.name);
+  };
+
+  const handleLoadMap = (map: MapData) => {
+    setGrid(map.grid);
+    setMapName(map.name);
+    setMapId(map.id);
+    setIsPublished(map.published);
+    setCreatorCompleted(map.creator_completed);
+    navigate(`/editor/${map.id}`, { replace: true });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!mapToDelete) return;
+    setDeleting(true);
+    try {
+      await api.maps.delete(mapToDelete);
+      if (mapToDelete === mapId) {
+        setGrid(makeEmptyGrid());
+        setMapName('');
+        setMapId(null);
+        setIsPublished(false);
+        setCreatorCompleted(false);
+        navigate('/editor', { replace: true });
+      }
+      refetchMyMaps();
+      showToast('Map supprimée', 'success');
+    } catch {
+      showToast('Erreur lors de la suppression', 'error');
+    } finally {
+      setDeleting(false);
+      setShowDeleteModal(false);
+      setMapToDelete(null);
+    }
   };
 
   const handleSave = async () => {
@@ -281,6 +319,65 @@ export function EditorPage() {
             />
           </div>
 
+          {/* Maps Grid */}
+          {!adminMode && (
+            <div className="flex flex-col gap-2 w-52 shrink-0">
+              <p className="text-xs font-medium text-white/50 uppercase tracking-wide mb-1">
+                Mes maps
+              </p>
+              {loadingMyMaps ? (
+                <div className="flex justify-center pt-4">
+                  <Spinner size="sm" className="text-deep-400" />
+                </div>
+              ) : myMaps.length === 0 ? (
+                <p className="text-white/30 text-xs">Aucune map sauvegardée</p>
+              ) : (
+                myMaps.map((m) => (
+                  <div
+                    key={m.id}
+                    className={[
+                      'flex items-center justify-between gap-2 px-3 py-2 rounded border text-sm transition-colors',
+                      m.id === mapId
+                        ? 'bg-deep-500 border-deep-300 text-white'
+                        : 'bg-surface-raised border-surface-border text-white/70 hover:text-white',
+                    ].join(' ')}
+                  >
+                    <button
+                      className="flex-1 text-left truncate min-w-0"
+                      onClick={() => handleLoadMap(m)}
+                    >
+                      <span className="block truncate font-medium">{m.name}</span>
+                    </button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => {
+                        setMapToDelete(m.id);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      Supprimer
+                    </Button>
+                  </div>
+                ))
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setGrid(makeEmptyGrid());
+                  setMapName('');
+                  setMapId(null);
+                  setIsPublished(false);
+                  setCreatorCompleted(false);
+                  navigate('/editor', { replace: true });
+                }}
+              >
+                Créer une nouvelle map
+              </Button>
+            </div>
+          )}
+
           {/* Admin right panel */}
           {adminMode && (
             <div className="flex flex-col gap-2 w-40 shrink-0">
@@ -340,6 +437,24 @@ export function EditorPage() {
           </Button>
           <Button onClick={handlePublish} loading={publishing}>
             Confirmer
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Supprimer la map ?"
+      >
+        <p className="text-white/70 text-sm mb-5">
+          Cette action est irréversible. La map sera supprimée définitivement.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Annuler
+          </Button>
+          <Button variant="primary" onClick={handleDeleteConfirm} loading={deleting}>
+            Supprimer
           </Button>
         </div>
       </Modal>
