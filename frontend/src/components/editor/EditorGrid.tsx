@@ -18,20 +18,28 @@ interface EditorGridProps {
   onTileClick: (x: number, y: number) => void;
 }
 
-function tileColor(tile: TileValue): string {
+function tileColor(tile: TileValue, row: number, col: number): string {
+  const isOuterWall =
+    row === 0 ||
+    row === GRID_SIZE - 1 ||
+    col === 0 ||
+    col === GRID_SIZE - 1;
+
+  if (tile === TILE.WALL && isOuterWall) return '#2a2520';
+  if (tile === TILE.WALL) return '#5b4a3a';
+
   switch (tile) {
-    case TILE.WALL:  return '#5b4636';
-    case TILE.EXIT:  return '#00b894';
-    case TILE.SPAWN:   return '#2f80ed';
-    case TILE.ENEMY_H: return '#c26a2e';
-    case TILE.ENEMY_V: return '#C2185B';
-    default:           return '#111827'; // EMPTY
+    case TILE.EXIT:    return '#10b981';
+    case TILE.SPAWN:   return '#3b82f6';
+    case TILE.ENEMY_H: return '#d97706';
+    case TILE.ENEMY_V: return '#be185d';
+    default:           return '#121826';
   }
 }
 
 function tileBorder(tile: TileValue): string {
-  if (tile === TILE.WALL) return '1px solid #3d2a5c';
-  return '1px solid #1a1a2e';
+  if (tile === TILE.WALL) return '1px solid #4131229a';
+  return '1px solid #202a3a7a';
 }
 
 export function EditorGrid({ grid, onTileClick }: EditorGridProps) {
@@ -53,7 +61,7 @@ export function EditorGrid({ grid, onTileClick }: EditorGridProps) {
             style={{
               width: 22,
               height: 22,
-              backgroundColor: tileColor(tile),
+              backgroundColor: tileColor(tile, rowIdx, colIdx),
               border: tileBorder(tile),
               transition: 'opacity 0.05s',
             }}
