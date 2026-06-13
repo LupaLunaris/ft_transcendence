@@ -36,8 +36,8 @@
 - Erreurs API : { error: string, code: number }
 - Réponses succès : { data: T } ou { data: T[], total, page, limit }
 - Socket events : snake_case
-- Client→Server : player_input, join_lobby, leave_lobby
-- Server→Client : game_state, race_finished, player_joined, player_left, error_event
+- Client→Server : `join_lobby`, `leave_lobby`, `join_race`, `player_input`, `player_died`
+- Server→Client : `lobby_state`, `duel_start`, `game_state`, `race_finished`, `error_event`
 - Grille : TileValue[][] 25x25 — EMPTY=0 WALL=1 EXIT=2 SPAWN=3 ENEMY_H=4 ENEMY_V=5
 - Phaser→React : this.game.events.emit(eventName, payload) — pas d'EventBus séparé
 - Composants : fonctionnels + hooks, TypeScript strict, jamais de any
@@ -64,47 +64,42 @@ Les emails suivants ont is_admin=true automatiquement à la création de compte 
 - /shared/**                     → jpaulis
 
 ## État du projet
-- Étapes 1-4 complètes
-- Migration SQLite → PostgreSQL : à implémenter (schema.prisma + migrations + .env.example)
-- Étape 5 (Socket.IO race multijoueur) : à implémenter
-- Éditeur admin + mode tour complet : à faire
+- Étapes 1-4 : complètes
+- Migration PostgreSQL : **complète** (schema.prisma + migration 20260527000000_init_postgres + Docker)
+- Étape 5 (Socket.IO multijoueur) : **complète** — implémentée comme système de **Duel**
+- Delete map + Unpublish map : **complets** (backend + frontend)
+- Éditeur admin de la tour : **complet** (GET/PUT /admin/tower/:order_index + EditorPage admin mode)
+- RacePage (`/play/:map_id/race`) : placeholder conservé, le vrai mode multijoueur passe par `/duel`
 
-## Plan d'implémentation PostgreSQL + Multijoueur
+## Architecture Socket.IO Duel (implémentée)
 
-### 1 — Migration PostgreSQL (backend)
-Fichiers à modifier :
-- `backend/prisma/schema.prisma` : `provider = "sqlite"` → `"postgresql"`
-- `backend/prisma/migrations/` : supprimer l'historique SQLite, recréer avec `prisma migrate dev --name init_postgres`
-- `backend/.env.example` : remplacer `DATABASE_URL="file:./dev.db"` par le format PostgreSQL
-- `backend/src/` : aucun changement — Prisma Client est identique côté code
+### Backend — `backend/src/socket/duelHandler.ts`
+Monofichier qui gère tout le cycle duel (remplace les 3 fichiers game/ prévus) :
+- **Lobby global** : `map_id → LobbyRegistration` — visible par tous les joueurs connectés
+- **Limite** : max 3 inscriptions simultanées par joueur
+- **Match** : déclenché immédiatement quand 2 joueurs différents rejoignent le même lobby
+- **Room de course** : `race:${race_id}` (préfixée, séparée du lobby)
+- **`join_race`** : event pour rejoindre la room de course (socket de jeu ≠ socket de lobby)
+- **`player_died`** : émis par le client quand un ennemi le capture côté Phaser
+- Auth JWT via `io.use()` avec lookup DB (`prisma.user.findUnique`)
 
-Points d'attention lors de la migration :
-- `grid_json String` → reste `TEXT` en PostgreSQL, aucun changement de code
-- `DateTime` → devient `TIMESTAMPTZ` natif (transparent via Prisma)
-- Les seeds existants (`seed.ts`, `seed-tower.ts`) sont compatibles sans modification
+Events Socket.IO réels :
+- Client→Server : `join_lobby`, `leave_lobby`, `join_race`, `player_input`, `player_died`
+- Server→Client : `lobby_state`, `duel_start`, `game_state`, `race_finished`, `player_joined`, `player_left`, `error_event`
 
-### 2 — Étape 5 : Socket.IO race multijoueur
-Architecture cible :
-- `backend/src/game/` → nouveau dossier : logique de lobby et de course
-  - `lobby.manager.ts` : gestion des rooms Socket.IO (join/leave/start)
-  - `race.handler.ts` : enregistrement des handlers socket par connexion
-  - `race.state.ts` : état en mémoire de la course (positions, timer, statuts)
-- `backend/src/server.ts` : brancher `registerRaceHandlers(io, socket, user)` dans `io.on('connection')`
+### Frontend — pages et composants duel
+- `frontend/src/pages/duel/DuelPage.tsx` — lobby avec liste des maps publiées + inscriptions
+- `frontend/src/pages/duel/DuelGamePage.tsx` — jeu duel (reçoit `DuelStartPayload` via `location.state`)
+- `frontend/src/game/scenes/DuelScene.ts` — scène Phaser : joueur local + fantôme adversaire (teinté bleu)
+- `frontend/src/hooks/useDuelLobby.ts` — hook Socket.IO pour le lobby
 
-Events Socket.IO à implémenter :
-- Client → Server : `join_lobby`, `leave_lobby`, `player_input`
-- Server → Client : `game_state`, `race_finished`, `player_joined`, `player_left`, `error_event`
-
-Persistance en fin de course :
-- Créer un `Score` (completion_time_ms) pour chaque joueur qui termine
-- Incrémenter `User.diamonds` du gagnant (+1)
-
-### 3 — Fichiers à mettre à jour (docs + config)
-- `README.md` : section stack → PostgreSQL, section démarrage → Docker en premier
-- `README_install_and_start.md` : supprimer la section "Démarrage rapide SQLite", Docker devient le mode principal
-- `Makefile` : vérifier que `db-migrate` fonctionne en mode PostgreSQL local (variable DATABASE_URL à passer)
-- `docker-compose.yml` : déjà configuré — vérifier que le backend lance `prisma migrate deploy` au démarrage
-- `.env.example` (racine) : créer s'il n'existe pas
+### Types partagés duel (shared)
+```ts
+interface LobbyEntry { map_id: string; player: { id, username, avatar } }
+interface DuelStartPayload { race_id, map_id, grid: Grid, opponent: { id, username, avatar } }
+// ClientToServerEvents: + join_race({ race_id }), player_died()
+// ServerToClientEvents: + lobby_state({ entries }), duel_start(DuelStartPayload)
+```
 
 ## Documentation de session (obligatoire en fin de conversation)
 
