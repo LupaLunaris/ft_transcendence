@@ -19,6 +19,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { GameCanvas } from '@/game/GameCanvas';
 import { CongratulatoryModal } from '@/components/tower/CongratulatoryModal';
 import { GameOverModal } from '@/components/game/GameOverModal';
+import { Button } from '@/components/ui/Button';
 
 export function TowerGamePage() {
   const { order_index: orderIndexParam } = useParams<{ order_index: string }>();
@@ -51,6 +52,10 @@ export function TowerGamePage() {
   const handleDeath = useCallback(() => {
     setDead(true);
   }, []);
+
+  const handleExitMap = useCallback(() => {
+    navigate('/tower');
+  }, [navigate]);
 
   const handleRestart = useCallback(() => {
     setDead(false);
@@ -123,6 +128,15 @@ return (
         onExit={handleExit}
         onDeath={handleDeath}
       />
+
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        onClick={handleExitMap}
+      >
+        Quitter le niveau
+      </Button>
 
       <p className="text-silver-400 text-sm">
         Utilisez les flèches ou WASD pour vous déplacer

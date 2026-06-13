@@ -211,6 +211,7 @@ export function EditorPage() {
       await api.maps.publish(mapId);
       setIsPublished(true);
       showToast('Map publiée ! Elle est désormais accessible dans S\'entraîner.', 'success');
+      navigate('/train');
     } catch (err) {
       const msg = err && typeof err === 'object' && 'error' in err
         ? String((err as { error: string }).error)
