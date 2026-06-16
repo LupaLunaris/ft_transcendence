@@ -18,11 +18,11 @@ import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/ui/LanguageSelector';
 
 const NAV_LINKS = [
-  { to: '/', label: 'Home' },
-  { to: '/editor', label: 'Éditeur' },
-  { to: '/train', label: 'S\'entraîner' },
-  { to: '/tower', label: 'La Tour' },
-];
+  { to: '/', key: 'navbar.home' },
+  { to: '/editor', key: 'navbar.editor' },
+  { to: '/train', key: 'navbar.train' },
+  { to: '/tower', key: 'navbar.tower' },
+] as const;
 
 export function Navbar() {
   const { user, logout, loading } = useAuth();
@@ -51,9 +51,9 @@ export function Navbar() {
         {/* Desktop nav */}
         {user && (
           <div className="hidden md:flex items-center gap-6">
-            {NAV_LINKS.map(({ to, label }) => (
+            {NAV_LINKS.map(({ to, key }) => (
               <NavLink key={to} to={to} className={linkClass} end={to === '/'}>
-                {label}
+                {t(key)}
               </NavLink>
             ))}
           </div>
@@ -61,6 +61,7 @@ export function Navbar() {
 
         {/* Desktop right side */}
         <div className="hidden md:flex items-center gap-3">
+          <LanguageSelector/>
           {!loading && (user ? (
             <>
               <Link
@@ -92,17 +93,16 @@ export function Navbar() {
 				onClick={logout}
 				className="text-silver-300 hover:text-ruby-400"
 				>
-				Déconnexion
+				{t('navbar.disconnect')}
 				</Button>
-        <LanguageSelector/>
 			</>
           ) : (
             <>
               <Link to="/login">
-                <Button variant="ghost" size="sm">Connexion</Button>
+                <Button variant="ghost" size="sm">{t('common.login')}</Button>
               </Link>
               <Link to="/register">
-                <Button variant="primary" size="sm">Inscription</Button>
+                <Button variant="primary" size="sm">{t('common.register')}</Button>
               </Link>
             </>
           ))}
@@ -128,9 +128,10 @@ export function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden border-t border-surface-border bg-surface px-4 py-3 flex flex-col gap-3">
+          <LanguageSelector/>
           {!loading && (user ? (
             <>
-              {NAV_LINKS.map(({ to, label }) => (
+              {NAV_LINKS.map(({ to, key }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -138,24 +139,27 @@ export function Navbar() {
                   end={to === '/'}
                   onClick={() => setMenuOpen(false)}
                 >
-                  {label}
+                  {t(key)}
                 </NavLink>
               ))}
               <button
                 onClick={() => { logout(); setMenuOpen(false); }}
                 className="text-sm text-silver-300 hover:text-ruby-300 text-left transition-colors"
               >
-                Déconnexion
+                {t('navbar.disconnect')}
               </button>
-              <LanguageSelector/>
             </>
           ) : (
             <div className="flex gap-3">
               <Link to="/login" onClick={() => setMenuOpen(false)}>
-                <Button variant="ghost" size="sm">Connexion</Button>
+                <Button variant="ghost" size="sm">
+                  {t('common.login')}
+                </Button>
               </Link>
               <Link to="/register" onClick={() => setMenuOpen(false)}>
-                <Button variant="primary" size="sm">Inscription</Button>
+                <Button variant="primary" size="sm">
+                  {t('common.register')}
+                </Button>
               </Link>
             </div>
           ))}

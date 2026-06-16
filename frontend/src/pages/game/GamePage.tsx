@@ -20,6 +20,7 @@ import { GameCanvas } from '@/game/GameCanvas';
 import { GameOverModal } from '@/components/game/GameOverModal';
 import { api } from '@/services/api.service';
 import { Button } from '@/components/ui/Button';
+import { useTranslation } from 'react-i18next';
 
 export function GamePage() {
   const { map_id } = useParams<{ map_id: string }>();
@@ -29,6 +30,7 @@ export function GamePage() {
   const { map, loading, error } = useMap(map_id);
   const [dead, setDead] = useState(false);
   const [gameKey, setGameKey] = useState(0);
+  const { t, i18n } = useTranslation();
 
   const handleDeath = useCallback(() => {
     setDead(true);
@@ -56,9 +58,9 @@ export function GamePage() {
       if (!map_id) return;
       try {
         await api.scores.submit(map_id, time_ms);
-        showToast(`Terminé en ${(time_ms / 1000).toFixed(2)}s !`, 'success');
+        showToast(t('game_page.toast_finished', { time: (time_ms / 1000).toFixed(2) }), 'success');
       } catch {
-        showToast('Score non enregistré', 'error');
+        showToast(t('game_page.toast_score_error'), 'error');
       }
       // Creator completing their own map: mark it done and return to editor to publish
       if (map && user && map.creator_id === user.id) {
@@ -86,14 +88,16 @@ export function GamePage() {
   if (error || !map) {
     return (
       <div className="min-h-screen bg-surface flex items-center justify-center">
-        <p className="text-coral-400">{error ?? 'Map introuvable'}</p>
+        <p className="text-coral-400">
+          {error ?? t('game_page.no_map')}
+        </p>
       </div>
     );
   }
 
   const backLabel = map && user && map.creator_id === user.id
-    ? 'Retour à l\'éditeur'
-    : 'Retour aux entraînements';
+    ? t('game_page.backlabel_editor')
+    : t('game_page.backlabel_train');
 
   return (
     <>
@@ -114,10 +118,10 @@ export function GamePage() {
           size="sm"
           onClick={handleExitMap}
         >
-          Quitter
+          {t('game_page.exit')}
         </Button>
         <p className="text-white/40 text-sm">
-          Utilisez les flèches ou WASD pour vous déplacer
+          {t('game_page.instructions')}
         </p>
       </div>
 

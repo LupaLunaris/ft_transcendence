@@ -25,6 +25,7 @@ import { useAuth } from '@/context/auth.context';
 import { DuelScene } from '@/game/scenes/DuelScene';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
+import { useTranslation } from 'react-i18next';
 
 type DuelSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
@@ -42,18 +43,20 @@ function ResultOverlay({
   myId:   string;
   onLeave: () => void;
 }) {
+  const { t, i18n } = useTranslation();
+
   const won = result.winner_id === myId;
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 rounded-lg gap-5">
       <p className="text-5xl">{won ? '🏆' : '💀'}</p>
       <p className="text-2xl font-bold text-white font-fantasy">
-        {won ? 'Victoire !' : 'Défaite'}
+        {won ? t('duel_game_page.win') : t('duel_game_page.lose')}
       </p>
       <p className="text-white/60 text-sm">
-        Temps : {(result.duration_ms / 1000).toFixed(2)}s
+        {t('duel_game_page.time', { time: (result.duration_ms / 1000).toFixed(2) })}
       </p>
       <Button variant="primary" onClick={onLeave}>
-        Retour au duel
+        {t('duel_game_page.back_duel')}
       </Button>
     </div>
   );
@@ -65,6 +68,7 @@ export function DuelGamePage() {
   const location  = useLocation();
   const navigate  = useNavigate();
   const { user, token } = useAuth();
+  const { t, i18n } = useTranslation();
 
   const state = location.state as DuelStartPayload | null;
 
@@ -182,7 +186,9 @@ export function DuelGamePage() {
         {waiting && !result && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3">
             <Spinner size="lg" className="text-deep-400" />
-            <p className="text-white/70 text-sm">En attente de l'adversaire…</p>
+            <p className="text-white/70 text-sm">
+              {t('duel_game_page.wait_other_player')}
+            </p>
           </div>
         )}
 
@@ -196,7 +202,7 @@ export function DuelGamePage() {
       </div>
 
       <p className="text-white/40 text-sm">
-        Flèches ou WASD · Atteins la sortie avant ton adversaire
+        {t('duel_game_page.instructions')}
       </p>
     </div>
   );

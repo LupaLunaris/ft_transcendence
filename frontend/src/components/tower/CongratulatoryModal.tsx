@@ -12,6 +12,7 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { useTranslation } from 'react-i18next';
 
 interface CongratulatoryModalProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ export function CongratulatoryModal({
   onHome,
 }: CongratulatoryModalProps) {
   const [displayedDiamonds, setDisplayedDiamonds] = useState(0);
+   const { t, i18n } = useTranslation();
 
   // Animate diamond counter from 0 to final value when modal opens
   useEffect(() => {
@@ -78,19 +80,23 @@ export function CongratulatoryModal({
 
         {/* Title */}
         <h2 id="congrats-title" className="text-2xl font-bold font-fantasy text-white tracking-wide">
-          Niveau {level} réussi !
+          {t('congratulatory_modal.level')} {level} {t('congratulatory_modal.succeeded')}
         </h2>
 
         {/* Reward */}
         <div className="flex flex-col items-center gap-1">
-          <p className="text-white/60 text-sm">Tu as gagné un diamant !</p>
+          <p className="text-white/60 text-sm">
+            {t('congratulatory_modal.win')}
+          </p>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-3xl">💎</span>
             <span className="text-4xl font-bold text-deep-200 tabular-nums transition-all">
               {displayedDiamonds}
             </span>
           </div>
-          <p className="text-white/40 text-xs mt-1">diamants au total</p>
+          <p className="text-white/40 text-xs mt-1">
+            {t('congratulatory_modal.diamonds_nb')}
+          </p>
         </div>
 
         {/* Actions */}
@@ -101,7 +107,9 @@ export function CongratulatoryModal({
             className="w-full"
             onClick={onContinue}
           >
-            {hasNextLevel ? `⚔️ Niveau ${level + 1}` : '🏠 Retour à l\'accueil'}
+            {hasNextLevel ? 
+              `⚔️ ${t('congratulatory_modal.level')} ${level + 1}` 
+              : t('congratulatory_modal.to_homepage')}
           </Button>
           <Button
             variant="ghost"
@@ -109,7 +117,7 @@ export function CongratulatoryModal({
             className="w-full"
             onClick={onHome}
           >
-            Accueil
+            {t('congratulatory_modal.homepage')}
           </Button>
         </div>
       </div>
