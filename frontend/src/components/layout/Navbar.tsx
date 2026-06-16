@@ -27,7 +27,7 @@ const NAV_LINKS = [
 export function Navbar() {
   const { user, logout, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
 	const linkClass = ({ isActive }: { isActive: boolean }) =>
 	[

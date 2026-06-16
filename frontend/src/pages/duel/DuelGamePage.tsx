@@ -43,7 +43,7 @@ function ResultOverlay({
   myId:   string;
   onLeave: () => void;
 }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const won = result.winner_id === myId;
   return (
@@ -68,7 +68,7 @@ export function DuelGamePage() {
   const location  = useLocation();
   const navigate  = useNavigate();
   const { user, token } = useAuth();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const state = location.state as DuelStartPayload | null;
 

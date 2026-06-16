@@ -16,6 +16,7 @@
     "navbar.disconnect": "Afmelden",
     "navbar.train": "Trainen",
     "navbar.tower": "De Toren",
+    "navbar.toggle": "Menu openen/sluiten",
 
     "game_over_modal.game_over": "Game Over",
     "game_over_modal.ennemy": "Een vijand heeft je te pakken…",
@@ -75,8 +76,9 @@
     "duel_page.no_published_map": "Nog geen gepubliceerde maps.",
     "duel_page.registered": "Ingeschreven",
     "duel_page.challenge": "Uitdagen",
-    "duel_page.play_count": "{{count}} partij",
-    "duel_page.play_count_plural": "{{count}} partijen",
+    "duel_page.play_count_one": "{{count}} partij",
+    "duel_page.play_count_zero": "{{count}} partijen",
+    "duel_page.play_count_other": "{{count}} partijen",
 
     "editor_page.title_new": "Nieuwe map",
     "editor_page.title_edit": "Map bewerken",
@@ -119,6 +121,7 @@
     "editor_page.warning": "Deze actie is onomkeerbaar. De map wordt permanent verwijderd.",
     "editor_page.delete_map": "Map verwijderen?",
     "editor_page.toast_delete_ok": "Map verwijderd",
+    "editor_page.my_maps": "Mijn maps",
 
     "game_page.toast_score_error": "Score niet opgeslagen",
     "game_page.instructions": "Gebruik de pijltjes of WASD om te bewegen",
@@ -135,7 +138,9 @@
     "tower_game_page.exit_level": "Niveau verlaten",
 
     "home_page.lore": "Ergens diep ondergrond, in vergeten mijnen, heeft zich een verzet gevormd. Oude mijnwerkers en bouwers hebben je opgenomen en trainen je door hun labyrinten om van jou een echte avonturier te maken. Jouw doel: de toren beklimmen en de heks Meduza te verslaan die over de diepten regeert. Leer je eigen gangen te bouwen, train hard en bereid je voor op de beklimming.",
-    "home_page.diamond": "diamanten",
+    "home_page.diamond_count_one": "diamant",
+    "home_page.diamond_count_zero": "diamanten",
+    "home_page.diamond_count_other": "diamanten",
     "home_page.create_map": "Een map maken",
     "home_page.map_instructions": "Teken je kerker en daag de gemeenschap uit",
     "home_page.train_d": "Verken de maps van de gemeenschap",
@@ -143,8 +148,9 @@
     "home_page.climb_tower_d": "8 officiële niveaus te veroveren",
     "home_page.duel_d": "Neem het op tegen een speler in realtime",
     "home_page.play_now": "Nu spelen",
-    "home_page.map_count": "{{count}} map",
-    "home_page.map_count_plural": "{{count}} maps",
+    "home_page.map_count_one": "{{count}} map",
+    "home_page.map_count_zero": "{{count}} maps",
+    "home_page.map_count_other": "{{count}} maps",
 
     "not_found_page.not_found_title": "Kamer niet gevonden",
     "not_found_page.not_found_subtitle": "Deze gang bestaat niet in de kerker.",

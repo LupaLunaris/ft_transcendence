@@ -332,7 +332,7 @@ export function EditorPage() {
           {!adminMode && (
             <div className="flex flex-col gap-2 w-52 shrink-0">
               <p className="text-xs font-medium text-white/50 uppercase tracking-wide mb-1">
-                Mes maps
+                {t('editor_page.my_maps')}
               </p>
               {loadingMyMaps ? (
                 <div className="flex justify-center pt-4">

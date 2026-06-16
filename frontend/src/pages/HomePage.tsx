@@ -73,7 +73,7 @@ export function HomePage() {
 						alt=""
 						className="w-3.5 h-3.5 opacity-90"
 					/>
-					{user.diamonds} {t('home_page.diamond')}
+					{t('home_page.diamond_count', { count: user.diamonds})}
 					</span>
                   <span className="flex items-center gap-1">
 					<img

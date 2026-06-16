@@ -21,7 +21,7 @@ interface TileSelectorProps {
 
 
 export function TileSelector({ selected, onChange }: TileSelectorProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const TILE_OPTIONS: Array<{ value: TileValue; label: string; color: string; description: string }> = [
   { value: TILE.EMPTY,   label: t('tile_selector.floor'),    color: '#1f2933', description: t('tile_selector.floor_d') },

@@ -21,7 +21,7 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ isOpen, backLabel, onRestart, onBack }: GameOverModalProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   
   if (!isOpen) return null;
 

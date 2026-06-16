@@ -24,7 +24,7 @@ import { LanguageSelector } from '@/components/ui/LanguageSelector';
 export function LoginPage() {
   const { user, login, loading: authLoading } = useAuth();
   const { showToast } = useToast();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

@@ -30,7 +30,7 @@ export function GamePage() {
   const { map, loading, error } = useMap(map_id);
   const [dead, setDead] = useState(false);
   const [gameKey, setGameKey] = useState(0);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const handleDeath = useCallback(() => {
     setDead(true);

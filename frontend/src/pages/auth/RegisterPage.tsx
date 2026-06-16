@@ -31,7 +31,7 @@ export function RegisterPage() {
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   if (authLoading)
     return (
@@ -51,7 +51,7 @@ export function RegisterPage() {
     if (password.length < 8)
       next.password = t('register_page.validation_password');
     if (password !== confirm)
-      next.confirm = t('validation_confirm_password');
+      next.confirm = t('register_page.validation_confirm_password');
 
     setErrors(next);
     return Object.keys(next).length === 0;

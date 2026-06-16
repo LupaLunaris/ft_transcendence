@@ -16,6 +16,7 @@
     "navbar.disconnect": "Déconnexion",
     "navbar.train": "S'entraîner",
     "navbar.tower": "La Tour",
+    "navbar.toggle": "Ouvrir/Fermer le menu",
 
     "game_over_modal.game_over": "Game Over",
     "game_over_modal.ennemy": "Un ennemi t'a eu…",
@@ -76,8 +77,9 @@
     "duel_page.no_published_map": "Aucune map publiée pour l'instant.",
     "duel_page.registered": "Inscrit",
     "duel_page.challenge": "Défier",
-    "duel_page.play_count": "{{count}} partie",
-    "duel_page.play_count_plural": "{{count}} parties",
+    "duel_page.play_count_one": "{{count}} partie",
+    "duel_page.play_count_zero": "{{count}} parties",
+    "duel_page.play_count_other": "{{count}} parties",
 
     "editor_page.title_new": "Nouvelle map",
     "editor_page.title_edit": "Modifier la map",
@@ -120,6 +122,7 @@
     "editor_page.warning": "Cette action est irréversible. La map sera supprimée définitivement.",
     "editor_page.delete_map": "Supprimer la map?",
     "editor_page.toast_delete_ok": "Map supprimée",
+    "editor_page.my_maps": "Mes maps",
 
     "game_page.toast_score_error": "Score non enregistré",
     "game_page.instructions": "Utilisez les flèches ou WASD pour vous déplacer",
@@ -136,7 +139,9 @@
     "tower_game_page.exit_level": "Quitter le niveau",
 
     "home_page.lore": "Quelque part sous la terre, dans des mines oubliées, une résistance s'est formée. D'anciens mineurs et bâtisseurs t'ont recueilli et t'entraînent dans leurs labyrinthes pour faire de toi un vrai aventurier. Ton but : gravir la tour et affronter la sorcière Meduza qui règne sur les profondeurs. Apprends à construire tes propres couloirs,entraîne-toi, et prépare-toi à l'ascension.",
-    "home_page.diamond": "diamants",
+    "home_page.diamond_count_one": "{{count}} diamant",
+    "home_page.diamond_count_zero": "{{count}} diamants",
+    "home_page.diamond_count_other": "{{count}} diamants",
     "home_page.create_map": "Créer une map",
     "home_page.map_instructions": "Dessine ton donjon et défie la communauté",
     "home_page.train_d": "Parcours les maps de la communauté",
@@ -144,8 +149,9 @@
     "home_page.climb_tower_d": "8 niveaux officiels à conquérir",
     "home_page.duel_d": "Affronte un joueur en temps réel",
     "home_page.play_now": "Jouer maintenant",
-    "home_page.map_count": "{{count}} map",
-    "home_page.map_count_plural": "{{count}} maps",
+    "home_page.map_count_one": "{{count}} map",
+    "home_page.map_count_zero": "{{count}} maps",
+    "home_page.map_count_other": "{{count}} maps",
 
     "not_found_page.not_found_title": "Salle introuvable",
     "not_found_page.not_found_subtitle": "Ce couloir n'existe pas dans le donjon.",

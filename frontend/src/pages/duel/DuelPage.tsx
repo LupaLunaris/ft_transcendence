@@ -45,7 +45,7 @@ const PAGE_SIZE = 20;
 export function DuelPage() {
   const navigate    = useNavigate();
   const { user, token } = useAuth();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [difficulty, setDifficulty] = useState<Difficulty | undefined>();
   const [page,       setPage]       = useState(1);

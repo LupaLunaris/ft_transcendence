@@ -32,7 +32,7 @@ export function CongratulatoryModal({
   onHome,
 }: CongratulatoryModalProps) {
   const [displayedDiamonds, setDisplayedDiamonds] = useState(0);
-   const { t, i18n } = useTranslation();
+   const { t } = useTranslation();
 
   // Animate diamond counter from 0 to final value when modal opens
   useEffect(() => {

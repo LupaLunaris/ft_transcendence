@@ -16,6 +16,7 @@
     "navbar.disconnect": "Disconnect",
     "navbar.train": "Train",
     "navbar.tower": "The Tower",
+    "navbar.toggle": "Toggle menu",
 
     "game_over_modal.game_over": "Game Over",
     "game_over_modal.ennemy": "An enemy got you…",
@@ -75,8 +76,9 @@
     "duel_page.no_published_map": "No published maps yet.",
     "duel_page.registered": "Registered",
     "duel_page.challenge": "Challenge",
-    "duel_page.play_count": "{{count}} game",
-    "duel_page.play_count_plural": "{{count}} games",
+    "duel_page.play_count_one": "{{count}} game",
+    "duel_page.play_count_zero": "{{count}} games",
+    "duel_page.play_count_other": "{{count}} games",
 
     "editor_page.title_new": "New map",
     "editor_page.title_edit": "Edit map",
@@ -119,6 +121,7 @@
     "editor_page.warning": "This action is irreversible. The map will be permanently deleted.",
     "editor_page.delete_map": "Delete map?",
     "editor_page.toast_delete_ok": "Map deleted",
+    "editor_page.my_maps": "My maps",
 
     "game_page.toast_score_error": "Score not saved",
     "game_page.instructions": "Use the arrows or WASD to move",
@@ -135,7 +138,9 @@
     "tower_game_page.exit_level": "Exit level",
 
     "home_page.lore": "Somewhere beneath the earth, in forgotten mines, a resistance has formed. Ancient miners and builders have taken you in and train you through their labyrinths to make you a true adventurer. Your goal: climb the tower and face the witch Meduza who rules the depths. Learn to build your own corridors, train hard, and prepare for the ascent.",
-    "home_page.diamond": "diamonds",
+    "home_page.diamond_count_one": "diamond",
+    "home_page.diamond_count_zero": "diamonds",
+    "home_page.diamond_count_other": "diamonds",
     "home_page.create_map": "Create a map",
     "home_page.map_instructions": "Draw your dungeon and challenge the community",
     "home_page.train_d": "Explore the community maps",
@@ -143,8 +148,9 @@
     "home_page.climb_tower_d": "8 official levels to conquer",
     "home_page.duel_d": "Face a player in real time",
     "home_page.play_now": "Play now",
-    "home_page.map_count": "{{count}} map",
-    "home_page.map_count_plural": "{{count}} maps",
+    "home_page.map_count_one": "{{count}} map",
+    "home_page.map_count_other": "{{count}} maps",
+    "home_page.map_count_zero": "{{count}} maps",
 
     "not_found_page.not_found_title": "Room not found",
     "not_found_page.not_found_subtitle": "This corridor doesn't exist in the dungeon.",
