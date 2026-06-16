@@ -26,16 +26,13 @@ import { TileSelector } from '@/components/editor/TileSelector';
 import { useMyMaps } from '@/hooks/useMap';
 
 function makeEmptyGrid(): Grid {
-  const grid = Array.from({ length: GRID_SIZE }, (_, row) =>
-    Array.from({ length: GRID_SIZE }, (__, col) => {
-      if (row === 0 || row === GRID_SIZE - 1 || col === 0 || col === GRID_SIZE - 1)
-        return TILE.WALL as TileValue;
-      return TILE.EMPTY as TileValue;
-    }),
+  const grid = Array.from({ length: GRID_SIZE }, () =>
+    Array.from({ length: GRID_SIZE }, () => TILE.WALL as TileValue),
   ) as Grid;
-  // validateGrid requires exactly 1 SPAWN and 1 EXIT — mirror backend defaults
+
   grid[1][1] = TILE.SPAWN;
   grid[GRID_SIZE - 2][GRID_SIZE - 2] = TILE.EXIT;
+
   return grid;
 }
 
@@ -46,7 +43,7 @@ export function EditorPage() {
   const { user } = useAuth();
 
   const [grid, setGrid] = useState<Grid>(makeEmptyGrid);
-  const [selectedTile, setSelectedTile] = useState<TileValue>(TILE.WALL);
+  const [selectedTile, setSelectedTile] = useState<TileValue>(TILE.EMPTY);
   const [mapName, setMapName] = useState('');
   const [mapId, setMapId] = useState<string | null>(id ?? null);
   const [creatorCompleted, setCreatorCompleted] = useState(false);
