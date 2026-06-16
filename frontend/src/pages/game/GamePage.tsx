@@ -19,6 +19,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { GameCanvas } from '@/game/GameCanvas';
 import { GameOverModal } from '@/components/game/GameOverModal';
 import { api } from '@/services/api.service';
+import { Button } from '@/components/ui/Button';
 
 export function GamePage() {
   const { map_id } = useParams<{ map_id: string }>();
@@ -37,6 +38,10 @@ export function GamePage() {
     setDead(false);
     setGameKey((k) => k + 1);
   }, []);
+
+  const handleExitMap = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
 
   const handleBack = useCallback(() => {
     if (map && user && map.creator_id === user.id) {
@@ -93,7 +98,7 @@ export function GamePage() {
   return (
     <>
       <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-4 p-4">
-        <h2 className="text-xl font-semibold text-white font-fantasy tracking-wide">
+        <h2 className="text-xl font-semibold text-silver-100 font-fantasy tracking-wide">
           {map.name}
         </h2>
         <GameCanvas
@@ -103,6 +108,14 @@ export function GamePage() {
           onExit={handleExit}
           onDeath={handleDeath}
         />
+                <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={handleExitMap}
+        >
+          Quitter
+        </Button>
         <p className="text-white/40 text-sm">
           Utilisez les flèches ou WASD pour vous déplacer
         </p>
