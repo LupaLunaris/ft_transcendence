@@ -14,12 +14,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/auth.context';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
-
-const LORE = `Quelque part sous la terre, dans des mines oubliées, une résistance s'est formée.
-D'anciens mineurs et bâtisseurs t'ont recueilli et t'entraînent dans leurs labyrinthes
-pour faire de toi un vrai aventurier. Ton but : gravir la tour et affronter la sorcière
-Meduza qui règne sur les profondeurs. Apprends à construire tes propres couloirs,
-entraîne-toi, et prépare-toi à l'ascension.`;
+import { useTranslation } from 'react-i18next';
 
 function ActionIcon({ src, alt }: { src: string; alt: string }) {
   return (
@@ -31,6 +26,7 @@ function ActionIcon({ src, alt }: { src: string; alt: string }) {
 
 export function HomePage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <Layout>
@@ -41,7 +37,7 @@ export function HomePage() {
   			Guilds of the Deep
 		</h1>
           <p className="text-silver-400 text-base leading-relaxed max-w-xl mx-auto">
-  			{LORE}
+  			{t('home_page.lore')}
 		</p>
         </div>
 
@@ -77,7 +73,7 @@ export function HomePage() {
 						alt=""
 						className="w-3.5 h-3.5 opacity-90"
 					/>
-					{user.diamonds} diamants
+					{t('home_page.diamond_count', { count: user.diamonds})}
 					</span>
                   <span className="flex items-center gap-1">
 					<img
@@ -85,7 +81,7 @@ export function HomePage() {
 						alt=""
 						className="w-3.5 h-3.5 opacity-90"
 					/>
-					Niveau {user.tower_progress}
+					{t('congratulatory_modal.level')} {user.tower_progress}
 					</span>
                   <span className="flex items-center gap-1">
 					<img
@@ -93,7 +89,7 @@ export function HomePage() {
 						alt=""
 						className="w-3.5 h-3.5 opacity-90"
 					/>
-					{user.created_maps_count} map{user.created_maps_count !== 1 ? 's' : ''}
+					{t('home_page.map_count', { count: user.created_maps_count })}
 					</span>
                 </div>
               </div>
@@ -105,10 +101,10 @@ export function HomePage() {
                 <button className="gold-edge-hover w-full bg-surface-raised hover:bg-surface-hover border border-surface-border rounded-xl p-6 text-left group">
                   <ActionIcon src="/assets/icons/map.svg" alt="" />
                   <h3 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
-                    Créer une map
+                    {t('home_page.create_map')}
                   </h3>
                   <p className="text-xs text-silver-400 group-hover:text-silver-200 mt-1 transition-colors">
-                    Dessine ton donjon et défie la communauté
+                    {t('home_page.map_instructions')}
                   </p>
                 </button>
               </Link>
@@ -117,10 +113,10 @@ export function HomePage() {
                 <button className="gold-edge-hover w-full bg-surface-raised hover:bg-surface-hover border border-surface-border rounded-xl p-6 text-left group">
                   <ActionIcon src="/assets/icons/training.svg" alt="" />
                   <h3 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
-                    S'entraîner
+                    {t('navbar.train')}
                   </h3>
                   <p className="text-xs text-silver-400 group-hover:text-silver-200 mt-1 transition-colors">
-                    Parcours les maps de la communauté
+                    {t('home_page.train_d')}
                   </p>
                 </button>
               </Link>
@@ -129,10 +125,10 @@ export function HomePage() {
                 <button className="gold-edge-hover w-full bg-surface-raised hover:bg-surface-hover border border-surface-border rounded-xl p-6 text-left group">
                   <ActionIcon src="/assets/icons/tower.svg" alt="" />
                   <h3 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
-                    Monter la tour
+                    {t('home_page.climb_tower')}
                   </h3>
                   <p className="text-xs text-silver-400 group-hover:text-silver-200 mt-1 transition-colors">
-                    8 niveaux officiels à conquérir
+                    {t('home_page.climb_tower_d')}
                   </p>
                 </button>
               </Link>
@@ -141,10 +137,10 @@ export function HomePage() {
                 <button className="gold-edge-hover w-full bg-surface-raised hover:bg-surface-hover border border-surface-border rounded-xl p-6 text-left group">
                   <ActionIcon src="/assets/icons/duel.svg" alt="" />
                   <h3 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
-                    Duel
+                    {t('duel_page.duel')}
                   </h3>
                   <p className="text-xs text-silver-400 group-hover:text-silver-200 mt-1 transition-colors">
-                    Affronte un joueur en temps réel
+                    {t('home_page.duel_d')}
                   </p>
                 </button>
               </Link>
@@ -155,13 +151,13 @@ export function HomePage() {
           <div className="text-center">
             <Link to="/login">
               <Button size="lg" className="shadow-glow">
-                Jouer maintenant
+                {t('home_page.play_now')}
               </Button>
             </Link>
             <p className="mt-3 text-sm text-silver-400">
-              Pas encore de compte ?{' '}
+              {t('login_page.no_account')}{' '}
               <Link to="/register" className="text-gold-300 hover:text-gold-200 transition-colors">
-                S'inscrire
+                {t('common.to_register')}
               </Link>
             </p>
           </div>

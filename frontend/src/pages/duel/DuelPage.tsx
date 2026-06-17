@@ -19,18 +19,19 @@ import { useDuelLobby } from '@/hooks/useDuelLobby';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
+import { useTranslation } from 'react-i18next';
 
-const DIFFICULTIES: { value: Difficulty | undefined; label: string }[] = [
-  { value: undefined, label: 'Toutes' },
-  { value: 'easy',   label: 'Facile' },
-  { value: 'medium', label: 'Moyen' },
-  { value: 'hard',   label: 'Difficile' },
-];
+const DIFFICULTIES: { value: Difficulty | undefined; key: string }[] = [
+  { value: undefined, key: 'duel_page.difficulty_all' },
+  { value: 'easy',   key: 'duel_page.difficulty_easy' },
+  { value: 'medium', key: 'duel_page.difficulty_medium' },
+  { value: 'hard',   key: 'duel_page.difficulty_hard' },
+] as const;
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
-  easy:   'Facile',
-  medium: 'Moyen',
-  hard:   'Difficile',
+  easy:   'duel_page.difficulty_easy',
+  medium: 'duel_page.difficulty_medium',
+  hard:   'duel_page.difficulty_hard',
 };
 
 const DIFFICULTY_COLOR: Record<Difficulty, string> = {
@@ -44,6 +45,7 @@ const PAGE_SIZE = 20;
 export function DuelPage() {
   const navigate    = useNavigate();
   const { user, token } = useAuth();
+  const { t } = useTranslation();
 
   const [difficulty, setDifficulty] = useState<Difficulty | undefined>();
   const [page,       setPage]       = useState(1);
@@ -74,11 +76,11 @@ export function DuelPage() {
       <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold font-fantasy text-white tracking-wide">
-            ⚔️ Duel
+            ⚔️ {t('duel_page.duel')}
           </h1>
           <div className="flex items-center gap-2 text-sm text-white/40">
             <span className={`w-2 h-2 rounded-full ${connected ? 'bg-green-400' : 'bg-white/20'}`} />
-            {connected ? 'En ligne' : 'Connexion...'}
+            {connected ? t('common.online') : t('common.login')}
           </div>
         </div>
 
@@ -90,15 +92,15 @@ export function DuelPage() {
 
         {maxReached && (
           <p className="text-yellow-400 text-sm bg-yellow-400/10 border border-yellow-400/30 rounded px-3 py-2">
-            Inscrit sur 3 maps — retire-toi d'une map pour t'inscrire ailleurs.
+            {t('duel_page.too_many_maps')}
           </p>
         )}
 
         {/* Filtre difficulté */}
         <div className="flex gap-2 flex-wrap">
-          {DIFFICULTIES.map(({ value, label }) => (
+          {DIFFICULTIES.map(({ value, key }) => (
             <button
-              key={label}
+              key={key}
               onClick={() => handleDifficulty(value)}
               className={[
                 'px-3 py-1 rounded text-sm font-medium border transition-colors',
@@ -107,7 +109,7 @@ export function DuelPage() {
                   : 'bg-transparent border-surface-border text-white/60 hover:text-white',
               ].join(' ')}
             >
-              {label}
+              {t(key)}
             </button>
           ))}
         </div>
@@ -125,7 +127,7 @@ export function DuelPage() {
 
         {!loading && !mapsError && maps.length === 0 && (
           <p className="text-white/40 text-center py-12">
-            Aucune map publiée pour l'instant.
+            {t('duel_page.no_published_map')}
           </p>
         )}
 
@@ -147,9 +149,9 @@ export function DuelPage() {
                   <div>
                     <p className="font-medium text-white">{map.name}</p>
                     <p className={`text-xs mt-0.5 ${DIFFICULTY_COLOR[map.difficulty]}`}>
-                      {DIFFICULTY_LABEL[map.difficulty]}
+                      {t(DIFFICULTY_LABEL[map.difficulty])}
                       {' · '}
-                      {map.play_count} partie{map.play_count !== 1 ? 's' : ''}
+                      {t('duel_page.play_count', { count: map.play_count })}
                     </p>
                   </div>
 
@@ -175,7 +177,7 @@ export function DuelPage() {
                         disabled
                         className="opacity-60 cursor-default"
                       >
-                        Inscrit
+                        {t('duel_page.registered')}
                       </Button>
                     ) : hasOpponent ? (
                       <Button
@@ -183,7 +185,7 @@ export function DuelPage() {
                         size="sm"
                         onClick={() => joinLobby(map.id)}
                       >
-                        Défier
+                        {t('duel_page.challenge')}
                       </Button>
                     ) : (
                       <Button
@@ -192,7 +194,7 @@ export function DuelPage() {
                         disabled={maxReached || !connected}
                         onClick={() => { setError(null); joinLobby(map.id); }}
                       >
-                        S'inscrire
+                        {t('common.to_register')}
                       </Button>
                     )}
                   </div>
@@ -211,18 +213,17 @@ export function DuelPage() {
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
             >
-              Précédent
+              {t('common.previous')}
             </Button>
             <span className="text-white/50 text-sm">
-              Page {page} / {Math.ceil(total / PAGE_SIZE)}
-            </span>
+              {t('common.page', { current: page, total: Math.ceil(total / PAGE_SIZE) })}            </span>
             <Button
               variant="secondary"
               size="sm"
               onClick={() => setPage((p) => p + 1)}
               disabled={page >= Math.ceil(total / PAGE_SIZE)}
             >
-              Suivant
+              {t('common.next')}
             </Button>
           </div>
         )}
