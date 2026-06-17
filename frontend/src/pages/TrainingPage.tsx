@@ -17,18 +17,19 @@ import { usePublishedMaps } from '@/hooks/useMap';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
+import { useTranslation } from 'react-i18next';
 
-const DIFFICULTIES: { value: Difficulty | undefined; label: string }[] = [
-  { value: undefined, label: 'Toutes' },
-  { value: 'easy', label: 'Facile' },
-  { value: 'medium', label: 'Moyen' },
-  { value: 'hard', label: 'Difficile' },
-];
+const DIFFICULTIES: { value: Difficulty | undefined; key: string }[] = [
+  { value: undefined, key: 'duel_page.difficulty_all' },
+  { value: 'easy',   key: 'duel_page.difficulty_easy' },
+  { value: 'medium', key: 'duel_page.difficulty_medium' },
+  { value: 'hard',   key: 'duel_page.difficulty_hard' },
+] as const;
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
-  easy: 'Facile',
-  medium: 'Moyen',
-  hard: 'Difficile',
+  easy:   'duel_page.difficulty_easy',
+  medium: 'duel_page.difficulty_medium',
+  hard:   'duel_page.difficulty_hard',
 };
 
 const DIFFICULTY_COLOR: Record<Difficulty, string> = {
@@ -44,6 +45,7 @@ export function TrainingPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | undefined>();
   const [page, setPage] = useState(1);
   const { maps, total, loading, error } = usePublishedMaps(page, difficulty);
+  const { t } = useTranslation();
 
   function handleDifficulty(value: Difficulty | undefined) {
     setDifficulty(value);
@@ -54,14 +56,14 @@ export function TrainingPage() {
     <Layout>
       <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-6">
         <h1 className="text-2xl font-semibold font-fantasy text-white tracking-wide">
-          ⚔️ S'entraîner
+          ⚔️ {t('navbar.train')}
         </h1>
 
         {/* Difficulty filter */}
         <div className="flex gap-2 flex-wrap">
-          {DIFFICULTIES.map(({ value, label }) => (
+          {DIFFICULTIES.map(({ value, key }) => (
             <button
-              key={label}
+              key={key}
               onClick={() => handleDifficulty(value)}
               className={[
                 'px-3 py-1 rounded text-sm font-medium border transition-colors',
@@ -70,7 +72,7 @@ export function TrainingPage() {
                   : 'bg-transparent border-surface-border text-white/60 hover:text-white',
               ].join(' ')}
             >
-              {label}
+              {t(key)}
             </button>
           ))}
         </div>
@@ -88,7 +90,7 @@ export function TrainingPage() {
 
         {!loading && !error && maps.length === 0 && (
           <p className="text-white/40 text-center py-12">
-            Aucune map publiée pour l'instant.
+            {t('duel_page.no_published_map')}
           </p>
         )}
 
@@ -102,9 +104,9 @@ export function TrainingPage() {
                 <div>
                   <p className="font-medium text-white">{map.name}</p>
                   <p className={`text-xs mt-0.5 ${DIFFICULTY_COLOR[map.difficulty]}`}>
-                    {DIFFICULTY_LABEL[map.difficulty]}
+                    {t(DIFFICULTY_LABEL[map.difficulty])}
                     {' · '}
-                    {map.play_count} partie{map.play_count !== 1 ? 's' : ''}
+                    {t('duel_page.play_count', { count: map.play_count })}
                   </p>
                 </div>
                 <Button
@@ -112,7 +114,7 @@ export function TrainingPage() {
                   size="sm"
                   onClick={() => navigate(`/play/${map.id}`)}
                 >
-                  Jouer
+                  {t('training_page.play')}
                 </Button>
               </div>
             ))}
@@ -128,10 +130,10 @@ export function TrainingPage() {
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
             >
-              Précédent
+              {t('common.previous')}
             </Button>
             <span className="text-white/50 text-sm">
-              Page {page} / {Math.ceil(total / PAGE_SIZE)}
+              {t('common.page', { current: page, total: Math.ceil(total / PAGE_SIZE) })}
             </span>
             <Button
               variant="secondary"
@@ -139,7 +141,7 @@ export function TrainingPage() {
               onClick={() => setPage((p) => p + 1)}
               disabled={page >= Math.ceil(total / PAGE_SIZE)}
             >
-              Suivant
+              {t('common.next')}
             </Button>
           </div>
         )}

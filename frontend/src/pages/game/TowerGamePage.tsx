@@ -20,12 +20,14 @@ import { GameCanvas } from '@/game/GameCanvas';
 import { CongratulatoryModal } from '@/components/tower/CongratulatoryModal';
 import { GameOverModal } from '@/components/game/GameOverModal';
 import { Button } from '@/components/ui/Button';
+import { useTranslation } from 'react-i18next';
 
 export function TowerGamePage() {
   const { order_index: orderIndexParam } = useParams<{ order_index: string }>();
   const orderIndex = parseInt(orderIndexParam ?? '1', 10);
   const navigate = useNavigate();
   const { user, updateUser } = useAuth();
+  const { t } = useTranslation();
 
   const [dead, setDead] = useState(false);
   const [gameKey, setGameKey] = useState(0);
@@ -104,7 +106,9 @@ if (loading) {
 if (error || !level) {
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center">
-      <p className="text-ruby-400">{error ?? 'Niveau introuvable'}</p>
+      <p className="text-ruby-400">
+        {error ?? t('tower_game_page.no_level')}
+      </p>
     </div>
   );
 }
@@ -118,7 +122,7 @@ return (
       </h2>
 
       <p className="text-silver-400 text-xs uppercase tracking-widest">
-        Niveau {orderIndex} / 8
+        {t('tower_game_page.level', { orderIndex })}
       </p>
 
       <GameCanvas
@@ -135,17 +139,17 @@ return (
         size="sm"
         onClick={handleExitMap}
       >
-        Quitter le niveau
+        {t('tower_game_page.exit_level')}
       </Button>
 
       <p className="text-silver-400 text-sm">
-        Utilisez les flèches ou WASD pour vous déplacer
+        {t('game_page.instructions')}
       </p>
     </div>
 
     <GameOverModal
       isOpen={dead}
-      backLabel="Retour à la tour"
+      backLabel={t('tower_game_page.back_to_tower')}
       onRestart={handleRestart}
       onBack={() => navigate('/tower')}
     />
