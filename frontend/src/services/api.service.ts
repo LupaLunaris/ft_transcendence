@@ -74,6 +74,12 @@ interface UserProfile extends UserPublic {
   friends_count: number;
 }
 
+interface UserSearchResult {
+  id: string;
+  username: string;
+  avatar: string | null;
+}
+
 class ApiService {
   private readonly baseUrl: string = import.meta.env.VITE_API_URL ?? '/api/v1';
 
@@ -126,6 +132,11 @@ class ApiService {
   };
 
   users = {
+    search: (query: string): Promise<UserSearchResult[]> =>
+  this.request<UserSearchResult[]>(
+    'GET',
+    `/users/search?query=${encodeURIComponent(query)}`
+  ),
 	getById: (id: string): Promise<UserProfile> =>
 		this.request<UserProfile>('GET', `/users/${id}`),
 	};
@@ -205,4 +216,4 @@ class ApiService {
 }
 
 export const api = new ApiService();
-export type { UpdateProfileRequest, TowerLevel, TowerLevelFull, AdminMap, ScoreEntry, ScoreResult, FriendPublic, UserProfile };
+export type { UpdateProfileRequest, TowerLevel, TowerLevelFull, AdminMap, ScoreEntry, ScoreResult, FriendPublic, UserProfile, UserSearchResult };
