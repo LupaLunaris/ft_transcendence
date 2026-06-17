@@ -15,6 +15,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/context/auth.context';
 import { useTranslation } from 'react-i18next';
 import { FriendsList } from '@/components/friends/FriendsList';
+import { ProfileEditor } from '@/components/profile/ProfileEditor';
 
 export function ProfilePage() {
   const { t } = useTranslation();
@@ -132,6 +133,7 @@ export function ProfilePage() {
 		</div>
 
 		<FriendsList />
+		<ProfileEditor />
 		</div>
 	</Layout>
 	);
