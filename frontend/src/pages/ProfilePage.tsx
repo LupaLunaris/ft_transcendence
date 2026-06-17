@@ -39,56 +39,97 @@ export function ProfilePage() {
     );
   }
 
-  return (
-    <Layout>
-      <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-white">
-          <div className="flex flex-col items-center gap-4 text-center">
-            {user.avatar ? (
-              <img
-                src={user.avatar}
-                alt={`Avatar de ${user.username}`}
-                className="h-24 w-24 rounded-full object-cover border border-white/20"
-              />
-            ) : (
-              <div className="h-24 w-24 rounded-full border border-white/20 bg-white/10 flex items-center justify-center text-4xl">
-                🧙
-              </div>
-            )}
+	return (
+	<Layout>
+		<div className="max-w-3xl mx-auto px-4 py-12 flex flex-col gap-8">
+		<div className="text-center space-y-3">
+			<h1 className="guild-title-strong font-fantasy text-4xl tracking-widest">
+			{t('profile_page.profile')}
+			</h1>
+			<p className="text-silver-400 text-sm">
+			Consulte ta progression, tes cartes et ton identité de guilde.
+			</p>
+		</div>
 
-            <div>
-              <h1 className="text-2xl font-bold">
-                {t('profile_page.profile')}
-              </h1>
-              <p className="text-white/70">@{user.username}</p>
-            </div>
-          </div>
+		<div className="gold-edge bg-surface-raised border border-surface-border rounded-xl p-6">
+			<div className="flex flex-col sm:flex-row items-center gap-6">
+			<div className="w-24 h-24 rounded-full bg-gradient-to-br from-diamond-500/20 to-surface-muted border border-gold-500/40 shadow-gold-soft flex items-center justify-center text-3xl font-bold font-fantasy text-gold-200 shrink-0 overflow-hidden">
+				{user.avatar ? (
+				<img
+					src={user.avatar}
+					alt={user.username}
+					className="w-full h-full object-cover"
+				/>
+				) : (
+				user.username.slice(0, 2).toUpperCase()
+				)}
+			</div>
 
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="rounded-xl bg-black/20 p-4 text-center">
-              <p className="text-2xl font-bold">{user.diamonds}</p>
-              <p className="text-sm text-white/60">Diamonds</p>
-            </div>
+			<div className="flex-1 text-center sm:text-left">
+				<div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+				<h2 className="text-2xl font-semibold text-silver-100">
+					{user.username}
+				</h2>
 
-            <div className="rounded-xl bg-black/20 p-4 text-center">
-              <p className="text-2xl font-bold">{user.tower_progress}</p>
-              <p className="text-sm text-white/60">Tower progress</p>
-            </div>
+				{user.is_admin && (
+					<span className="mx-auto sm:mx-0 rounded-full border border-gold-500/40 bg-gold-500/10 px-3 py-1 text-xs font-semibold text-gold-300">
+					Admin
+					</span>
+				)}
+				</div>
 
-            <div className="rounded-xl bg-black/20 p-4 text-center">
-              <p className="text-2xl font-bold">{user.created_maps_count}</p>
-              <p className="text-sm text-white/60">Maps créées</p>
-            </div>
-          </div>
+				<p className="mt-2 text-sm text-silver-400">
+				Compte créé le{' '}
+				{new Date(user.created_at).toLocaleDateString('fr-BE')}
+				</p>
+			</div>
+			</div>
+		</div>
 
-          <div className="mt-6 rounded-xl bg-black/20 p-4 text-sm text-white/70">
-            <p>
-              Compte créé le{' '}
-              {new Date(user.created_at).toLocaleDateString('fr-BE')}
-            </p>
-          </div>
-        </div>
-      </div>
-    </Layout>
-  );
+		<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+			<div className="gold-edge-hover bg-surface-raised border border-surface-border rounded-xl p-5">
+			<div className="mb-3 flex h-10 items-center">
+				<img
+				src="/assets/icons/diamond.svg"
+				alt=""
+				className="w-6 h-6 opacity-90"
+				/>
+			</div>
+			<p className="text-3xl font-bold text-silver-100">
+				{user.diamonds}
+			</p>
+			<p className="mt-1 text-sm text-silver-400">Diamonds</p>
+			</div>
+
+			<div className="gold-edge-hover bg-surface-raised border border-surface-border rounded-xl p-5">
+			<div className="mb-3 flex h-10 items-center">
+				<img
+				src="/assets/icons/tower.svg"
+				alt=""
+				className="w-6 h-6 opacity-90"
+				/>
+			</div>
+			<p className="text-3xl font-bold text-silver-100">
+				{user.tower_progress}
+			</p>
+			<p className="mt-1 text-sm text-silver-400">Tower progress</p>
+			</div>
+
+			<div className="gold-edge-hover bg-surface-raised border border-surface-border rounded-xl p-5">
+			<div className="mb-3 flex h-10 items-center">
+				<img
+				src="/assets/icons/map.svg"
+				alt=""
+				className="w-6 h-6 opacity-90"
+				/>
+			</div>
+			<p className="text-3xl font-bold text-silver-100">
+				{user.created_maps_count}
+			</p>
+			<p className="mt-1 text-sm text-silver-400">Maps créées</p>
+			</div>
+		</div>
+		</div>
+	</Layout>
+	);
 }
