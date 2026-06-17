@@ -14,6 +14,7 @@ import { Layout } from '@/components/layout/Layout';
 import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/context/auth.context';
 import { useTranslation } from 'react-i18next';
+import { FriendsList } from '@/components/friends/FriendsList';
 
 export function ProfilePage() {
   const { t } = useTranslation();
@@ -129,6 +130,8 @@ export function ProfilePage() {
 			<p className="mt-1 text-sm text-silver-400">Maps créées</p>
 			</div>
 		</div>
+
+		<FriendsList />
 		</div>
 	</Layout>
 	);
