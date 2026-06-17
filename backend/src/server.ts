@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/* server.ts                                            :+:      :+:    :+:   */
+/*   server.ts                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/* By: jdebrull <jdebrull@student.42be              +#+  +:+       +#+       */
+/*   By: Jdebrull <jdebrull@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jdebrull        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jdebrull       ###   ########.fr          */
+/*   Created: 2026/06/12 11:31:38 by Jdebrull          #+#    #+#             */
+/*   Updated: 2026/06/12 11:31:38 by Jdebrull         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,9 @@ import rateLimit from 'express-rate-limit';
 import apiRouter from './routes/index';
 import { registerDuelHandlers } from './socket/duelHandler';
 import type { ClientToServerEvents, ServerToClientEvents } from '@ft/shared';
+import path from 'path';
+import friendsRouter from './routes/friends.routes';
+import usersRouter from './routes/users.routes';
 
 const PORT = process.env.PORT ?? 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:5173';
@@ -47,6 +50,9 @@ app.use(
 
 app.use(helmet());
 app.use(express.json({ limit: '10kb' }));
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+app.use('/api/v1/friends', friendsRouter);
+app.use('/api/v1/users', usersRouter);
 
 app.use(
   rateLimit({

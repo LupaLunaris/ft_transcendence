@@ -1,15 +1,3 @@
-// ************************************************************************** //
-//                                                                            //
-//                                                        :::      ::::::::   //
-// schema.prisma                                        :+:      :+:    :+:   //
-//                                                    +:+ +:+         +:+     //
-// By: jdebrull <jdebrull@student.42be               +#+  +:+       +#+       //
-//                                                +#+#+#+#+#+   +#+           //
-// Created: 2026/05/15 00:00:00 by jdebrull          #+#    #+#               //
-// Updated: 2026/05/17 00:00:00 by jdebrull        ###   ########.fr          //
-//                                                                            //
-// ************************************************************************** //
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -36,6 +24,9 @@ model User {
 
   maps   Map[]
   scores Score[]
+  
+  friendships_sent      Friendship[] @relation("FriendshipRequester")
+  friendships_received  Friendship[] @relation("FriendshipAddressee")
 }
 
 model Map {
@@ -73,4 +64,19 @@ model Score {
   map  Map  @relation(fields: [map_id], references: [id], onDelete: Cascade)
 
   @@index([map_id, completion_time_ms])
+}
+
+model Friendship {
+  id            String    @id @default(uuid())
+  created_at    DateTime  @default(now())
+  
+  requester_id  String
+  addressee_id  String
+  
+  requester     User  @relation("FriendshipRequester", fields: [requester_id], references: [id], onDelete: Cascade)
+  addressee     User  @relation("FriendshipAddressee", fields: [addressee_id], references: [id], onDelete: Cascade)
+
+  @@unique([requester_id, addressee_id])
+  @@index([requester_id])
+  @@index([addressee_id])
 }
