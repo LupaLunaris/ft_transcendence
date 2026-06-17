@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api, type FriendPublic } from '@/services/api.service';
 import { Spinner } from '@/components/ui/Spinner';
+import { UserSearch } from '@/components/friends/UserSearch';
 
 function getStatusLabel(status: FriendPublic['online_status']) {
   if (status === 'online') return 'Online';
@@ -59,6 +60,8 @@ export function FriendsList() {
         </div>
       </div>
 
+      <UserSearch onFriendAdded={loadFriends} />
+      
       {error && (
         <p className="mb-4 rounded-lg border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
           {error}
