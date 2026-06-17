@@ -122,6 +122,9 @@
     "editor_page.delete_map": "Map verwijderen?",
     "editor_page.toast_delete_ok": "Map verwijderd",
     "editor_page.my_maps": "Mijn maps",
+    "editor_page.unpublish": "Depubliceren",
+    "editor_page.toast_unpublish_ok": "Map gedepubliceerd! Ze is niet langer toegankelijk in Training.",
+    "editor_page.toast_unpublish_error": "Fout bij het depubliceren",
 
     "game_page.toast_score_error": "Score niet opgeslagen",
     "game_page.instructions": "Gebruik de pijltjes of WASD om te bewegen",

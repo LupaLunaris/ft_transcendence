@@ -122,6 +122,9 @@
     "editor_page.delete_map": "Delete map?",
     "editor_page.toast_delete_ok": "Map deleted",
     "editor_page.my_maps": "My maps",
+    "editor_page.unpublish": "Unpublish",
+    "editor_page.toast_unpublish_ok": "Map unpublished! It is no longer accessible in Training.",
+    "editor_page.toast_unpublish_error": "Error while unpublishing",
 
     "game_page.toast_score_error": "Score not saved",
     "game_page.instructions": "Use the arrows or WASD to move",
