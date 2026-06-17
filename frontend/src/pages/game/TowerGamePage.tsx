@@ -118,7 +118,7 @@ return (
     <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-4 p-4">
       <h2 className="guild-title font-fantasy text-xl font-semibold tracking-wide flex items-center gap-2">
         <img src="/assets/icons/tower.svg" alt="" className="h-6 w-6 object-contain opacity-80" />
-        {level.name}
+        {t('tower_levels.level_' + orderIndex)}
       </h2>
 
       <p className="text-silver-400 text-xs uppercase tracking-widest">

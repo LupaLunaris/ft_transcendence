@@ -168,5 +168,14 @@
 
     "errors.invalid_grid": "Invalid grid: 25x25 required, with borders, 1 SPAWN and 1 EXIT",
     "errors.no_path": "No path between SPAWN and exit",
-    "errors.name_required": "Name is required"
+    "errors.name_required": "Name is required",
+
+    "tower_levels.level_1": "The Catacombs",
+    "tower_levels.level_2": "The Broken Corridor",
+    "tower_levels.level_3": "The Forest of Columns",
+    "tower_levels.level_4": "The Flat Labyrinth",
+    "tower_levels.level_5": "The Crossroads of Hell",
+    "tower_levels.level_6": "The Serpentine",
+    "tower_levels.level_7": "The U-Traps",
+    "tower_levels.level_8": "The Final Abyss"
 }

@@ -119,7 +119,7 @@ export function EditorPage() {
   const handleSelectAdminLevel = (level: AdminMap) => {
     setSelectedLevel(level.order_index);
     setGrid(level.grid_json);
-    setMapName(level.name);
+    setMapName(t('tower_levels.level_' + level.order_index));
   };
 
   const handleLoadMap = (map: MapData) => {
@@ -409,18 +409,18 @@ export function EditorPage() {
                         } else {
                           setSelectedLevel(n);
                           setGrid(makeEmptyGrid());
-                          setMapName(t('editor_page.level', { n }));
+                          setMapName(t('tower_levels.level_' + n));
                         }
                       }}
                       className={[
-                        'px-3 py-2 rounded text-sm font-medium text-left transition-colors',
+                        'px-3 py-2 rounded text-sm font-medium text-left transition-colors w-full min-w-0',
                         isSelected
                           ? 'bg-deep-500 text-white ring-1 ring-deep-300'
                           : 'bg-surface-raised text-white/70 hover:bg-surface-muted border border-surface-border',
                       ].join(' ')}
                     >
                       <span className="font-bold">{n}.</span>{' '}
-                      <span className="truncate">{level?.name ?? t('editor_page.level', { n })}</span>
+                      <span className="truncate block">{t('tower_levels.level_' + n)}</span>
                     </button>
                   );
                 })

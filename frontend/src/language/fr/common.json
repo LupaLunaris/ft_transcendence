@@ -169,5 +169,14 @@
 
     "errors.invalid_grid": "Grille invalide : 25x25 requis, avec bordures, 1 SPAWN et 1 EXIT",
     "errors.no_path": "Aucun chemin entre le SPAWN et la sortie",
-    "errors.name_required": "Le nom est requis"
+    "errors.name_required": "Le nom est requis",
+
+    "tower_levels.level_1": "Les Catacombes",
+    "tower_levels.level_2": "Le Couloir Brisé",
+    "tower_levels.level_3": "La Forêt de Colonnes",
+    "tower_levels.level_4": "Le Labyrinthe Plat",
+    "tower_levels.level_5": "La Croisée des Enfers",
+    "tower_levels.level_6": "Le Serpentin",
+    "tower_levels.level_7": "Les Pièges en U",
+    "tower_levels.level_8": "L'Abîme Final"
 }   

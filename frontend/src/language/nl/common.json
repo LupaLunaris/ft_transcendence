@@ -168,5 +168,14 @@
 
     "errors.invalid_grid": "Ongeldige grid: 25x25 vereist, met randen, 1 SPAWN en 1 EXIT",
     "errors.no_path": "Geen pad tussen SPAWN en uitgang",
-    "errors.name_required": "Naam is verplicht"    
+    "errors.name_required": "Naam is verplicht",
+
+    "tower_levels.level_1": "De Catacomben",
+    "tower_levels.level_2": "De Gebroken Gang",
+    "tower_levels.level_3": "Het Woud van Kolommen",
+    "tower_levels.level_4": "Het Platte Labyrint",
+    "tower_levels.level_5": "Het Kruispunt van de Hel",
+    "tower_levels.level_6": "De Slang",
+    "tower_levels.level_7": "De U-Vallen",
+    "tower_levels.level_8": "De Laatste Afgrond"
 }
