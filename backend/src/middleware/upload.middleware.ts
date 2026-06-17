@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   upload.middleware.ts                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jdebrull <jdebrull@students.s42.be>        +#+  +:+       +#+        */
+/*   By: Jpaulis <Jpaulis@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/11 15:23:49 by jdebrull          #+#    #+#             */
-/*   Updated: 2026/06/11 15:55:07 by jdebrull         ###   ########.fr       */
+/*   Updated: 2026/06/17 08:54:40 by Jpaulis          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ import fs from 'fs';
 import { Request } from 'express';
 import { sendError } from '../utils/response.utils';
 
-const AVATAR_DIR = path.join(process.cwd(), 'upload', 'avatars');
+const AVATAR_DIR = path.join(process.cwd(), 'uploads', 'avatars');
 
 if (!fs.existsSync(AVATAR_DIR)) {
 	fs.mkdirSync(AVATAR_DIR, { recursive: true });

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   user.types.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jdebrull <jdebrull@students.s42.be>        +#+  +:+       +#+        */
+/*   By: Jpaulis <Jpaulis@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/15 00:00:00 by aulis             #+#    #+#             */
-/*   Updated: 2026/06/11 15:16:59 by jdebrull         ###   ########.fr       */
+/*   Updated: 2026/06/17 08:55:40 by Jpaulis          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ export interface FriendPublic {
   id: string;
   username: string;
   avatar: string | null;
-  online_status: 'online' | 'offline' | 'in-game';
+  online_status: 'online' | 'offline' | 'in_game';
   friendship_id: string;
   created_at: string;
 }
