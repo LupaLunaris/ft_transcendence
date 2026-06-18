@@ -138,6 +138,9 @@ class ApiService {
 
     publish: (id: string): Promise<MapData> =>
       this.request<MapData>('POST', `/maps/${id}/publish`),
+
+    unpublish: (id: string): Promise<MapData> =>
+      this.request<MapData>('POST', `/maps/${id}/unpublish`),
   };
 
   tower = {

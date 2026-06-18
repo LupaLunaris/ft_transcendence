@@ -123,6 +123,9 @@
     "editor_page.delete_map": "Supprimer la map?",
     "editor_page.toast_delete_ok": "Map supprimée",
     "editor_page.my_maps": "Mes maps",
+    "editor_page.unpublish": "Dépublier",
+    "editor_page.toast_unpublish_ok": "Map dépubliée ! Elle n'est plus disponible dans S'entraîner.",
+    "editor_page.toast_unpublish_error": "Erreur lors de la dépublication",
 
     "game_page.toast_score_error": "Score non enregistré",
     "game_page.instructions": "Utilisez les flèches ou WASD pour vous déplacer",

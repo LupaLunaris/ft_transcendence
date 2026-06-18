@@ -69,6 +69,7 @@ export function EditorPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [mapToDelete, setMapToDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [unpublishing, setUnpublishing] = useState(false);
 
   // Admin mode — initialized directly from user.is_admin (ProtectedRoute guarantees user
   // is non-null at mount time, so no extra render cycle is needed)
@@ -226,6 +227,23 @@ export function EditorPage() {
     }
   };
 
+  const handleUnpublish = async () => {
+    if (!mapId) return;
+    setUnpublishing(true);
+    try {
+      await api.maps.unpublish(mapId);
+      setIsPublished(false);
+      showToast(t('editor_page.toast_unpublish_ok'), 'success');
+    } catch (err) {
+      const msg = err && typeof err === 'object' && 'error' in err
+        ? String((err as { error: string }).error)
+        : t('editor_page.toast_unpublish_error');
+      showToast(msg, 'error');
+    } finally {
+      setUnpublishing(false);
+    }
+  };
+
   const handleTest = () => {
     if (!mapId) {
       showToast(t('editor_page.toast_save_first'), 'error');
@@ -298,6 +316,15 @@ export function EditorPage() {
                 }
               >
                 {isPublished ? t('editor_page.published') : t('editor_page.publish')}
+              </Button>
+            )}
+            {!adminMode && isPublished && (
+              <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleUnpublish} 
+              loading={unpublishing}>
+                🔓 {t('editor_page.unpublish')}
               </Button>
             )}
           </div>
