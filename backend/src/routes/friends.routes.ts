@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   friends.routes.ts                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Jdebrull <jdebrull@student.s19.be>         +#+  +:+       +#+        */
+/*   By: Jpaulis <Jpaulis@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/12 11:31:40 by Jdebrull          #+#    #+#             */
-/*   Updated: 2026/06/16 10:16:49 by Jdebrull         ###   ########.fr       */
+/*   Updated: 2026/06/17 09:07:35 by Jpaulis          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ const asyncHandler = (fn: (req: Request, res: Response) => Promise<void>) =>
 	(req: Request, res: Response, next: NextFunction) =>
 		fn(req, res).catch(next);
 
-function resolveStatus(userId: string): 'online' | 'offline' | 'in-game' {
+function resolveStatus(userId: string): 'online' | 'offline' | 'in_game' {
 	return (onlineUsers.has(userId) ? 'online' : 'offline'); 
 }
 

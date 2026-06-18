@@ -23,6 +23,32 @@ const asyncHandler = (fn: (req: Request, res: Response) => Promise<void>) =>
     (req: Request, res: Response, next: NextFunction) =>
         fn(req, res).catch(next);
 
+router.get('/search', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
+    const query = String(req.query.query ?? '').trim();
+
+    if (!query) {
+        sendSuccess(res, []);
+        return;
+    }
+
+    const users = await prisma.user.findMany({
+        where: {
+            username: {
+                contains: query,
+                mode: 'insensitive',
+            },
+        },
+        select: {
+            id: true,
+            username: true,
+            avatar: true,
+        },
+        take: 10,
+    });
+
+    sendSuccess(res, users);
+}));
+
 router.get('/:user_id', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
     const { user_id } = req.params;
     
