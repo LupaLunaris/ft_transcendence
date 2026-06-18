@@ -108,7 +108,7 @@ return (
                 </span>
 
                 <span className="text-xs text-center leading-snug">
-                  {level?.name ?? t('editor_page.level', { n })}
+                  {t('tower_levels.level_' + n)}
                 </span>
               </button>
             );
