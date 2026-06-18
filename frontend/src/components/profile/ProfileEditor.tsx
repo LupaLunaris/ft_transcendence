@@ -64,6 +64,7 @@ export function ProfileEditor() {
             <button
               key={avatar}
               type="button"
+			  aria-label={`Choisir l'avatar ${avatar}`}
               onClick={() => setSelectedAvatar(avatar)}
               className={`rounded-xl border p-2 ${
                 selectedAvatar === avatar
@@ -72,10 +73,10 @@ export function ProfileEditor() {
               }`}
             >
               <img
-                src={avatar}
-                alt=""
-                className="w-full rounded-lg"
-              />
+				src={avatar}
+				alt={`Avatar ${avatar}`}
+				className="w-full rounded-lg"
+				/>
             </button>
           ))}
         </div>
