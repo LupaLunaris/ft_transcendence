@@ -36,7 +36,9 @@ export const ASSET_TILE_WALL_SHEET = '/assets/tiles/sprite tuile/titleSheet.png'
 
 export const ASSET_SPRITE_PLAYER = '/assets/sprites/martinPlayer.png';
 export const ASSET_SPRITE_PLAYER_JEN = '/assets/sprites/JenTopBiche.png';
-export const ASSET_SPRITE_PLAYER_MAR = '/assets/sprites/martinPlayer.png .png';
+export const ASSET_SPRITE_PLAYER_MAR = '/assets/sprites/martinPlayer.png';
+export const ASSET_SPRITE_PLAYER_ELI = '/assets/sprites/elise.png';
+export const ASSET_SPRITE_PLAYER_JER = '/assets/sprites/jerem.png';
 export const ASSET_SPRITE_PLAYER_HERO = '/assets/sprites/hero_walking.png';
 export const ASSET_SPRITE_ENEMY_H = '/assets/sprites/enemy_test.png'; //enemy_h enemy_v
 export const ASSET_SPRITE_ENEMY_V = '/assets/sprites/enemy_test.png';
