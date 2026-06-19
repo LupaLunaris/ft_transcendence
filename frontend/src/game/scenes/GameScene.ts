@@ -14,7 +14,8 @@ import Phaser from 'phaser';
 import { TILE, GRID_SIZE, type Grid, type Direction } from '@ft/shared';
 import { BaseScene, TILE_SIZE } from './BaseScene';
 import {
-	KEY_SPRITE_PLAYER, ASSET_SPRITE_PLAYER,ASSET_SPRITE_PLAYER_JEN,ASSET_SPRITE_PLAYER_HERO,
+	KEY_SPRITE_PLAYER, ASSET_SPRITE_PLAYER,
+	ASSET_SPRITE_PLAYER_ELI,ASSET_SPRITE_PLAYER_JER,ASSET_SPRITE_PLAYER_JEN, ASSET_SPRITE_PLAYER_HERO,
 	KEY_SPRITE_ENEMY_H, ASSET_SPRITE_ENEMY_H,
 	KEY_SPRITE_ENEMY_V, ASSET_SPRITE_ENEMY_V,
 } from '../assets';
@@ -123,7 +124,7 @@ export class GameScene extends BaseScene {
 			frameHeight: ENEMY_V_FRAME_H,
 		});
 		if (!this.textures.exists(KEY_SPRITE_PLAYER)) {
-			this.load.spritesheet(KEY_SPRITE_PLAYER, ASSET_SPRITE_PLAYER_JEN, {
+			this.load.spritesheet(KEY_SPRITE_PLAYER,ASSET_SPRITE_PLAYER_JER, {
 				frameWidth: FRAME_W,
 				frameHeight: FRAME_H,
 			});
