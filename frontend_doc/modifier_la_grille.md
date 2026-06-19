@@ -21,13 +21,14 @@ Seul `EditorGrid.tsx` contrôle l'affichage visuel de la grille. Les autres fich
 
 ## Architecture du composant `EditorGrid.tsx`
 
-Le composant reçoit trois props :
+Le composant reçoit quatre props :
 
 | Prop | Type | Rôle |
 |------|------|------|
 | `grid` | `Grid` (= `TileValue[][]`, 25×25) | Données de la carte |
 | `selectedTile` | `TileValue` | Tuile active dans le sélecteur |
-| `onTileClick(x, y)` | `(number, number) => void` | Callback quand on clique/peint une cellule |
+| `onTileClick(x, y)` | `(number, number) => void` | Callback clic gauche / drag gauche |
+| `onTileRightClick?(x, y)` | `(number, number) => void` | Callback clic droit / drag droit (optionnel) |
 
 ### Rendu
 
@@ -172,6 +173,23 @@ Pour supprimer les bordures : `return 'none'`.
 
 ---
 
+## Interactions souris
+
+| Geste | Résultat |
+|-------|----------|
+| Clic gauche | Place `selectedTile` sur la cellule |
+| Drag gauche (`buttons === 1`) | Peint `selectedTile` en continu |
+| Clic droit | Efface la cellule → `TILE.EMPTY` (sol) |
+| Drag droit (`buttons === 2`) | Efface en continu |
+
+Le menu contextuel natif du navigateur est supprimé (`e.preventDefault()`) sur chaque cellule — le droit-clic ne déclenche pas de menu.
+
+Les bordures extérieures (row/col = 0 ou 24) sont inaltérables dans les deux sens : `setTile` et `clearTile` retournent sans modifier la grille si la cellule est sur un bord.
+
+La prop `onTileRightClick` est `undefined` quand la map est publiée (`!adminMode && isPublished`), ce qui désactive silencieusement le clic droit — cohérent avec `onTileClick` qui reçoit `() => {}` dans le même cas.
+
+---
+
 ## Récapitulatif du flux de données
 
 ```
@@ -183,7 +201,8 @@ EditorPage.tsx
   │     onChange → setSelectedTile()
   │
   └─→ EditorGrid.tsx
-        grid, onTileClick → setTile(x, y)
+        onTileClick      → setTile(x, y)   ← place selectedTile
+        onTileRightClick → clearTile(x, y) ← force TILE.EMPTY
         │
         └─ [CSS Grid : 625 divs, 25 colonnes]
               tileColor(tile) → backgroundColor

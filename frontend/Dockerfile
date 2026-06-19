@@ -1,6 +1,8 @@
 # Build context: monorepo root (docker-compose sets context: .)
 FROM node:20-alpine
 
+RUN apk add --no-cache libc6-compat
+
 WORKDIR /app
 
 # Copy workspace manifests for layer caching

@@ -117,6 +117,15 @@ export function EditorPage() {
     });
   }, [selectedTile]);
 
+  const clearTile = useCallback((x: number, y: number) => {
+    if (x === 0 || x === GRID_SIZE - 1 || y === 0 || y === GRID_SIZE - 1) return;
+    setGrid((prev) => {
+      const next = prev.map((row) => [...row]) as Grid;
+      next[y][x] = TILE.EMPTY;
+      return next;
+    });
+  }, []);
+
   const handleSelectAdminLevel = (level: AdminMap) => {
     setSelectedLevel(level.order_index);
     setGrid(level.grid_json);
@@ -349,6 +358,7 @@ export function EditorPage() {
               grid={grid}
               selectedTile={selectedTile}
               onTileClick={(!adminMode && isPublished) ? () => {} : setTile}
+              onTileRightClick={(!adminMode && isPublished) ? undefined : clearTile}
             />
           </div>
 

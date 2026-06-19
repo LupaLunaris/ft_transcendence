@@ -16,6 +16,7 @@ interface EditorGridProps {
   grid: Grid;
   selectedTile: TileValue;
   onTileClick: (x: number, y: number) => void;
+  onTileRightClick?: (x: number, y: number) => void;
 }
 
 function tileColor(tile: TileValue, row: number, col: number): string {
@@ -42,7 +43,7 @@ function tileBorder(tile: TileValue): string {
   return '1px solid #202a3a7a';
 }
 
-export function EditorGrid({ grid, onTileClick }: EditorGridProps) {
+export function EditorGrid({ grid, onTileClick, onTileRightClick }: EditorGridProps) {
   return (
     <div
       className="inline-block border border-surface-border rounded overflow-hidden cursor-crosshair select-none"
@@ -51,8 +52,6 @@ export function EditorGrid({ grid, onTileClick }: EditorGridProps) {
         gridTemplateColumns: `repeat(${GRID_SIZE}, 22px)`,
         gap: 0,
       }}
-      // Prevent context menu on right-click drag
-      onContextMenu={(e) => e.preventDefault()}
     >
       {grid.map((row, rowIdx) =>
         row.map((tile, colIdx) => (
@@ -67,9 +66,13 @@ export function EditorGrid({ grid, onTileClick }: EditorGridProps) {
             }}
             className="hover:opacity-75"
             onClick={() => onTileClick(colIdx, rowIdx)}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              onTileRightClick?.(colIdx, rowIdx);
+            }}
             onMouseEnter={(e) => {
-              // Paint on drag (left button held)
               if (e.buttons === 1) onTileClick(colIdx, rowIdx);
+              if (e.buttons === 2) onTileRightClick?.(colIdx, rowIdx);
             }}
           />
         )),
