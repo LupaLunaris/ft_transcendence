@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/* duelHandler.ts                                       :+:      :+:    :+:   */
+/*   duelHandler.ts                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/* By: jdebrull <jdebrull@student.42be              +#+  +:+       +#+       */
+/*   By: Jdebrull <jdebrull@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/27 00:00:00 by jdebrull        #+#    #+#               */
-/* Updated: 2026/05/27 00:00:00 by jdebrull       ###   ########.fr          */
+/*   Created: 2026/06/12 11:31:30 by Jdebrull          #+#    #+#             */
+/*   Updated: 2026/06/12 11:31:34 by Jdebrull         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ import type {
   ServerToClientEvents,
 } from '@ft/shared';
 import { TILE, GRID_SIZE } from '@ft/shared';
+import { onlineUsers } from '../state/online.state';
 
 // ─── Types internes ───────────────────────────────────────────────────────────
 
@@ -149,6 +150,7 @@ export function registerDuelHandlers(
 
   io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     const user = socket.data.user as SocketUser;
+    onlineUsers.add(user.id);
     console.log(`[duel] ${user.username} connected (${socket.id})`);
 
     // Envoie l'état courant du lobby au nouveau connecté
@@ -330,6 +332,7 @@ export function registerDuelHandlers(
 
     // ── disconnect ───────────────────────────────────────────────────────────
     socket.on('disconnect', () => {
+      onlineUsers.delete(user.id);
       console.log(`[duel] ${user.username} disconnected`);
       cleanupLobby(socket.id);
 

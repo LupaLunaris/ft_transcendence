@@ -60,6 +60,26 @@ interface ScoreResult {
   created_at: string;
 }
 
+interface FriendPublic {
+  id: string;
+  username: string;
+  avatar: string | null;
+  online_status: 'online' | 'offline' | 'in_game';
+  friendship_id: string;
+  created_at: string;
+}
+
+interface UserProfile extends UserPublic {
+  online_status: 'online' | 'offline' | 'in_game';
+  friends_count: number;
+}
+
+interface UserSearchResult {
+  id: string;
+  username: string;
+  avatar: string | null;
+}
+
 class ApiService {
   private readonly baseUrl: string = import.meta.env.VITE_API_URL ?? '/api/v1';
 
@@ -111,6 +131,27 @@ class ApiService {
       this.request<UserPublic>('PUT', '/auth/profile', req),
   };
 
+  users = {
+    search: (query: string): Promise<UserSearchResult[]> =>
+  this.request<UserSearchResult[]>(
+    'GET',
+    `/users/search?query=${encodeURIComponent(query)}`
+  ),
+	getById: (id: string): Promise<UserProfile> =>
+		this.request<UserProfile>('GET', `/users/${id}`),
+	};
+
+	friends = {
+	getList: (): Promise<FriendPublic[]> =>
+		this.request<FriendPublic[]>('GET', '/friends'),
+
+	add: (userId: string): Promise<FriendPublic> =>
+		this.request<FriendPublic>('POST', `/friends/${userId}`),
+
+	remove: (userId: string): Promise<{ message: string }> =>
+		this.request<{ message: string }>('DELETE', `/friends/${userId}`),
+	};
+
   maps = {
     getPublished: (page = 1, difficulty?: Difficulty): Promise<PaginatedResponse<MapSummary>> => {
       const params = new URLSearchParams({ page: String(page) });
@@ -138,6 +179,9 @@ class ApiService {
 
     publish: (id: string): Promise<MapData> =>
       this.request<MapData>('POST', `/maps/${id}/publish`),
+
+    unpublish: (id: string): Promise<MapData> =>
+      this.request<MapData>('POST', `/maps/${id}/unpublish`),
   };
 
   tower = {
@@ -175,4 +219,4 @@ class ApiService {
 }
 
 export const api = new ApiService();
-export type { UpdateProfileRequest, TowerLevel, TowerLevelFull, AdminMap, ScoreEntry, ScoreResult };
+export type { UpdateProfileRequest, TowerLevel, TowerLevelFull, AdminMap, ScoreEntry, ScoreResult, FriendPublic, UserProfile, UserSearchResult };

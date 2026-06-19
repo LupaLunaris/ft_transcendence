@@ -12,7 +12,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { TILE, GRID_SIZE, type Grid, type TileValue } from '@ft/shared';
+import { TILE, GRID_SIZE, type Grid, type TileValue, type MapData } from '@ft/shared';
 import { api, type AdminMap } from '@/services/api.service';
 import { useAuth } from '@/context/auth.context';
 import { useToast } from '@/components/ui/useToast';
@@ -23,18 +23,28 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Layout } from '@/components/layout/Layout';
 import { EditorGrid } from '@/components/editor/EditorGrid';
 import { TileSelector } from '@/components/editor/TileSelector';
+import { useMyMaps } from '@/hooks/useMap';
+import { useTranslation } from 'react-i18next';
+
+const ERROR_MAP: Record<string, string> = {
+  'Invalid grid: must be 25x25 with WALL borders, valid tile values, exactly 1 SPAWN and 1 EXIT': 'errors.invalid_grid',
+  'No clear path from SPAWN to EXIT': 'errors.no_path',
+  'Name is required': 'errors.name_required',
+};
+
+function getErrorKey(err: unknown, fallback: string): string {
+  const message = (err as { error?: string })?.error ?? '';
+  return ERROR_MAP[message] ?? fallback;
+}
 
 function makeEmptyGrid(): Grid {
-  const grid = Array.from({ length: GRID_SIZE }, (_, row) =>
-    Array.from({ length: GRID_SIZE }, (__, col) => {
-      if (row === 0 || row === GRID_SIZE - 1 || col === 0 || col === GRID_SIZE - 1)
-        return TILE.WALL as TileValue;
-      return TILE.EMPTY as TileValue;
-    }),
+  const grid = Array.from({ length: GRID_SIZE }, () =>
+    Array.from({ length: GRID_SIZE }, () => TILE.WALL as TileValue),
   ) as Grid;
-  // validateGrid requires exactly 1 SPAWN and 1 EXIT — mirror backend defaults
+
   grid[1][1] = TILE.SPAWN;
   grid[GRID_SIZE - 2][GRID_SIZE - 2] = TILE.EXIT;
+
   return grid;
 }
 
@@ -43,9 +53,10 @@ export function EditorPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const [grid, setGrid] = useState<Grid>(makeEmptyGrid);
-  const [selectedTile, setSelectedTile] = useState<TileValue>(TILE.WALL);
+  const [selectedTile, setSelectedTile] = useState<TileValue>(TILE.EMPTY);
   const [mapName, setMapName] = useState('');
   const [mapId, setMapId] = useState<string | null>(id ?? null);
   const [creatorCompleted, setCreatorCompleted] = useState(false);
@@ -54,6 +65,11 @@ export function EditorPage() {
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
+  const { maps: myMaps, loading: loadingMyMaps, refetch: refetchMyMaps } = useMyMaps();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [mapToDelete, setMapToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [unpublishing, setUnpublishing] = useState(false);
 
   // Admin mode — initialized directly from user.is_admin (ProtectedRoute guarantees user
   // is non-null at mount time, so no extra render cycle is needed)
@@ -74,7 +90,7 @@ export function EditorPage() {
         setCreatorCompleted(map.creator_completed);
         setIsPublished(map.published);
       })
-      .catch(() => showToast('Impossible de charger la map', 'error'))
+      .catch(() => showToast(t('editor_page.toast_load_error'), 'error'))
       .finally(() => setLoadingMap(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -86,7 +102,7 @@ export function EditorPage() {
     api.admin
       .getTowerLevels()
       .then(setAdminLevels)
-      .catch(() => showToast('Impossible de charger les niveaux admin', 'error'))
+      .catch(() => showToast(t('editor_page.toast_admin_levels_error'), 'error'))
       .finally(() => setLoadingAdminLevels(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminMode]);
@@ -104,19 +120,52 @@ export function EditorPage() {
   const handleSelectAdminLevel = (level: AdminMap) => {
     setSelectedLevel(level.order_index);
     setGrid(level.grid_json);
-    setMapName(level.name);
+    setMapName(t('tower_levels.level_' + level.order_index));
+  };
+
+  const handleLoadMap = (map: MapData) => {
+    setGrid(map.grid);
+    setMapName(map.name);
+    setMapId(map.id);
+    setIsPublished(map.published);
+    setCreatorCompleted(map.creator_completed);
+    navigate(`/editor/${map.id}`, { replace: true });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!mapToDelete) return;
+    setDeleting(true);
+    try {
+      await api.maps.delete(mapToDelete);
+      if (mapToDelete === mapId) {
+        setGrid(makeEmptyGrid());
+        setMapName('');
+        setMapId(null);
+        setIsPublished(false);
+        setCreatorCompleted(false);
+        navigate('/editor', { replace: true });
+      }
+      refetchMyMaps();
+      showToast(t('editor_page.toast_delete_ok'), 'success');
+    } catch {
+      showToast(t('editor_page.toast_delete_error'), 'error');
+    } finally {
+      setDeleting(false);
+      setShowDeleteModal(false);
+      setMapToDelete(null);
+    }
   };
 
   const handleSave = async () => {
     if (adminMode) {
       if (selectedLevel === null) {
-        showToast('Sélectionne un niveau à modifier', 'error');
+        showToast(t('editor_page.toast_select_level'), 'error');
         return;
       }
       setSaving(true);
       try {
         const updated = await api.admin.updateTowerLevel(selectedLevel, {
-          name: mapName || `Niveau ${selectedLevel}`,
+          name: mapName || t('editor_page.level', { n: selectedLevel }),
           grid_json: JSON.stringify(grid),
         });
         // Sync local cache — upsert: replace if exists, append if new
@@ -126,12 +175,9 @@ export function EditorPage() {
             ? prev.map((l) => (l.order_index === selectedLevel ? updated : l))
             : [...prev, updated].sort((a, b) => a.order_index - b.order_index);
         });
-        showToast(`Niveau ${selectedLevel} sauvegardé !`, 'success');
+        showToast(t('editor_page.toast_save_level_ok', { level: selectedLevel }), 'success');
       } catch (err) {
-        const msg = err && typeof err === 'object' && 'error' in err
-          ? String((err as { error: string }).error)
-          : 'Erreur lors de la sauvegarde';
-        showToast(msg, 'error');
+        showToast(t(getErrorKey(err, 'editor_page.toast_save_error')), 'error');
       } finally {
         setSaving(false);
       }
@@ -139,7 +185,7 @@ export function EditorPage() {
     }
 
     if (!mapName.trim()) {
-      showToast('Donne un nom à ta map', 'error');
+      showToast(t('editor_page.toast_name_required'), 'error');
       return;
     }
     setSaving(true);
@@ -151,12 +197,9 @@ export function EditorPage() {
         setMapId(created.id);
         navigate(`/editor/${created.id}`, { replace: true });
       }
-      showToast('Map sauvegardée !', 'success');
+      showToast(t('editor_page.toast_save_ok'), 'success');
     } catch (err) {
-      const msg = err && typeof err === 'object' && 'error' in err
-        ? String((err as { error: string }).error)
-        : 'Erreur lors de la sauvegarde';
-      showToast(msg, 'error');
+      showToast(t(getErrorKey(err, 'editor_page.toast_save_error')), 'error');
     } finally {
       setSaving(false);
     }
@@ -164,7 +207,7 @@ export function EditorPage() {
 
   const handlePublish = async () => {
     if (!mapId) {
-      showToast('Sauvegarde d\'abord ta map', 'error');
+      showToast(t('editor_page.toast_save_first'), 'error');
       return;
     }
     setPublishing(true);
@@ -172,20 +215,38 @@ export function EditorPage() {
     try {
       await api.maps.publish(mapId);
       setIsPublished(true);
-      showToast('Map publiée ! Elle est désormais accessible dans S\'entraîner.', 'success');
+      showToast(t('editor_page.toast_publish_ok'), 'success');
+      navigate('/train');
     } catch (err) {
       const msg = err && typeof err === 'object' && 'error' in err
         ? String((err as { error: string }).error)
-        : 'Erreur lors de la publication';
+        : t('editor_page.toast_publish_error');
       showToast(msg, 'error');
     } finally {
       setPublishing(false);
     }
   };
 
+  const handleUnpublish = async () => {
+    if (!mapId) return;
+    setUnpublishing(true);
+    try {
+      await api.maps.unpublish(mapId);
+      setIsPublished(false);
+      showToast(t('editor_page.toast_unpublish_ok'), 'success');
+    } catch (err) {
+      const msg = err && typeof err === 'object' && 'error' in err
+        ? String((err as { error: string }).error)
+        : t('editor_page.toast_unpublish_error');
+      showToast(msg, 'error');
+    } finally {
+      setUnpublishing(false);
+    }
+  };
+
   const handleTest = () => {
     if (!mapId) {
-      showToast('Sauvegarde d\'abord ta map', 'error');
+      showToast(t('editor_page.toast_save_first'), 'error');
       return;
     }
     navigate(`/play/${mapId}`);
@@ -202,8 +263,8 @@ export function EditorPage() {
   }
 
   const saveLabel = adminMode && selectedLevel !== null
-    ? `💾 Sauvegarder niveau ${selectedLevel}`
-    : '💾 Sauvegarder';
+    ? t('editor_page.save_level', { level: selectedLevel })
+    : t('editor_page.save');
 
   return (
     <Layout>
@@ -211,13 +272,14 @@ export function EditorPage() {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <h1 className="text-2xl font-semibold font-fantasy text-white tracking-wide flex items-center gap-3">
             {adminMode
-              ? `Éditeur admin${selectedLevel !== null ? ` — Niveau ${selectedLevel}` : ''}`
-              : mapId ? (isPublished ? 'Map publiée' : 'Modifier la map') : 'Nouvelle map'}
-            {!adminMode && isPublished && (
-              <span className="text-xs font-sans font-medium bg-deep-600 text-deep-200 px-2 py-0.5 rounded-full">
-                ✓ publiée
-              </span>
-            )}
+              ? selectedLevel !== null
+                ? t('editor_page.title_admin_level', { level: selectedLevel })
+                : t('editor_page.title_admin')
+              : mapId
+                ? isPublished ? t('editor_page.title_published') 
+                : t('editor_page.title_edit')
+                : t('editor_page.title_new')
+            }
           </h1>
           <div className="flex gap-2 flex-wrap">
             {user?.is_admin && (
@@ -229,12 +291,12 @@ export function EditorPage() {
                   if (adminMode) setSelectedLevel(null);
                 }}
               >
-                🔧 Mode Admin
+                {t('editor_page.admin_mode')}
               </Button>
             )}
             {!adminMode && (
               <Button variant="secondary" size="sm" onClick={handleTest} disabled={!mapId || isPublished}>
-                🎮 Tester
+                {t('editor_page.test')}
               </Button>
             )}
             <Button variant="secondary" size="sm" onClick={handleSave} loading={saving} disabled={!adminMode && isPublished}>
@@ -248,12 +310,21 @@ export function EditorPage() {
                 loading={publishing}
                 disabled={!mapId || !creatorCompleted || isPublished}
                 title={
-                  isPublished ? 'Map déjà publiée' :
-                  !creatorCompleted ? 'Teste ta map d\'abord pour pouvoir la publier' :
+                  isPublished ? t('editor_page.tooltip_published'):
+                  !creatorCompleted ? t('editor_page.tooltip_test_first') :
                   undefined
                 }
               >
-                🚀 {isPublished ? 'Publiée' : 'Publier'}
+                {isPublished ? t('editor_page.published') : t('editor_page.publish')}
+              </Button>
+            )}
+            {!adminMode && isPublished && (
+              <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleUnpublish} 
+              loading={unpublishing}>
+                🔓 {t('editor_page.unpublish')}
               </Button>
             )}
           </div>
@@ -263,10 +334,10 @@ export function EditorPage() {
           {/* Left panel: tile selector + name */}
           <div className="flex flex-col gap-5 w-44 shrink-0">
             <Input
-              label={adminMode ? 'Nom du niveau' : 'Nom de la map'}
+              label={adminMode ? t('editor_page.level_name_label') : t('editor_page.map_name_label')}
               value={mapName}
               onChange={(e) => setMapName(e.target.value)}
-              placeholder={adminMode ? 'Cryptes oubliées' : 'Mon donjon'}
+              placeholder={adminMode ? t('editor_page.level_name_placeholder') : t('editor_page.map_name_placeholder')}
               maxLength={50}
             />
             <TileSelector selected={selectedTile} onChange={setSelectedTile} />
@@ -281,11 +352,72 @@ export function EditorPage() {
             />
           </div>
 
+          {/* Maps Grid */}
+          {!adminMode && (
+            <div className="flex flex-col gap-2 w-52 shrink-0">
+              <p className="text-xs font-medium text-white/50 uppercase tracking-wide mb-1">
+                {t('editor_page.my_maps')}
+              </p>
+              {loadingMyMaps ? (
+                <div className="flex justify-center pt-4">
+                  <Spinner size="sm" className="text-deep-400" />
+                </div>
+              ) : myMaps.length === 0 ? (
+                <p className="text-white/30 text-xs">
+                  {t('editor_page.no_saved_maps')}
+                </p>
+              ) : (
+                myMaps.map((m) => (
+                  <div
+                    key={m.id}
+                    className={[
+                      'flex items-center justify-between gap-2 px-3 py-2 rounded border text-sm transition-colors',
+                      m.id === mapId
+                        ? 'bg-deep-500 border-deep-300 text-white'
+                        : 'bg-surface-raised border-surface-border text-white/70 hover:text-white',
+                    ].join(' ')}
+                  >
+                    <button
+                      className="flex-1 text-left truncate min-w-0"
+                      onClick={() => handleLoadMap(m)}
+                    >
+                      <span className="block truncate font-medium">{m.name}</span>
+                    </button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => {
+                        setMapToDelete(m.id);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      {t('editor_page.delete')}
+                    </Button>
+                  </div>
+                ))
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setGrid(makeEmptyGrid());
+                  setMapName('');
+                  setMapId(null);
+                  setIsPublished(false);
+                  setCreatorCompleted(false);
+                  navigate('/editor', { replace: true });
+                }}
+              >
+                {t('editor_page.create_new_map')}
+              </Button>
+            </div>
+          )}
+
           {/* Admin right panel */}
           {adminMode && (
             <div className="flex flex-col gap-2 w-40 shrink-0">
               <p className="text-xs font-medium text-white/50 uppercase tracking-wide mb-1">
-                Niveaux tour
+                {t('editor_page.tower_levels')}
               </p>
               {loadingAdminLevels ? (
                 <div className="flex justify-center pt-4">
@@ -304,18 +436,18 @@ export function EditorPage() {
                         } else {
                           setSelectedLevel(n);
                           setGrid(makeEmptyGrid());
-                          setMapName(`Niveau ${n}`);
+                          setMapName(t('tower_levels.level_' + n));
                         }
                       }}
                       className={[
-                        'px-3 py-2 rounded text-sm font-medium text-left transition-colors',
+                        'px-3 py-2 rounded text-sm font-medium text-left transition-colors w-full min-w-0',
                         isSelected
                           ? 'bg-deep-500 text-white ring-1 ring-deep-300'
                           : 'bg-surface-raised text-white/70 hover:bg-surface-muted border border-surface-border',
                       ].join(' ')}
                     >
                       <span className="font-bold">{n}.</span>{' '}
-                      <span className="truncate">{level?.name ?? `Niveau ${n}`}</span>
+                      <span className="truncate block">{t('tower_levels.level_' + n)}</span>
                     </button>
                   );
                 })
@@ -328,18 +460,35 @@ export function EditorPage() {
       <Modal
         isOpen={showPublishModal}
         onClose={() => setShowPublishModal(false)}
-        title="Publier la map ?"
+        title={t('editor_page.publish_modal_title')}
       >
         <p className="text-white/70 text-sm mb-5">
-          Tu dois avoir terminé ta propre map avant de la publier. Une fois publiée, elle ne
-          pourra plus être modifiée.
+          {t('editor_page.publish_modal_body')}
         </p>
         <div className="flex gap-3 justify-end">
           <Button variant="secondary" onClick={() => setShowPublishModal(false)}>
-            Annuler
+            {t('editor_page.cancel')}
           </Button>
           <Button onClick={handlePublish} loading={publishing}>
-            Confirmer
+            {t('editor_page.confirm')}
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title={t('editor_page.delete_map')}
+      >
+        <p className="text-white/70 text-sm mb-5">
+          {t('editor_page.warning')}
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            {t('editor_page.cancel')}
+          </Button>
+          <Button variant="primary" onClick={handleDeleteConfirm} loading={deleting}>
+            {t('editor_page.delete')}
           </Button>
         </div>
       </Modal>

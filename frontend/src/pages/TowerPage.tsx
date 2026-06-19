@@ -16,11 +16,13 @@ import { useApi } from '@/hooks/useApi';
 import { api, type TowerLevel } from '@/services/api.service';
 import { Layout } from '@/components/layout/Layout';
 import { Spinner } from '@/components/ui/Spinner';
+import { useTranslation } from 'react-i18next';
 
 export function TowerPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data: levels, loading, error } = useApi<TowerLevel[]>(() => api.tower.getList());
+  const { t } = useTranslation();
 
   const progress = user?.tower_progress ?? 0;
 
@@ -42,13 +44,13 @@ return (
         </div>
 
         <h1 className="guild-title-strong text-3xl font-bold font-fantasy tracking-wide">
-          La Tour
+          {t('tower_page.title')}
         </h1>
 
         <p className="text-silver-400 text-sm mt-2">
           {progress === 8
-            ? 'Tour complétée ! Tu es le Maître des Profondeurs.'
-            : `Niveau actuel : ${progress} / 8`}
+            ? t('tower_page.success')
+            : t('tower_page.tower_level', { progress })}
         </p>
       </div>
 
@@ -106,7 +108,7 @@ return (
                 </span>
 
                 <span className="text-xs text-center leading-snug">
-                  {level?.name ?? `Niveau ${n}`}
+                  {t('tower_levels.level_' + n)}
                 </span>
               </button>
             );
@@ -117,8 +119,12 @@ return (
       {!loading && (
         <div className="flex flex-col gap-2">
           <div className="flex justify-between text-xs text-silver-400">
-            <span>Progression</span>
-            <span>{progress} / 8 niveaux</span>
+            <span>
+              {t('tower_page.progress')}
+            </span>
+            <span>
+              {progress} {t('tower_page.levels')}
+              </span>
           </div>
 
           <div className="w-full h-2 bg-surface-raised rounded-full overflow-hidden border border-surface-border">

@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 import { Button } from '@/components/ui/Button';
+import { useTranslation } from 'react-i18next';
 
 interface GameOverModalProps {
   isOpen: boolean;
@@ -20,6 +21,8 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ isOpen, backLabel, onRestart, onBack }: GameOverModalProps) {
+  const { t } = useTranslation();
+  
   if (!isOpen) return null;
 
   return (
@@ -39,14 +42,16 @@ export function GameOverModal({ isOpen, backLabel, onRestart, onBack }: GameOver
 
         <div className="flex flex-col gap-1">
           <h2 id="gameover-title" className="text-2xl font-bold font-fantasy text-coral-400 tracking-wide">
-            Game Over
+            {t('game_over_modal.game_over')}
           </h2>
-          <p className="text-white/50 text-sm">Un ennemi t'a eu...</p>
+          <p className="text-white/50 text-sm">
+            {t('game_over_modal.ennemy')}
+          </p>
         </div>
 
         <div className="flex flex-col gap-3 w-full">
           <Button variant="primary" size="md" className="w-full" onClick={onRestart}>
-            Recommencer
+            {t('game_over_modal.retry')}
           </Button>
           <Button variant="ghost" size="sm" className="w-full" onClick={onBack}>
             {backLabel}
