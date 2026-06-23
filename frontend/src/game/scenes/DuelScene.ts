@@ -14,9 +14,10 @@ import Phaser from 'phaser';
 import { TILE, GRID_SIZE, type Grid, type Direction, type PlayerState } from '@ft/shared';
 import { BaseScene, TILE_SIZE } from './BaseScene';
 import {
-  KEY_SPRITE_PLAYER,  ASSET_SPRITE_PLAYER,
+  KEY_SPRITE_PLAYER,
   KEY_SPRITE_ENEMY_H, ASSET_SPRITE_ENEMY_H,
   KEY_SPRITE_ENEMY_V, ASSET_SPRITE_ENEMY_V,
+  DEFAULT_PLAYER_SPRITE,
 } from '../assets';
 import { type Enemy, HorizontalEnemy, VerticalEnemy, type EnemyGameObject } from '../entities/Enemy';
 
@@ -49,12 +50,16 @@ export interface DuelSceneData {
   grid:          Grid;
   my_id:         string;
   my_username:   string;
+  my_sprite?:    string;
   opponent:      { id: string; username: string; avatar: string | null };
 }
 
 // ─── DuelScene ────────────────────────────────────────────────────────────────
 
 export class DuelScene extends BaseScene {
+
+  // ── Sprite URL résolue depuis l'avatar du joueur local ───────────────────
+  private playerSpriteUrl = DEFAULT_PLAYER_SPRITE;
 
   // ── Joueur local ──────────────────────────────────────────────────────────
   private grid:          Grid     = [];
@@ -90,6 +95,12 @@ export class DuelScene extends BaseScene {
     super({ key: 'DuelScene' });
   }
 
+  // ── init ──────────────────────────────────────────────────────────────────
+
+  init(data: DuelSceneData): void {
+    if (data.my_sprite) this.playerSpriteUrl = data.my_sprite;
+  }
+
   // ── preload ───────────────────────────────────────────────────────────────
 
   preload(): void {
@@ -103,7 +114,7 @@ export class DuelScene extends BaseScene {
       frameHeight: ENEMY_FRAME_H,
     });
     if (!this.textures.exists(KEY_SPRITE_PLAYER)) {
-      this.load.spritesheet(KEY_SPRITE_PLAYER, ASSET_SPRITE_PLAYER, {
+      this.load.spritesheet(KEY_SPRITE_PLAYER, this.playerSpriteUrl, {
         frameWidth:  FRAME_W,
         frameHeight: FRAME_H,
       });

@@ -14,6 +14,7 @@ import { useCallback, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth.context';
 import { useMap } from '@/hooks/useMap';
+import { AVATAR_TO_SPRITE, DEFAULT_PLAYER_SPRITE } from '@/game/assets';
 import { useToast } from '@/components/ui/useToast';
 import { Spinner } from '@/components/ui/Spinner';
 import { GameCanvas } from '@/game/GameCanvas';
@@ -109,6 +110,7 @@ export function GamePage() {
           key={gameKey}
           grid={map.grid}
           player_id={user!.id}
+          player_sprite={AVATAR_TO_SPRITE[user!.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE}
           onExit={handleExit}
           onDeath={handleDeath}
         />
