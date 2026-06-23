@@ -4,11 +4,12 @@ import { useAuth } from '@/context/auth.context';
 import { useTranslation } from 'react-i18next';
 
 const AVATARS = [
-  '/assets/avatars/Blue_Mage.png',
-  '/assets/avatars/Knight_Vert.png',
-  '/assets/avatars/Range_or.png',
-  '/assets/avatars/Rogue_Violet.png',
+  '/assets/avatars/Jerem_avatar.png',
+  '/assets/avatars/Martin_avatar2.png',
+  '/assets/avatars/Jen_avatar.png',
+  '/assets/avatars/Elise_avatar.png',
 ];
+
 
 export function ProfileEditor() {
   const { user, updateUser } = useAuth();

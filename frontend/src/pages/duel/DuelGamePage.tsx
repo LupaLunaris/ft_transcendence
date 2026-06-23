@@ -23,6 +23,7 @@ import type {
 } from '@ft/shared';
 import { useAuth } from '@/context/auth.context';
 import { DuelScene } from '@/game/scenes/DuelScene';
+import { AVATAR_TO_SPRITE, DEFAULT_PLAYER_SPRITE } from '@/game/assets';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { useTranslation } from 'react-i18next';
@@ -150,10 +151,11 @@ export function DuelGamePage() {
 
     game.events.once('ready', () => {
       game.scene.add('DuelScene', DuelScene, true, {
-        grid:         state.grid,
-        my_id:        user.id,
-        my_username:  user.username,
-        opponent:     state.opponent,
+        grid:        state.grid,
+        my_id:       user.id,
+        my_username: user.username,
+        my_sprite:   AVATAR_TO_SPRITE[user.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE,
+        opponent:    state.opponent,
       });
     });
 
