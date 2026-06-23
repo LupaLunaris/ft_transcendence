@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '@/services/api.service';
 import { useAuth } from '@/context/auth.context';
+import { useTranslation } from 'react-i18next';
 
 const AVATARS = [
   '/assets/avatars/Blue_Mage.png',
@@ -11,6 +12,7 @@ const AVATARS = [
 
 export function ProfileEditor() {
   const { user, updateUser } = useAuth();
+  const { t } = useTranslation();
 
   const [username, setUsername] = useState(user?.username ?? '');
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar ?? AVATARS[0]);
@@ -28,9 +30,9 @@ export function ProfileEditor() {
 
       updateUser(updatedUser);
 
-      setMessage('Profil mis à jour.');
+      setMessage(t('profile_editor_update_success'));
     } catch {
-      setMessage('Erreur lors de la mise à jour.');
+      setMessage(t('profile_editor_update_error'));
     } finally {
       setSaving(false);
     }
@@ -39,12 +41,12 @@ export function ProfileEditor() {
   return (
     <div className="gold-edge bg-surface-raised border border-surface-border rounded-xl p-6">
       <h2 className="font-fantasy text-2xl text-silver-100 mb-4">
-        Modifier le profil
+        {t('profile_editor_update_profile')}
       </h2>
 
       <div className="mb-6">
         <label className="block text-silver-400 mb-2">
-          Nom d'utilisateur
+          {t('profile_editor_username')}
         </label>
 
         <input
@@ -56,7 +58,7 @@ export function ProfileEditor() {
 
       <div className="mb-6">
         <p className="text-silver-400 mb-3">
-          Choisir un avatar
+          {t('profile_editor_avatar')}
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -87,7 +89,7 @@ export function ProfileEditor() {
         disabled={saving}
         className="rounded-lg bg-gold-500/20 border border-gold-500 px-4 py-2 text-gold-300"
       >
-        {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+        {saving ? t('profile_editor_saving') : t('profile_editor_save')}
       </button>
 
       {message && (

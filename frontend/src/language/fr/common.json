@@ -181,5 +181,40 @@
     "tower_levels.level_5": "La Croisée des Enfers",
     "tower_levels.level_6": "Le Serpentin",
     "tower_levels.level_7": "Les Pièges en U",
-    "tower_levels.level_8": "L'Abîme Final"
+    "tower_levels.level_8": "L'Abîme Final",
+
+    "friends_list_online": "En ligne",
+    "friends_list_ingame": "En jeu",
+    "friends_list_offline": "Déconnecté",
+    "friends_list_loadfriends_error": "Impossible de charger la liste d'amis.",
+    "friends_list_delete_error": "Impossible de supprimer cet ami.",
+    "friends_list_friends": "Amis",
+    "friends_list_friends_list": "Liste de tes compagnons de guilde",
+    "friends_list_no_friend": "Aucun ami pour le moment",
+    "friends_list_add_friend": "Tu pourras ajouter d'autres joueurs depuis la recherche utilisateur.",
+    "friends_list_remove": "Retirer",
+
+    "friends_search_characters": "Tape au moins 2 caractères.",
+    "friends_search_error": "Impossible de rechercher des joueurs.",
+    "friends_search_add_friend_error": "Impossible d'ajouter ce joueur en ami.",
+    "friends_search_search_player": "Rechercher un joueur...",
+    "friends_search_searching": "Recherche...",
+    "friends_search_search": "Chercher",
+    "friends_search_add": "Ajouter",
+
+    "profile_editor_update_success": "Profil mis à jour.",
+    "profile_editor_update_error": "Erreur lors de la mise à jour.",
+    "profile_editor_update_profile": "Modifier le profil",
+    "profile_editor_username": "Nom d'utilisateur",
+    "profile_editor_avatar": "Choisir un avatar",
+    "profile_editor_saving": "Sauvegarde...",
+    "profile_editor_save": "Sauvegarder",
+
+    "profile_page_offline_error": "Tu dois être connecté pour voir ton profil.",
+    "profile_page_info": "Consulte ta progression, tes cartes et ton identité de guilde.",
+    "profile_page_admin": "Admin",
+    "profile_page_count_creation": "Compte créé le {{date}}",
+    "profile_page_diamond": "Diamants",
+    "profile_page_tower_progress": "Progression de tour",
+    "profile_page_maps": "Maps créées"
 }   

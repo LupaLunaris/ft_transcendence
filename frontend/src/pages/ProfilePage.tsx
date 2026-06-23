@@ -35,7 +35,9 @@ export function ProfilePage() {
     return (
       <Layout>
         <div className="max-w-2xl mx-auto px-4 py-12 text-center text-white/60">
-          <p>Tu dois être connectée pour voir ton profil.</p>
+          <p>
+			{t('profile_page_offline_error')}
+		  </p>
         </div>
       </Layout>
     );
@@ -49,7 +51,7 @@ export function ProfilePage() {
 			{t('profile_page.profile')}
 			</h1>
 			<p className="text-silver-400 text-sm">
-			Consulte ta progression, tes cartes et ton identité de guilde.
+				{t('profile_page_info')}
 			</p>
 		</div>
 
@@ -75,14 +77,13 @@ export function ProfilePage() {
 
 				{user.is_admin && (
 					<span className="mx-auto sm:mx-0 rounded-full border border-gold-500/40 bg-gold-500/10 px-3 py-1 text-xs font-semibold text-gold-300">
-					Admin
+						{t('profile_page_admin')}
 					</span>
 				)}
 				</div>
 
 				<p className="mt-2 text-sm text-silver-400">
-				Compte créé le{' '}
-				{new Date(user.created_at).toLocaleDateString('fr-BE')}
+				{t("profile_page_count_creation", { date: new Date(user.created_at).toLocaleDateString('fr-BE') })}
 				</p>
 			</div>
 			</div>
@@ -100,7 +101,9 @@ export function ProfilePage() {
 			<p className="text-3xl font-bold text-silver-100">
 				{user.diamonds}
 			</p>
-			<p className="mt-1 text-sm text-silver-400">Diamonds</p>
+			<p className="mt-1 text-sm text-silver-400">
+				{t('profile_page_diamond')}
+			</p>
 			</div>
 
 			<div className="gold-edge-hover bg-surface-raised border border-surface-border rounded-xl p-5">
@@ -114,7 +117,9 @@ export function ProfilePage() {
 			<p className="text-3xl font-bold text-silver-100">
 				{user.tower_progress}
 			</p>
-			<p className="mt-1 text-sm text-silver-400">Tower progress</p>
+			<p className="mt-1 text-sm text-silver-400">
+				{t('profile_page_tower_progress')}
+			</p>
 			</div>
 
 			<div className="gold-edge-hover bg-surface-raised border border-surface-border rounded-xl p-5">
@@ -128,7 +133,9 @@ export function ProfilePage() {
 			<p className="text-3xl font-bold text-silver-100">
 				{user.created_maps_count}
 			</p>
-			<p className="mt-1 text-sm text-silver-400">Maps créées</p>
+			<p className="mt-1 text-sm text-silver-400">
+				{t('profile_page_maps')}
+			</p>
 			</div>
 		</div>
 
