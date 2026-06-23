@@ -1,0 +1,26 @@
+# Build context: monorepo root
+FROM node:20-alpine
+
+RUN apk add --no-cache openssl
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+COPY shared/package.json ./shared/
+COPY backend/package.json ./backend/
+COPY frontend/package.json ./frontend/
+
+RUN npm install
+
+COPY shared/ ./shared/
+RUN npm run build -w shared
+
+COPY backend/ ./backend/
+
+WORKDIR /app/backend
+
+RUN npx prisma generate && npm run build
+
+EXPOSE 3001
+
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run db:seed && node dist/server.js"]

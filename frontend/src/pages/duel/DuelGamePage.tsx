@@ -89,7 +89,10 @@ export function DuelGamePage() {
   useEffect(() => {
     if (!state || !token) return;
 
-    const socket: DuelSocket = io({ auth: { token }, transports: ['websocket', 'polling'] });
+    // LOCAL (via proxy Vite) — rollback si besoin:
+    // const socket: DuelSocket = io({ auth: { token }, transports: ['websocket', 'polling'] });
+    // PROD (Vercel + Railway cross-domain):
+    const socket: DuelSocket = io(import.meta.env.VITE_BACKEND_URL, { auth: { token }, transports: ['websocket', 'polling'] });
     socketRef.current = socket;
 
     socket.on('game_state', (gameState) => {
