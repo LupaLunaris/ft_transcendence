@@ -4,6 +4,8 @@ networks:
 
 volumes:
   postgres_data:
+  vault_data:
+  vault_logs:
 
 services:
   postgres:
@@ -21,6 +23,30 @@ services:
       - ft_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  vault:
+    image: hashicorp/vault:1.17
+    container_name: vault
+    restart: unless-stopped
+    environment:
+      - SKIP_CHOWN=1
+      - VAULT_ADDR=https://127.0.0.1:8200
+      - VAULT_CACERT=/vault/certs/ca-cert.pem
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/config:/vault/config
+      - ./vault/certs:/vault/certs:ro
+      - vault_data:/vault/file
+      - vault_logs:/vault/logs
+    networks:
+      - ft_network
+    command: server
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "--no-check-certificate", "http://127.0.0.1:8200/v1/sys/health?standbyok=true"]
       interval: 10s
       timeout: 5s
       retries: 5

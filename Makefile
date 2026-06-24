@@ -6,6 +6,7 @@
 		test test-backend test-frontend \
 		docker-build docker-up docker-down docker-down-v docker-logs docker-logs-backend docker-restart \
 		db-generate db-migrate db-seed db-studio \
+		certs \
 		clean fclean re
 
 # ── Colors ────────────────────────────────────────────────────────────────────
@@ -27,7 +28,7 @@ help: ## Show available commands
 	@grep -E '^(install|dev|docker-up|docker-down|start):.*## ' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS=":.*?## "}; {printf "  $(GREEN)%-22s$(RESET)%s\n", $$1, $$2}'
 	@printf "\n$(CYAN)Advanced commands (optional)$(RESET)\n"
-	@grep -E '^(dev-backend|dev-frontend|build|build-shared|test|test-backend|test-frontend|docker-build|docker-logs|docker-logs-backend|docker-restart):.*## ' $(MAKEFILE_LIST) \
+	@grep -E '^(dev-backend|dev-frontend|build|build-shared|test|test-backend|test-frontend|docker-build|docker-logs|docker-logs-backend|docker-restart|certs):.*## ' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS=":.*?## "}; {printf "  $(GREEN)%-22s$(RESET)%s\n", $$1, $$2}'
 	@printf "\n$(CYAN)Database commands$(RESET)\n"
 	@grep -E '^db-.*:.*## ' $(MAKEFILE_LIST) \
@@ -136,6 +137,13 @@ test-frontend: ## Run frontend tests (Vitest + Testing Library)
 	npm test --workspace=frontend
 
 # ─────────────────────────────────────────────────────────────────────────────
+# SECURITY - Vault TLS certificates
+# ─────────────────────────────────────────────────────────────────────────────
+
+certs: ## Generates self-signed TLS certs for Vault (skips if already present)
+	@./vault/generate-certs.sh
+
+# ─────────────────────────────────────────────────────────────────────────────
 # DOCKER
 # ─────────────────────────────────────────────────────────────────────────────
 # Note: requires a .env at the project root (copy .env.example and fill values)
@@ -143,16 +151,17 @@ test-frontend: ## Run frontend tests (Vitest + Testing Library)
 docker-build: ## Build Docker images (no cache)
 	$(COMPOSE) build --no-cache
 
-docker-up: ## Build and start all services in detached mode
+docker-up: certs ## Build and start all services in detached mode
 	@if [ ! -f .env ]; then \
 		printf "$(RED)Error: .env not found. Copy .env.example and fill in values.$(RESET)\n"; \
 		exit 1; \
 	fi
 	$(COMPOSE) up --build -d
 	@printf "$(GREEN)Services running:$(RESET)\n"
-	@printf "  Frontend: http://localhost:5173\n"
-	@printf "  Backend:  http://localhost:3001/api/health\n"
-	@printf "  Postgres: localhost:5432\n"
+	@printf "	Frontend:	http://localhost:5173\n"
+	@printf "	Backend:	http://localhost:3001/api/health\n"
+	@printf "	Postgres:	localhost:5432\n"
+	@printf "	Vault:		https://localhost:8200 (internal only, not host-exposed)\n"
 
 docker-down: ## Stop and remove containers (keeps volumes)
 	$(COMPOSE) down
@@ -166,7 +175,7 @@ docker-logs: ## Stream logs from all services
 docker-logs-backend: ## Stream backend logs only
 	$(COMPOSE) logs -f backend
 
-docker-restart: ## Tear down, rebuild, and restart all services
+docker-restart: certs ## Tear down, rebuild, and restart all services
 	$(COMPOSE) down
 	$(COMPOSE) up --build -d
 
