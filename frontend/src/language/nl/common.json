@@ -188,7 +188,7 @@
     "friends_list_loadfriends_error": "Kan vriendenlijst niet laden.",
     "friends_list_delete_error": "Kan deze vriend niet verwijderen.",
     "friends_list_friends": "Vrienden",
-    "friends_list_friends_list": "Jouw gildegenoten lijst",
+    "friends_list_friends_list": "Guild broeders",
     "friends_list_no_friend": "Nog geen vrienden",
     "friends_list_add_friend": "Je kunt andere spelers toevoegen via de gebruikerszoekfunctie.",
     "friends_list_remove": "Verwijderen",
@@ -210,10 +210,10 @@
     "profile_editor_save": "Opslaan",
 
     "profile_page_offline_error": "Je moet ingelogd zijn om je profiel te bekijken.",
-    "profile_page_info": "Bekijk je voortgang, je kaarten en je gilde-identiteit.",
+    "profile_page_info": "Bekijk je vooruitgang, je maps en jouw guild.",
     "profile_page_admin": "Admin",
     "profile_page_count_creation": "Account aangemaakt op {{date}}",
     "profile_page_diamond": "Diamanten",
-    "profile_page_tower_progress": "Torenvoortgang",
-    "profile_page_maps": "Gemaakte kaarten"
+    "profile_page_tower_progress": "Torenvooruitgang",
+    "profile_page_maps": "Voltooide maps"
 }
