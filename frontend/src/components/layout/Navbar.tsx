@@ -131,6 +131,29 @@ export function Navbar() {
           <LanguageSelector/>
           {!loading && (user ? (
             <>
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 text-sm text-silver-300 hover:text-gold-300 transition-colors"
+              >
+                <div className="
+					w-7 h-7
+					rounded-full
+					bg-gradient-to-br
+					from-diamond-500/20
+					to-surface-muted
+					border border-gold-500/40
+					text-gold-200
+					flex items-center justify-center
+					text-xs font-bold uppercase
+					">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={user.username} className="w-full h-full rounded-full object-cover" />
+                  ) : (
+                    user.username.slice(0, 2).toUpperCase()
+                  )}
+                </div>
+                <span>{user.username}</span>
+              </Link>
               {NAV_LINKS.map(({ to, key }) => (
                 <NavLink
                   key={to}
