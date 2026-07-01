@@ -22,6 +22,7 @@ const NAV_LINKS = [
   { to: '/editor', key: 'navbar.editor' },
   { to: '/train', key: 'navbar.train' },
   { to: '/tower', key: 'navbar.tower' },
+  { to: '/duel', key: 'duel_page.duel' }
 ] as const;
 
 export function Navbar() {
