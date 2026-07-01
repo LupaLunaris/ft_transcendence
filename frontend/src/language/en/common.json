@@ -215,5 +215,9 @@
     "profile_page_count_creation": "Account created on {{date}}",
     "profile_page_diamond": "Diamonds",
     "profile_page_tower_progress": "Tower progression",
-    "profile_page_maps": "Created maps"
+    "profile_page_maps": "Created maps",
+
+    "footer.rights": "All rights reserved.",
+    "footer.terms": "Terms of Service",
+    "footer.privacy": "Privacy Policy"
 }
