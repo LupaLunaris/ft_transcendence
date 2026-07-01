@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api, type UserSearchResult } from '@/services/api.service';
+import { useTranslation } from 'react-i18next';
 
 interface UserSearchProps {
   onFriendAdded: () => void;
@@ -10,6 +11,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
   const [results, setResults] = useState<UserSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   async function handleSearch(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -18,7 +20,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
 
     if (trimmedQuery.length < 2) {
       setResults([]);
-      setError('Tape au moins 2 caractères.');
+      setError(t('friends_search_characters'));
       return;
     }
 
@@ -29,7 +31,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
       const users = await api.users.search(trimmedQuery);
       setResults(users);
     } catch {
-      setError('Impossible de rechercher des joueurs.');
+      setError(t('friends_search_error'));
     } finally {
       setLoading(false);
     }
@@ -44,7 +46,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
 
       setResults((current) => current.filter((user) => user.id !== userId));
     } catch {
-      setError('Impossible d’ajouter ce joueur en ami.');
+      setError(t('friends_search_add_friend_error'));
     }
   }
 
@@ -55,7 +57,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
           type="text"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Rechercher un joueur..."
+          placeholder={t('friends_search_search_player')}
           className="flex-1 rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm text-silver-100 placeholder:text-silver-500 outline-none focus:border-gold-500/60"
         />
 
@@ -64,7 +66,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
           disabled={loading}
           className="rounded-lg border border-gold-500/40 bg-gold-500/10 px-4 py-2 text-sm font-semibold text-gold-300 hover:bg-gold-500/20 disabled:opacity-50"
         >
-          {loading ? 'Recherche...' : 'Chercher'}
+          {loading ? t('friends_search_searching') : t('friends_search_search')}
         </button>
       </form>
 
@@ -104,7 +106,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
                 onClick={() => void handleAddFriend(user.id)}
                 className="rounded-lg border border-surface-border px-3 py-2 text-xs font-semibold text-silver-300 hover:border-gold-500/50 hover:text-gold-300 transition-colors"
               >
-                Ajouter
+                {t('friends_search_add')}
               </button>
             </div>
           ))}

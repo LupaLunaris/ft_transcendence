@@ -2,17 +2,19 @@ import { useEffect, useState } from 'react';
 import { api, type FriendPublic } from '@/services/api.service';
 import { Spinner } from '@/components/ui/Spinner';
 import { UserSearch } from '@/components/friends/UserSearch';
-
-function getStatusLabel(status: FriendPublic['online_status']) {
-  if (status === 'online') return 'Online';
-  if (status === 'in_game') return 'In game';
-  return 'Offline';
-}
+import { useTranslation } from 'react-i18next';
 
 export function FriendsList() {
   const [friends, setFriends] = useState<FriendPublic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
+
+  function getStatusLabel(status: FriendPublic['online_status']) {
+    if (status === 'online') return t('friends_list_online');
+    if (status === 'in_game') return t('friends_list_ingame');
+    return t('friends_list_offline');
+  }
 
   async function loadFriends() {
     try {
@@ -20,7 +22,7 @@ export function FriendsList() {
       const data = await api.friends.getList();
       setFriends(data);
     } catch {
-      setError('Impossible de charger la liste d’amis.');
+      setError(t('friends_list_loadfriends_error'));
     } finally {
       setLoading(false);
     }
@@ -31,7 +33,7 @@ export function FriendsList() {
       await api.friends.remove(userId);
       setFriends((current) => current.filter((friend) => friend.id !== userId));
     } catch {
-      setError('Impossible de supprimer cet ami.');
+      setError(t('friends_list_delete_error'));
     }
   }
 
@@ -52,10 +54,10 @@ export function FriendsList() {
       <div className="flex items-center justify-between gap-4 mb-5">
         <div>
           <h2 className="font-fantasy text-2xl tracking-widest text-silver-100">
-            Amis
+            {t('friends_list_friends')}
           </h2>
           <p className="text-sm text-silver-400">
-            Liste de tes compagnons de guilde.
+            {t('friends_list_friends_list')}
           </p>
         </div>
       </div>
@@ -70,9 +72,11 @@ export function FriendsList() {
 
       {friends.length === 0 ? (
         <div className="rounded-xl border border-surface-border bg-surface-muted/40 p-5 text-center">
-          <p className="text-silver-100 font-medium">Aucun ami pour le moment.</p>
+          <p className="text-silver-100 font-medium">
+            {t('friends_list_no_friend')}
+          </p>
           <p className="mt-1 text-sm text-silver-400">
-            Tu pourras ajouter d’autres joueurs depuis la recherche utilisateur.
+            {t('friends_list_add_friend')}
           </p>
         </div>
       ) : (
@@ -110,7 +114,7 @@ export function FriendsList() {
                 onClick={() => void handleRemoveFriend(friend.id)}
                 className="rounded-lg border border-surface-border px-3 py-2 text-xs font-semibold text-silver-300 hover:border-red-400/50 hover:text-red-200 transition-colors"
               >
-                Retirer
+                {t('friends_list_remove')}
               </button>
             </div>
           ))}
