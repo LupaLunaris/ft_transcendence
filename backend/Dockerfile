@@ -23,8 +23,9 @@ COPY backend/ ./backend/
 
 WORKDIR /app/backend
 
-RUN npx prisma generate
+ARG DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+RUN DATABASE_URL=${DATABASE_URL} npx prisma generate
 
 EXPOSE 3001
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run db:seed && npm run dev"]
+CMD ["node", "-r", "ts-node/register", "src/index.ts"]

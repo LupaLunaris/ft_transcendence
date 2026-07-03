@@ -151,17 +151,30 @@ certs: ## Generates self-signed TLS certs for Vault (skips if already present)
 docker-build: ## Build Docker images (no cache)
 	$(COMPOSE) build --no-cache
 
+vault-unseal: ## Unseal Vault (reads keys from vault/secrets/init-output.txt automatically)
+	@printf "$(CYAN)Unsealing Vault from vault/secrets/init-output.txt...$(RESET)\n"
+	@KEYS=$$(grep 'Unseal Key' vault/secrets/init-output.txt | awk '{print $$NF}' | tr -d '\r' | head -3); \
+	COUNT=0; \
+	for KEY in $$KEYS; do \
+		docker exec -i vault vault operator unseal "$$KEY" > /dev/null; \
+		COUNT=$$((COUNT + 1)); \
+		printf "$(GREEN)Applied key $$COUNT/3$(RESET)\n"; \
+	done
+	@printf "$(GREEN)Vault unsealed.$(RESET)\n"
+
 docker-up: certs ## Build and start all services in detached mode
 	@if [ ! -f .env ]; then \
 		printf "$(RED)Error: .env not found. Copy .env.example and fill in values.$(RESET)\n"; \
 		exit 1; \
 	fi
+	$(COMPOSE) up --build -d postgres
+	$(COMPOSE) up --build -d --no-deps vault
+	@$(MAKE) vault-unseal
 	$(COMPOSE) up --build -d
 	@printf "$(GREEN)Services running:$(RESET)\n"
-	@printf "	Frontend:	http://localhost:5173\n"
-	@printf "	Backend:	http://localhost:3001/api/health\n"
-	@printf "	Postgres:	localhost:5432\n"
-	@printf "	Vault:		https://localhost:8200 (internal only, not host-exposed)\n"
+	@printf "  Frontend: http://localhost:5173\n"
+	@printf "  Backend:  http://localhost:3001/api/health\n"
+	@printf "  Postgres: localhost:5432\n"
 
 docker-down: ## Stop and remove containers (keeps volumes)
 	$(COMPOSE) down
@@ -177,6 +190,9 @@ docker-logs-backend: ## Stream backend logs only
 
 docker-restart: certs ## Tear down, rebuild, and restart all services
 	$(COMPOSE) down
+	$(COMPOSE) up --build -d postgres
+	$(COMPOSE) up --build -d --no-deps vault
+	@$(MAKE) vault-unseal
 	$(COMPOSE) up --build -d
 
 # ─────────────────────────────────────────────────────────────────────────────
