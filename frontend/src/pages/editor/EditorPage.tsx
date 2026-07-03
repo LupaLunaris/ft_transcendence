@@ -70,6 +70,8 @@ export function EditorPage() {
   const [mapToDelete, setMapToDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showUnsavedTestModal, setShowUnsavedTestModal] = useState(false);
 
   // Admin mode — initialized directly from user.is_admin (ProtectedRoute guarantees user
   // is non-null at mount time, so no extra render cycle is needed)
@@ -89,6 +91,7 @@ export function EditorPage() {
         setMapId(map.id);
         setCreatorCompleted(map.creator_completed);
         setIsPublished(map.published);
+        setHasUnsavedChanges(false);
       })
       .catch(() => showToast(t('editor_page.toast_load_error'), 'error'))
       .finally(() => setLoadingMap(false));
@@ -115,6 +118,7 @@ export function EditorPage() {
       next[y][x] = selectedTile;
       return next;
     });
+    setHasUnsavedChanges(true);
   }, [selectedTile]);
 
   const clearTile = useCallback((x: number, y: number) => {
@@ -124,6 +128,7 @@ export function EditorPage() {
       next[y][x] = TILE.EMPTY;
       return next;
     });
+    setHasUnsavedChanges(true);
   }, []);
 
   const handleSelectAdminLevel = (level: AdminMap) => {
@@ -133,6 +138,7 @@ export function EditorPage() {
   };
 
   const handleLoadMap = (map: MapData) => {
+    setHasUnsavedChanges(false);
     setGrid(map.grid);
     setMapName(map.name);
     setMapId(map.id);
@@ -152,6 +158,7 @@ export function EditorPage() {
         setMapId(null);
         setIsPublished(false);
         setCreatorCompleted(false);
+        setHasUnsavedChanges(false);
         navigate('/editor', { replace: true });
       }
       refetchMyMaps();
@@ -165,11 +172,11 @@ export function EditorPage() {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<boolean> => {
     if (adminMode) {
       if (selectedLevel === null) {
         showToast(t('editor_page.toast_select_level'), 'error');
-        return;
+        return false;
       }
       setSaving(true);
       try {
@@ -185,17 +192,19 @@ export function EditorPage() {
             : [...prev, updated].sort((a, b) => a.order_index - b.order_index);
         });
         showToast(t('editor_page.toast_save_level_ok', { level: selectedLevel }), 'success');
+        setHasUnsavedChanges(false);
+        return true;
       } catch (err) {
         showToast(t(getErrorKey(err, 'editor_page.toast_save_error')), 'error');
+        return false;
       } finally {
         setSaving(false);
       }
-      return;
     }
 
     if (!mapName.trim()) {
       showToast(t('editor_page.toast_name_required'), 'error');
-      return;
+      return false;
     }
     setSaving(true);
     try {
@@ -207,8 +216,11 @@ export function EditorPage() {
         navigate(`/editor/${created.id}`, { replace: true });
       }
       showToast(t('editor_page.toast_save_ok'), 'success');
+      setHasUnsavedChanges(false);
+      return true;
     } catch (err) {
       showToast(t(getErrorKey(err, 'editor_page.toast_save_error')), 'error');
+      return false;
     } finally {
       setSaving(false);
     }
@@ -236,6 +248,14 @@ export function EditorPage() {
     }
   };
 
+  const handlePublishClick = () => {
+  if (hasUnsavedChanges) {
+    showToast(t('editor_page.toast_unsaved_before_publish'), 'error');
+    return;
+  }
+  setShowPublishModal(true);
+  };
+
   const handleUnpublish = async () => {
     if (!mapId) return;
     setUnpublishing(true);
@@ -258,7 +278,19 @@ export function EditorPage() {
       showToast(t('editor_page.toast_save_first'), 'error');
       return;
     }
+    if (hasUnsavedChanges) {
+    setShowUnsavedTestModal(true);
+    return;
+  }
     navigate(`/play/${mapId}`);
+  };
+
+  const handleSaveAndTest = async () => {
+  setShowUnsavedTestModal(false);
+  const success = await handleSave();
+  if (success && mapId) {
+    navigate(`/play/${mapId}`);
+  }
   };
 
   if (loadingMap) {
@@ -315,7 +347,7 @@ export function EditorPage() {
               <Button
                 variant="primary"
                 size="sm"
-                onClick={() => setShowPublishModal(true)}
+                onClick={handlePublishClick}
                 loading={publishing}
                 disabled={!mapId || !creatorCompleted || isPublished}
                 title={
@@ -345,7 +377,7 @@ export function EditorPage() {
             <Input
               label={adminMode ? t('editor_page.level_name_label') : t('editor_page.map_name_label')}
               value={mapName}
-              onChange={(e) => setMapName(e.target.value)}
+              onChange={(e) => { setMapName(e.target.value); setHasUnsavedChanges(true); }}
               placeholder={adminMode ? t('editor_page.level_name_placeholder') : t('editor_page.map_name_placeholder')}
               maxLength={50}
             />
@@ -415,6 +447,7 @@ export function EditorPage() {
                   setMapId(null);
                   setIsPublished(false);
                   setCreatorCompleted(false);
+                  setHasUnsavedChanges(false);
                   navigate('/editor', { replace: true });
                 }}
               >
@@ -499,6 +532,24 @@ export function EditorPage() {
           </Button>
           <Button variant="primary" onClick={handleDeleteConfirm} loading={deleting}>
             {t('editor_page.delete')}
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showUnsavedTestModal}
+        onClose={() => setShowUnsavedTestModal(false)}
+        title={t('editor_page.unsaved_changes_title')}
+      >
+        <p className="text-white/70 text-sm mb-5">
+          {t('editor_page.unsaved_changes_body')}
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setShowUnsavedTestModal(false)}>
+            {t('editor_page.cancel')}
+          </Button>
+          <Button onClick={handleSaveAndTest} loading={saving}>
+            {t('editor_page.save_and_test')}
           </Button>
         </div>
       </Modal>

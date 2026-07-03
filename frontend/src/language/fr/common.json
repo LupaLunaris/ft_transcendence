@@ -126,6 +126,10 @@
     "editor_page.unpublish": "Dépublier",
     "editor_page.toast_unpublish_ok": "Map dépubliée ! Elle n'est plus disponible dans S'entraîner.",
     "editor_page.toast_unpublish_error": "Erreur lors de la dépublication",
+    "editor_page.unsaved_changes_title": "Modifications non sauvegardées",
+    "editor_page.unsaved_changes_body": "Tu as des modifications non sauvegardées. Si tu testes maintenant sans sauvegarder, ces changements seront perdus.",
+    "editor_page.save_and_test": "Sauvegarder et tester",
+    "editor_page.toast_unsaved_before_publish": "Tu as des modifications non sauvegardées. Tu dois d'abord sauvegarder et tester ta map avant de la publier.",
 
     "game_page.toast_score_error": "Score non enregistré",
     "game_page.instructions": "Utilisez les flèches ou WASD pour vous déplacer",
