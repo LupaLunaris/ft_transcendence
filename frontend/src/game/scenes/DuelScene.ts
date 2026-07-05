@@ -34,8 +34,8 @@ const ANIM_FRAMES: Record<Direction, { walk: number[]; idle: number }> = {
   up:    { walk: [9, 10],   idle: 10 },
 };
 
-const ENEMY_FRAME_W = 258;
-const ENEMY_FRAME_H = 353;
+const ENEMY_FRAME_W = 240;
+const ENEMY_FRAME_H = 343;
 
 const ENEMY_ANIM_FRAMES: Record<Direction, number[]> = {
   down:  [0,  1,  2,  3],
@@ -44,22 +44,28 @@ const ENEMY_ANIM_FRAMES: Record<Direction, number[]> = {
   up:    [12, 13, 14, 15],
 };
 
+// Clé locale à la scène : texture du sprite adverse, distincte de KEY_SPRITE_PLAYER
+// pour que le fantôme affiche le skin de l'adversaire et non celui du joueur local.
+const KEY_SPRITE_OPPONENT = 'sprite_opponent';
+
 // ─── Data passée à la scène ───────────────────────────────────────────────────
 
 export interface DuelSceneData {
-  grid:          Grid;
-  my_id:         string;
-  my_username:   string;
-  my_sprite?:    string;
-  opponent:      { id: string; username: string; avatar: string | null };
+  grid:            Grid;
+  my_id:           string;
+  my_username:     string;
+  my_sprite?:      string;
+  opponent_sprite?: string;
+  opponent:        { id: string; username: string; avatar: string | null };
 }
 
 // ─── DuelScene ────────────────────────────────────────────────────────────────
 
 export class DuelScene extends BaseScene {
 
-  // ── Sprite URL résolue depuis l'avatar du joueur local ───────────────────
+  // ── Sprite URL résolue depuis l'avatar du joueur local / de l'adversaire ──
   private playerSpriteUrl = DEFAULT_PLAYER_SPRITE;
+  private opponentSpriteUrl = DEFAULT_PLAYER_SPRITE;
 
   // ── Joueur local ──────────────────────────────────────────────────────────
   private grid:          Grid     = [];
@@ -99,6 +105,7 @@ export class DuelScene extends BaseScene {
 
   init(data: DuelSceneData): void {
     if (data.my_sprite) this.playerSpriteUrl = data.my_sprite;
+    if (data.opponent_sprite) this.opponentSpriteUrl = data.opponent_sprite;
   }
 
   // ── preload ───────────────────────────────────────────────────────────────
@@ -115,6 +122,12 @@ export class DuelScene extends BaseScene {
     });
     if (!this.textures.exists(KEY_SPRITE_PLAYER)) {
       this.load.spritesheet(KEY_SPRITE_PLAYER, this.playerSpriteUrl, {
+        frameWidth:  FRAME_W,
+        frameHeight: FRAME_H,
+      });
+    }
+    if (!this.textures.exists(KEY_SPRITE_OPPONENT)) {
+      this.load.spritesheet(KEY_SPRITE_OPPONENT, this.opponentSpriteUrl, {
         frameWidth:  FRAME_W,
         frameHeight: FRAME_H,
       });
@@ -147,7 +160,7 @@ export class DuelScene extends BaseScene {
     const spawnPy = this.gridY * TILE_SIZE + TILE_SIZE / 2;
 
     // ── Sprite joueur distant (fantôme bleuté, légèrement transparent) ──────
-    this.remotePlayer = this.add.sprite(spawnPx, spawnPy, KEY_SPRITE_PLAYER);
+    this.remotePlayer = this.add.sprite(spawnPx, spawnPy, KEY_SPRITE_OPPONENT);
     this.remotePlayer.setScale(0.20);
     this.remotePlayer.setOrigin(0.5, 0.75);
     this.remotePlayer.setDepth(1);
@@ -167,6 +180,9 @@ export class DuelScene extends BaseScene {
     this.localPlayer.setDepth(2);
 
     // ── Animations (walk + idle × 4 directions) ──────────────────────────────
+    // Une animation Phaser porte sa propre référence de texture (fixée à la
+    // création) : il faut donc un jeu d'anims distinct par texture, sinon le
+    // fantôme adverse affiche les frames du sprite local dès qu'on joue l'anim.
     (Object.entries(ANIM_FRAMES) as [Direction, { walk: number[]; idle: number }][])
       .forEach(([dir, { walk, idle }]) => {
         if (!this.anims.exists(`walk_${dir}`)) {
@@ -185,10 +201,26 @@ export class DuelScene extends BaseScene {
             repeat:    0,
           });
         }
+        if (!this.anims.exists(`remote_walk_${dir}`)) {
+          this.anims.create({
+            key:       `remote_walk_${dir}`,
+            frames:    this.anims.generateFrameNumbers(KEY_SPRITE_OPPONENT, { frames: walk }),
+            frameRate: FRAME_RATE,
+            repeat:    -1,
+          });
+        }
+        if (!this.anims.exists(`remote_idle_${dir}`)) {
+          this.anims.create({
+            key:       `remote_idle_${dir}`,
+            frames:    this.anims.generateFrameNumbers(KEY_SPRITE_OPPONENT, { frames: [idle] }),
+            frameRate: 1,
+            repeat:    0,
+          });
+        }
       });
 
     this.localPlayer.anims.play('idle_down');
-    this.remotePlayer.anims.play('idle_down');
+    this.remotePlayer.anims.play('remote_idle_down');
 
     this.spawnEnemies(data.grid);
 
@@ -301,7 +333,7 @@ export class DuelScene extends BaseScene {
     const targetX = nx * TILE_SIZE + TILE_SIZE / 2;
     const targetY = ny * TILE_SIZE + TILE_SIZE / 2;
 
-    this.remotePlayer.anims.play(`walk_${state.direction}`, true);
+    this.remotePlayer.anims.play(`remote_walk_${state.direction}`, true);
 
     if (this.remoteMoving) {
       // Déjà en mouvement : on saute directement à la cible
@@ -323,7 +355,7 @@ export class DuelScene extends BaseScene {
       ease:     'Linear',
       onComplete: () => {
         this.remoteMoving = false;
-        this.remotePlayer.anims.play(`idle_${this.remoteLastDir}`);
+        this.remotePlayer.anims.play(`remote_idle_${this.remoteLastDir}`);
       },
     });
   }
@@ -348,6 +380,7 @@ export class DuelScene extends BaseScene {
         if (this.textures.exists(key)) {
           const sprite = this.add.sprite(px, py, key)
             .setScale(0.2)
+            .setCrop(15, 15, ENEMY_FRAME_W - 30, ENEMY_FRAME_H - 30)
             .setOrigin(0.5, 0.75)
             .setDepth(2);
 

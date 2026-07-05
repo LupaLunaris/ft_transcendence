@@ -151,11 +151,12 @@ export function DuelGamePage() {
 
     game.events.once('ready', () => {
       game.scene.add('DuelScene', DuelScene, true, {
-        grid:        state.grid,
-        my_id:       user.id,
-        my_username: user.username,
-        my_sprite:   AVATAR_TO_SPRITE[user.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE,
-        opponent:    state.opponent,
+        grid:            state.grid,
+        my_id:           user.id,
+        my_username:     user.username,
+        my_sprite:       AVATAR_TO_SPRITE[user.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE,
+        opponent_sprite: AVATAR_TO_SPRITE[state.opponent.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE,
+        opponent:        state.opponent,
       });
     });
 
