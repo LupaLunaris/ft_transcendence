@@ -219,5 +219,9 @@
     "profile_page_count_creation": "Account aangemaakt op {{date}}",
     "profile_page_diamond": "Diamanten",
     "profile_page_tower_progress": "Torenvooruitgang",
-    "profile_page_maps": "Voltooide maps"
+    "profile_page_maps": "Voltooide maps",
+
+    "footer.rights": "Alle rechten voorbehouden.",
+    "footer.terms": "Gebruiksvoorwaarden",
+    "footer.privacy": "Privacybeleid"
 }

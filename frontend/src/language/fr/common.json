@@ -220,5 +220,9 @@
     "profile_page_count_creation": "Compte créé le {{date}}",
     "profile_page_diamond": "Diamants",
     "profile_page_tower_progress": "Progression de tour",
-    "profile_page_maps": "Maps créées"
+    "profile_page_maps": "Maps créées",
+
+    "footer.rights": "Tous droits réservés.",
+    "footer.terms": "Conditions d'utilisation",
+    "footer.privacy": "Politique de confidentialité"
 }   
