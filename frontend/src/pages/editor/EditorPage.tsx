@@ -380,6 +380,7 @@ export function EditorPage() {
               onChange={(e) => { setMapName(e.target.value); setHasUnsavedChanges(true); }}
               placeholder={adminMode ? t('editor_page.level_name_placeholder') : t('editor_page.map_name_placeholder')}
               maxLength={50}
+              disabled={adminMode}
             />
             <TileSelector selected={selectedTile} onChange={setSelectedTile} />
           </div>
