@@ -125,6 +125,10 @@
     "editor_page.unpublish": "Depubliceren",
     "editor_page.toast_unpublish_ok": "Map gedepubliceerd! Ze is niet langer toegankelijk in Training.",
     "editor_page.toast_unpublish_error": "Fout bij het depubliceren",
+    "editor_page.unsaved_changes_title": "Niet-opgeslagen wijzigingen",
+    "editor_page.unsaved_changes_body": "Je hebt niet-opgeslagen wijzigingen. Als je nu test zonder op te slaan, gaan deze wijzigingen verloren.",
+    "editor_page.save_and_test": "Opslaan en testen",
+    "editor_page.toast_unsaved_before_publish": "Je hebt niet-opgeslagen wijzigingen. Je moet je kaart eerst opslaan en testen voordat je ze publiceert.",
 
     "game_page.toast_score_error": "Score niet opgeslagen",
     "game_page.instructions": "Gebruik de pijltjes of WASD om te bewegen",

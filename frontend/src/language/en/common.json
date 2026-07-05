@@ -125,6 +125,10 @@
     "editor_page.unpublish": "Unpublish",
     "editor_page.toast_unpublish_ok": "Map unpublished! It is no longer accessible in Training.",
     "editor_page.toast_unpublish_error": "Error while unpublishing",
+    "editor_page.unsaved_changes_title": "Unsaved changes",
+    "editor_page.unsaved_changes_body": "You have unsaved changes. If you test now without saving, these changes will be lost.",
+    "editor_page.save_and_test": "Save and test",
+    "editor_page.toast_unsaved_before_publish": "You have unsaved changes. You must save and test your map before publishing it.",
 
     "game_page.toast_score_error": "Score not saved",
     "game_page.instructions": "Use the arrows or WASD to move",
