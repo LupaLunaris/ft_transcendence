@@ -26,9 +26,6 @@ import { type Enemy, HorizontalEnemy, VerticalEnemy, type EnemyGameObject } from
 const FRAME_RATE = 8;  // fps animation marche
 
 
-
-
-
 //ATTENTION CE COMENTAIRE N"EST PAS LA PAR ERREUR- Ne pas suprimer
 //pour player hero
 
