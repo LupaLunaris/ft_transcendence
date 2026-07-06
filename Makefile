@@ -151,16 +151,19 @@ certs: ## Generates self-signed TLS certs for Vault (skips if already present)
 docker-build: ## Build Docker images (no cache)
 	$(COMPOSE) build --no-cache
 
-vault-unseal: ## Unseal Vault (reads keys from vault/secrets/init-output.txt automatically)
-	@printf "$(CYAN)Unsealing Vault from vault/secrets/init-output.txt...$(RESET)\n"
-	@KEYS=$$(grep 'Unseal Key' vault/secrets/init-output.txt | awk '{print $$NF}' | tr -d '\r' | head -3); \
-	COUNT=0; \
-	for KEY in $$KEYS; do \
-		docker exec -i vault vault operator unseal "$$KEY" > /dev/null; \
-		COUNT=$$((COUNT + 1)); \
-		printf "$(GREEN)Applied key $$COUNT/3$(RESET)\n"; \
+vault-wait:
+	@echo "Waiting for Vault API..."
+	@until docker exec vault wget --no-check-certificate -qO- https://127.0.0.1:8200/v1/sys/seal-status >/dev/null 2>&1; do \
+		sleep 1; \
 	done
-	@printf "$(GREEN)Vault unsealed.$(RESET)\n"
+	@echo "Vault API is reachable."
+
+vault-unseal: vault-wait
+	@printf "$(CYAN)Unsealing Vault...$(RESET)\n"
+	@docker exec vault vault operator unseal "$$(sed -E 's/\x1B\[[0-9;]*[mK]//g' vault/secrets/init-output.txt | grep 'Unseal Key 1:' | awk '{print $$NF}' | tr -d '\r')"
+	@docker exec vault vault operator unseal "$$(sed -E 's/\x1B\[[0-9;]*[mK]//g' vault/secrets/init-output.txt | grep 'Unseal Key 2:' | awk '{print $$NF}' | tr -d '\r')"
+	@docker exec vault vault operator unseal "$$(sed -E 's/\x1B\[[0-9;]*[mK]//g' vault/secrets/init-output.txt | grep 'Unseal Key 3:' | awk '{print $$NF}' | tr -d '\r')"
+	@docker exec vault vault status
 
 docker-up: certs ## Build and start all services in detached mode
 	@if [ ! -f .env ]; then \
@@ -169,8 +172,9 @@ docker-up: certs ## Build and start all services in detached mode
 	fi
 	$(COMPOSE) up --build -d postgres
 	$(COMPOSE) up --build -d --no-deps vault
-	@$(MAKE) vault-unseal
 	$(COMPOSE) up --build -d
+	sleep 3
+	@$(MAKE) vault-unseal
 	@printf "$(GREEN)Services running:$(RESET)\n"
 	@printf "  Frontend: http://localhost:5173\n"
 	@printf "  Backend:  http://localhost:3001/api/health\n"
