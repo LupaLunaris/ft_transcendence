@@ -46,7 +46,7 @@ services:
       - ft_network
     command: server
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "--no-check-certificate", "http://127.0.0.1:8200/v1/sys/health?standbyok=true"]
+      test: ["CMD", "wget", "--spider", "-q", "--no-check-certificate", "https://127.0.0.1:8200/v1/sys/health?standbyok=true"]
       interval: 10s
       timeout: 5s
       retries: 5
