@@ -112,9 +112,11 @@ interface ServerToClientEvents {
 
 ### DuelScene (`frontend/src/game/scenes/DuelScene.ts`) — multijoueur
 - Étend `BaseScene`
-- Reçoit `{ grid, my_id, my_username, opponent: { id, username, avatar } }` via `create()`
-- Joueur local : sprite normal, caméra suit le joueur
-- Joueur distant : sprite teinté bleu (0x66aaff), alpha 0.55, label pseudo au-dessus
+- Reçoit `{ grid, my_id, my_username, my_sprite?, opponent_sprite?, opponent: { id, username, avatar } }` via `create()`
+- Joueur local : sprite normal (texture `KEY_SPRITE_PLAYER`, résolue depuis `my_sprite`), caméra suit le joueur
+- Joueur distant : sprite teinté bleu (0x66aaff), alpha 0.55, label pseudo au-dessus — texture **dédiée** `sprite_opponent` (résolue depuis `opponent_sprite`), animations `remote_walk_*`/`remote_idle_*` séparées des animations locales
+  (une anim Phaser garde sa texture d'origine même jouée sur un autre sprite → nécessite un jeu d'animations par texture, cf. `frontend_doc/duel-remote-ghost-sprite-identity.md`)
+- Ennemis : `ENEMY_FRAME_W/H = 240×343` (aligné sur `GameScene`, seul découpage valide de `enemy_test.png` 962×1375px), `.setCrop()` appliqué comme dans `GameScene` — cf. `frontend_doc/duel-enemy-sprite-crop-freeze.md`
 - Émissions Phaser→React :
   - `emit_player_input` → React → `socket.emit('player_input', { direction })`
   - `player_caught` → React → `socket.emit('player_died')`
@@ -152,9 +154,11 @@ socketRace: Map<socket_id, race_id>
 4. `player_input` → mouvement serveur-autoritaire, `game_state` broadcasté à la room
 5. Exit atteint → `race_finished` + nettoyage
 6. `player_died` (ennemi client) → `race_finished` avec le survivant gagnant
-7. `disconnect` → adversaire gagne par forfait
+7. `disconnect` pendant une course active → délai de grâce **3000ms** (`DISCONNECT_GRACE_MS`) avant forfait — `RacePlayer.connected = false` + `setTimeout`, annulé si le même `user.id` rejoint via `join_race` avant expiration (cf. `backend_doc/duel-reconnection-grace-period.md`). Désinscription du lobby en attente : toujours immédiate, sans délai.
 
 **Limite lobby :** max 3 inscriptions simultanées par socket
+
+**Note :** lobby et courses actives sont strictement limités à 2 joueurs (pas encore de mode 3+ joueurs).
 
 ### `backend/src/server.ts`
 - Appelle `registerDuelHandlers(io)` — c'est là que l'auth JWT et les handlers sont montés

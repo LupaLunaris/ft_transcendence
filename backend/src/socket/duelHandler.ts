@@ -47,7 +47,12 @@ interface RacePlayer {
   alive: boolean;
   finished: boolean;
   start_time: number;
+  connected: boolean;
+  disconnect_timer?: ReturnType<typeof setTimeout>;
 }
+
+// Délai de grâce avant de considérer un joueur déconnecté comme perdant.
+const DISCONNECT_GRACE_MS = 3000;
 
 interface ActiveRace {
   race_id: string;
@@ -120,8 +125,37 @@ function cleanupLobby(socket_id: string): void {
 function cleanupRace(race_id: string): void {
   const race = activeRaces.get(race_id);
   if (!race) return;
-  for (const p of race.players.values()) socketRace.delete(p.socket_id);
+  for (const p of race.players.values()) {
+    socketRace.delete(p.socket_id);
+    if (p.disconnect_timer) clearTimeout(p.disconnect_timer);
+  }
   activeRaces.delete(race_id);
+}
+
+// Finalise la défaite par forfait après expiration du délai de grâce
+// (ou immédiatement si la course n'a pas encore démarré).
+function forfeitRace(
+  io: Server<ClientToServerEvents, ServerToClientEvents>,
+  race_id: string,
+  loser_user_id: string,
+): void {
+  const race = activeRaces.get(race_id);
+  if (!race || race.finished) return;
+
+  race.finished = true;
+  const loser = race.players.get(loser_user_id);
+  if (loser) loser.alive = false;
+
+  const winner = Array.from(race.players.values()).find(p => p.user.id !== loser_user_id);
+  const result: RaceResult = {
+    winner_id:   winner?.user.id ?? '',
+    loser_id:    loser_user_id,
+    duration_ms: Date.now() - (loser?.start_time || race.created_at),
+    map_id:      race.map_id,
+    created_at:  new Date().toISOString(),
+  };
+  io.to(`race:${race_id}`).emit('race_finished', result);
+  cleanupRace(race_id);
 }
 
 // ─── Enregistrement des handlers ─────────────────────────────────────────────
@@ -197,12 +231,12 @@ export function registerDuelHandlers(
             [existing.user.id, {
               user: existing.user, socket_id: existing.socket_id,
               position: { ...spawn }, direction: 'down',
-              alive: true, finished: false, start_time: 0,
+              alive: true, finished: false, start_time: 0, connected: true,
             }],
             [user.id, {
               user, socket_id: socket.id,
               position: { ...spawn }, direction: 'down',
-              alive: true, finished: false, start_time: 0,
+              alive: true, finished: false, start_time: 0, connected: true,
             }],
           ]),
           started: false, finished: false, tick: 0, created_at: Date.now(),
@@ -250,7 +284,15 @@ export function registerDuelHandlers(
 
       // Mise à jour socket_id : le game socket ≠ lobby socket
       const player = race.players.get(user.id);
-      if (player) player.socket_id = socket.id;
+      if (player) {
+        player.socket_id = socket.id;
+        player.connected = true;
+        // Reconnexion dans le délai de grâce : annule le forfait programmé.
+        if (player.disconnect_timer) {
+          clearTimeout(player.disconnect_timer);
+          player.disconnect_timer = undefined;
+        }
+      }
 
       const room = io.sockets.adapter.rooms.get(`race:${race_id}`);
       if (room && room.size === 2 && !race.started) {
@@ -334,25 +376,26 @@ export function registerDuelHandlers(
     socket.on('disconnect', () => {
       onlineUsers.delete(user.id);
       console.log(`[duel] ${user.username} disconnected`);
+      // Désinscrit immédiatement des lobbies en attente (pas de délai de grâce hors course).
       cleanupLobby(socket.id);
 
       const race_id = socketRace.get(socket.id);
+      socketRace.delete(socket.id);
+
       if (race_id) {
         const race = activeRaces.get(race_id);
-        if (race && !race.finished) {
-          race.finished = true;
-          const player = race.players.get(user.id);
-          if (player) player.alive = false;
-          const winner = Array.from(race.players.values()).find(p => p.user.id !== user.id);
-          const result: RaceResult = {
-            winner_id:   winner?.user.id ?? '',
-            loser_id:    user.id,
-            duration_ms: Date.now() - race.created_at,
-            map_id:      race.map_id,
-            created_at:  new Date().toISOString(),
-          };
-          io.to(`race:${race_id}`).emit('race_finished', result);
-          cleanupRace(race_id);
+        const player = race?.players.get(user.id);
+
+        // Ignore si un autre socket a déjà repris ce joueur (reconnexion plus rapide
+        // que la propagation de l'event 'disconnect' du socket précédent).
+        if (race && !race.finished && player && player.socket_id === socket.id) {
+          player.connected = false;
+          player.disconnect_timer = setTimeout(() => {
+            const stillDisconnected = race.players.get(user.id);
+            if (stillDisconnected && !stillDisconnected.connected) {
+              forfeitRace(io, race_id, user.id);
+            }
+          }, DISCONNECT_GRACE_MS);
         }
       }
 
