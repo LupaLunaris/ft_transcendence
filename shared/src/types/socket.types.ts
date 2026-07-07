@@ -15,22 +15,27 @@ import { Grid } from './tiles.types';
 
 export interface LobbyEntry {
   map_id: string;
-  player: {
+  // File d'attente pour cette map — 1 à 4 joueurs (MAX_LOBBY_PLAYERS côté serveur).
+  players: {
     id: string;
     username: string;
     avatar: string | null;
-  };
+  }[];
+  // Timestamp (ms) de départ de la course, ou null tant qu'un seul joueur attend
+  // (le countdown ne démarre qu'à partir de 2 inscrits).
+  countdown_ends_at: number | null;
 }
 
 export interface DuelStartPayload {
   race_id: string;
   map_id: string;
   grid: Grid;
-  opponent: {
+  // 1 à 3 adversaires (course de 2 à 4 joueurs).
+  opponents: {
     id: string;
     username: string;
     avatar: string | null;
-  };
+  }[];
 }
 
 export interface ClientToServerEvents {
@@ -38,7 +43,6 @@ export interface ClientToServerEvents {
   join_lobby: (data: { map_id: string }) => void;
   leave_lobby: () => void;
   join_race: (data: { race_id: string }) => void;
-  player_died: () => void;
 }
 
 export interface ServerToClientEvents {

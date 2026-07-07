@@ -24,21 +24,41 @@ export interface PlayerState {
   position: Position;
   direction: Direction;
   alive: boolean;
+  finished: boolean;
+}
+
+export type EnemyKind = 'horizontal' | 'vertical';
+
+export interface EnemyState {
+  id: string;
+  kind: EnemyKind;
+  position: Position;
+  direction: Direction;
 }
 
 export interface GameState {
   race_id: string;
   map_id: string;
   players: PlayerState[];
+  enemies: EnemyState[];
   tick: number;
   started: boolean;
   finished: boolean;
 }
 
+// Classement complet — 2 à 4 entrées, triées par rank croissant.
+// duration_ms est null pour un joueur qui n'a pas atteint l'EXIT (mort ou forfait).
+export interface RaceRankingEntry {
+  user_id: string;
+  username: string;
+  rank: number;
+  duration_ms: number | null;
+  finished: boolean;
+}
+
 export interface RaceResult {
-  winner_id: string;
-  loser_id: string;
-  duration_ms: number;
+  race_id: string;
   map_id: string;
+  ranking: RaceRankingEntry[];
   created_at: string;
 }

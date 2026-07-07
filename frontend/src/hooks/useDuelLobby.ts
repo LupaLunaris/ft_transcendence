@@ -71,7 +71,9 @@ export function useDuelLobby({
   }, [token]);
 
   const myRegistrations = useMemo(
-    () => new Set(lobbyEntries.filter(e => e.player.id === userId).map(e => e.map_id)),
+    () => new Set(
+      lobbyEntries.filter(e => e.players.some(p => p.id === userId)).map(e => e.map_id),
+    ),
     [lobbyEntries, userId],
   );
 
