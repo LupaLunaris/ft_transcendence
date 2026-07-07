@@ -92,7 +92,7 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 | Plusieurs utilisateurs connectés simultanément | Martin | Jerem | Jennifer | 25/07 | 🟡 | |
 | Gestion correcte des actions simultanées | Martin | Jerem | Jennifer | 25/07 | 🟡 | |
 | Synchronisation temps réel correcte | Martin | Jerem | Jennifer | 25/07 | 🟡 | |
-| Aucune corruption de données | Jerem | Jennifer | Élise | 25/07 | 🟡 | Fini, a vérifier |
+| Aucune corruption de données | Jerem | Jennifer | Élise | 25/07 | 🟡 | Fini, à vérifier |
 | Fichier `.env` ignoré par Git | Jerem | Jennifer | Martin | 20/07 | ✅ | |
 | Fichier `.env.example` complet | Jerem | Jennifer | Martin | 20/07 | ✅ | |
 | Privacy Policy accessible et complète | Élise | Martin | Jennifer | 20/07 | ✅ | IA |
