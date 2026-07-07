@@ -9,9 +9,8 @@
 - [✅ Requirements obligatoires](#requirements-obligatoires)
   - [Git & Organisation](#git--organisation)
   - [README](#readme)
-- [🧪 Modules sélectionnés](#-modules-sélectionnés)
-  - [Tableau de suivi des modules](#tableau-de-suivi-des-modules)
-  - [Total estimé](#total-estimé)
+- [🧪 Modules sélectionnés](#modules-sélectionnés)
+  - [Total des points](#total-des-points)
 - [📚 Résumé des modules et critères de validation](#-résumé-des-modules-et-critères-de-validation)
 - [✅ Checklist avant de demander une correction](#-checklist-avant-de-demander-une-correction)
 
