@@ -20,6 +20,7 @@ import { GRID_SIZE } from '@ft/shared';
 interface GameCanvasProps {
   grid: Grid;
   player_id: string;
+  player_sprite?: string;
   onExit: (time_ms: number) => void;
   onDeath?: () => void;
 }
@@ -27,7 +28,7 @@ interface GameCanvasProps {
 const CANVAS_WIDTH  = 800;
 const CANVAS_HEIGHT = 600;
 
-export function GameCanvas({ grid, player_id, onExit, onDeath }: GameCanvasProps) {
+export function GameCanvas({ grid, player_id, player_sprite, onExit, onDeath }: GameCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // Keep callbacks stable so the effect doesn't re-run when parent re-renders
   const onExitRef = useRef(onExit);
@@ -66,7 +67,7 @@ export function GameCanvas({ grid, player_id, onExit, onDeath }: GameCanvasProps
 
     game.events.once('ready', () => {
       // Add and immediately start the scene with grid data
-      game.scene.add('GameScene', GameScene, true, { grid, player_id });
+      game.scene.add('GameScene', GameScene, true, { grid, player_id, player_sprite });
     });
 
     return () => {
