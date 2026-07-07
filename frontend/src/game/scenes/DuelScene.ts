@@ -38,10 +38,10 @@ const ENEMY_FRAME_W = 240;
 const ENEMY_FRAME_H = 343;
 
 const ENEMY_ANIM_FRAMES: Record<Direction, number[]> = {
-  down:  [0,  1,  2,  3],
-  left:  [8,  9, 10, 11],
-  right: [4,  5,  6,  7],
-  up:    [12, 13, 14, 15],
+	down: [1, 3, 2, 1, 3],
+	left: [4, 6, 5, 4, 6],
+	right: [1, 3, 2, 1, 3],
+	up: [12, 13, 14, 15],
 };
 
 // Clé locale à la scène : texture du sprite adverse, distincte de KEY_SPRITE_PLAYER
@@ -418,32 +418,42 @@ export class DuelScene extends BaseScene {
     });
   }
 
-  // ── moveEnemies ───────────────────────────────────────────────────────────
 
-  private moveEnemies(): void {
-    for (const enemy of this.enemies) {
-      const next  = enemy.computeNextPosition(this.grid);
-      enemy.gridX = next.x;
-      enemy.gridY = next.y;
-      enemy.applyPosition();
+	private moveEnemies(): void {
+		for (const enemy of this.enemies) {
+			const next = enemy.computeNextPosition(this.grid);
+			enemy.gridX = next.x;
+			enemy.gridY = next.y;
+			enemy.rect.setDepth(10 + enemy.gridY);
 
-      if (enemy.rect instanceof Phaser.GameObjects.Sprite) {
-        const key     = enemy instanceof HorizontalEnemy ? KEY_SPRITE_ENEMY_H : KEY_SPRITE_ENEMY_V;
-        const animKey = `${key}_walk_${enemy.lastDirection}`;
-        if (enemy.rect.anims.currentAnim?.key !== animKey) {
-          enemy.rect.anims.play(animKey, true);
-        }
-      }
-    }
+			this.tweens.add({
+				targets: enemy.rect,
+				x: next.x * TILE_SIZE + TILE_SIZE / 2,
+				y: next.y * TILE_SIZE + TILE_SIZE / 2,
+				duration: 350,
+				ease: 'Linear',
+			});
+			if (enemy.rect instanceof Phaser.GameObjects.Sprite) {
+				const key = enemy instanceof HorizontalEnemy ? KEY_SPRITE_ENEMY_H : KEY_SPRITE_ENEMY_V;
+				const animKey = `${key}_walk_${enemy.lastDirection}`;
+				if (enemy.rect.anims.currentAnim?.key !== animKey) {
+					enemy.rect.anims.play(animKey, true);
+				}
+			}
+		}
 
-    const caught = this.enemies.some(
-      e => e.gridX === this.gridX && e.gridY === this.gridY,
-    );
-    if (caught && !this.finished) {
-      this.finished = true;
-      this.game.events.emit('player_caught');
-    }
-  }
+		const caught = this.enemies.some(
+			e => e.gridX === this.gridX && e.gridY === this.gridY,
+		);
+		if (caught && !this.finished) {
+			this.finished = true;
+			this.game.events.emit('player_caught');
+		}
+	}
+
+
+
+
 
   // ── shutdown ──────────────────────────────────────────────────────────────
 
