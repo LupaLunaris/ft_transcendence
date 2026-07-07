@@ -156,7 +156,7 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 |--------|------|-------:|-------------|---------|--------------|----------|:---:|--------------|
 | Framework Frontend + Backend | Major | 2 | Jennifer + Jerem | Jennifer + Jerem | Martin | 20/07 | ✅ | React + Express. |
 | Real-time Features (WebSockets) | Major | 2 | Martin | Jerem | Jennifer | 25/07 | 🟡 | Synchronisation temps réel. |
-| Standard User Management | Major | 2 | Jennifer + Jerem | Jennifer + Jerem | Élise | 25/07 | 🟡 | Upload avatar et mettre un par défault, statut en ligne doit être visible pour les amis, vérifier suppression amis |
+| Standard User Management | Major | 2 | Jennifer + Jerem | Jennifer + Jerem | Élise | 25/07 | 🟡 | Upload avatar et mettre un par défaut, statut en ligne doit être visible pour les amis, vérifier suppression amis |
 | Complete Web-based Game | Major | 2 | Martin | Jennifer | Jerem | 25/07 | ✅ | Gameplay complet. |
 | Remote Players | Major | 2 | Martin | Jerem | Élise | 25/07 | 🟡 | Deux joueurs sur deux machines. |
 | Multiplayer Game (3+ joueurs) | Major | 2 | Martin | Jerem | Jennifer | 30/07 | 🟡 | Plus de deux joueurs simultanément. |
