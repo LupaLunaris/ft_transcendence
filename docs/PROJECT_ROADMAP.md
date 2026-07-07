@@ -2,11 +2,11 @@
 
 ## 📑 Table des matières
 
-- [🎯 Objectif](#-objectif)
-- [📅 Planning](#-planning)
-- [📋 Charge de travail estimée](#-charge-de-travail-estimée)
-- [🎯 Priorités](#-priorités)
-- [✅ Requirements obligatoires](#-requirements-obligatoires)
+- [🎯 Objectif](#objectif)
+- [📅 Planning](#planning)
+- [📋 Charge de travail estimée](#charge-de-travail-estimée)
+- [🎯 Priorités](#priorités)
+- [✅ Requirements obligatoires](#requirements-obligatoires)
   - [Git & Organisation](#git--organisation)
   - [README](#readme)
 - [🧪 Modules sélectionnés](#-modules-sélectionnés)
