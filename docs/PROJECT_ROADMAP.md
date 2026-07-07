@@ -80,7 +80,7 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 | Frontend responsive | Élise | Jennifer | Martin | 25/07 | 🟡 | Desktop, tablette et mobile. |
 | Frontend accessible | Élise | Jennifer | Martin | 25/07 | ⬜ | Navigation clavier, labels, contraste... |
 | Backend Express fonctionnel | Jerem | Jennifer | Martin | 20/07 | ✅ | |
-| Base de données avec schéma cohérent | Martin + Jennifer | Jerem | Élise | 20/07 | 🟡 | A revoir pendant leaderboard |
+| Base de données avec schéma cohérent | Martin + Jennifer | Jerem | Élise | 20/07 | 🟡 | À revoir pendant leaderboard |
 | ORM (Prisma) correctement configuré | Jennifer + Martin | Jerem | Élise | 20/07 | 🟡 | |
 | Authentification sécurisée (JWT + bcrypt) | Jerem | Élise | Jennifer | 20/07 | ✅ | |
 | Validation des formulaires (Frontend) | Jennifer | Élise | Martin | 20/07 | 🟡 | |
