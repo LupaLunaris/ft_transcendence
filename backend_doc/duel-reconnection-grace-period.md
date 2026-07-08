@@ -1,5 +1,23 @@
 # Duel — délai de grâce sur déconnexion en cours de course
 
+## Superseded
+
+Ce doc couvrait la version 2 joueurs (délai de **3000ms**, un seul
+adversaire gagne automatiquement). Depuis la généralisation à 2-4 joueurs,
+le mécanisme décrit ici (champ `connected`, `disconnect_timer`, annulation
+sur `join_race`) est **toujours en place et inchangé dans son principe**,
+mais avec deux différences :
+
+- `DISCONNECT_GRACE_MS` est passé à **10000** (10s).
+- Le forfait ne termine plus systématiquement la course : il ne fait que
+  marquer ce joueur résolu (`alive = false`) — c'est `isRaceOver()` qui
+  décide si la course entière est terminée (voir
+  `backend_doc/duel-nplayer-lobby-and-race-lifecycle.md`, section
+  "Reconnexion — généralisation à N joueurs").
+
+Le contenu ci-dessous reste correct pour comprendre le mécanisme de base ;
+se référer au doc N-joueurs pour le comportement actuel exact.
+
 ## Contexte
 
 `socket.io-client` reconnecte automatiquement en cas de coupure réseau

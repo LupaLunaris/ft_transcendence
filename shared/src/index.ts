@@ -17,3 +17,4 @@ export * from './types/auth.types';
 export * from './types/game.types';
 export * from './types/socket.types';
 export * from './types/api.types';
+export * from './game/enemyLogic';

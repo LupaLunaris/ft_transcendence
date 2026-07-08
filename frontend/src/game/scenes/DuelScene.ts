@@ -6,12 +6,15 @@
 /* By: malafont <malafont@student.42belgium.be       +#+  +:+       +#+       */
 /*                                                +#+#+#+#+#+   +#+           */
 /* Created: 2026/05/27 00:00:00 by malafont        #+#    #+#               */
-/* Updated: 2026/05/27 00:00:00 by malafont       ###   ########.fr          */
+/* Updated: 2026/07/07 00:00:00 by malafont       ###   ########.fr          */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Phaser from 'phaser';
-import { TILE, GRID_SIZE, type Grid, type Direction, type PlayerState } from '@ft/shared';
+import {
+  TILE, GRID_SIZE, extractEnemiesFromGrid,
+  type Grid, type Direction, type PlayerState, type EnemyState,
+} from '@ft/shared';
 import { BaseScene, TILE_SIZE } from './BaseScene';
 import {
   KEY_SPRITE_PLAYER,
@@ -19,7 +22,7 @@ import {
   KEY_SPRITE_ENEMY_V, ASSET_SPRITE_ENEMY_V,
   DEFAULT_PLAYER_SPRITE,
 } from '../assets';
-import { type Enemy, HorizontalEnemy, VerticalEnemy, type EnemyGameObject } from '../entities/Enemy';
+import { type EnemyGameObject } from '../entities/Enemy';
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
 
@@ -38,34 +41,51 @@ const ENEMY_FRAME_W = 240;
 const ENEMY_FRAME_H = 343;
 
 const ENEMY_ANIM_FRAMES: Record<Direction, number[]> = {
-	down: [1, 3, 2, 1, 3],
-	left: [4, 6, 5, 4, 6],
-	right: [1, 3, 2, 1, 3],
-	up: [12, 13, 14, 15],
+  down:  [1, 3, 2, 1, 3],
+  left:  [4, 6, 5, 4, 6],
+  right: [1, 3, 2, 1, 3],
+  up:    [12, 13, 14, 15],
 };
-
-// Clé locale à la scène : texture du sprite adverse, distincte de KEY_SPRITE_PLAYER
-// pour que le fantôme affiche le skin de l'adversaire et non celui du joueur local.
-const KEY_SPRITE_OPPONENT = 'sprite_opponent';
 
 // ─── Data passée à la scène ───────────────────────────────────────────────────
 
 export interface DuelSceneData {
-  grid:            Grid;
-  my_id:           string;
-  my_username:     string;
-  my_sprite?:      string;
-  opponent_sprite?: string;
-  opponent:        { id: string; username: string; avatar: string | null };
+  grid:             Grid;
+  my_id:            string;
+  my_username:      string;
+  my_sprite?:       string;
+  // 1 à 3 adversaires (course de 2 à 4 joueurs) + URL de sprite par id.
+  opponents:        { id: string; username: string; avatar: string | null }[];
+  opponent_sprites: Record<string, string>;
+}
+
+// ─── Fantôme adverse ──────────────────────────────────────────────────────────
+// Un adversaire = une texture dédiée + un jeu d'anims dédié (cf.
+// frontend_doc/duel-remote-ghost-sprite-identity.md) : une anim Phaser garde
+// sa texture d'origine même jouée sur un sprite différent, donc pas moyen de
+// partager un seul jeu d'anims entre plusieurs adversaires aux skins distincts.
+
+interface RemoteGhost {
+  sprite:  Phaser.GameObjects.Sprite;
+  label:   Phaser.GameObjects.Text;
+  gridX:   number;
+  gridY:   number;
+  moving:  boolean;
+  lastDir: Direction;
+}
+
+function opponentTextureKey(id: string): string {
+  return `sprite_opponent_${id}`;
 }
 
 // ─── DuelScene ────────────────────────────────────────────────────────────────
 
 export class DuelScene extends BaseScene {
 
-  // ── Sprite URL résolue depuis l'avatar du joueur local / de l'adversaire ──
+  // ── Sprite URL résolue depuis l'avatar du joueur local ────────────────────
   private playerSpriteUrl = DEFAULT_PLAYER_SPRITE;
-  private opponentSpriteUrl = DEFAULT_PLAYER_SPRITE;
+  private opponents: DuelSceneData['opponents'] = [];
+  private opponentSpriteUrls: Record<string, string> = {};
 
   // ── Joueur local ──────────────────────────────────────────────────────────
   private grid:          Grid     = [];
@@ -84,18 +104,11 @@ export class DuelScene extends BaseScene {
   private lastDirection: Direction = 'down';
   private moveDuration  = 150;
 
-  // ── Joueur distant ────────────────────────────────────────────────────────
-  private remotePlayer!:  Phaser.GameObjects.Sprite;
-  private remoteGridX    = 0;
-  private remoteGridY    = 0;
-  private remoteMoving   = false;
-  private remoteLastDir: Direction = 'down';
+  // ── Adversaires distants (1 à 3) ──────────────────────────────────────────
+  private remotes = new Map<string, RemoteGhost>(); // clé = user_id adversaire
 
-  // ── Label pseudo adversaire ───────────────────────────────────────────────
-  private remoteLabel!: Phaser.GameObjects.Text;
-
-  // ── Ennemis ───────────────────────────────────────────────────────────────
-  private enemies: Enemy[] = [];
+  // ── Ennemis (positions pilotées par le serveur, cf. duelHandler.ts) ───────
+  private enemySprites = new Map<string, EnemyGameObject>();
 
   constructor() {
     super({ key: 'DuelScene' });
@@ -105,7 +118,8 @@ export class DuelScene extends BaseScene {
 
   init(data: DuelSceneData): void {
     if (data.my_sprite) this.playerSpriteUrl = data.my_sprite;
-    if (data.opponent_sprite) this.opponentSpriteUrl = data.opponent_sprite;
+    this.opponents = data.opponents;
+    this.opponentSpriteUrls = data.opponent_sprites;
   }
 
   // ── preload ───────────────────────────────────────────────────────────────
@@ -126,11 +140,14 @@ export class DuelScene extends BaseScene {
         frameHeight: FRAME_H,
       });
     }
-    if (!this.textures.exists(KEY_SPRITE_OPPONENT)) {
-      this.load.spritesheet(KEY_SPRITE_OPPONENT, this.opponentSpriteUrl, {
-        frameWidth:  FRAME_W,
-        frameHeight: FRAME_H,
-      });
+    for (const opponent of this.opponents) {
+      const key = opponentTextureKey(opponent.id);
+      if (!this.textures.exists(key)) {
+        this.load.spritesheet(key, this.opponentSpriteUrls[opponent.id] ?? DEFAULT_PLAYER_SPRITE, {
+          frameWidth:  FRAME_W,
+          frameHeight: FRAME_H,
+        });
+      }
     }
   }
 
@@ -153,36 +170,11 @@ export class DuelScene extends BaseScene {
         }
       }
     }
-    this.remoteGridX = this.gridX;
-    this.remoteGridY = this.gridY;
 
     const spawnPx = this.gridX * TILE_SIZE + TILE_SIZE / 2;
     const spawnPy = this.gridY * TILE_SIZE + TILE_SIZE / 2;
 
-    // ── Sprite joueur distant (fantôme bleuté, légèrement transparent) ──────
-    this.remotePlayer = this.add.sprite(spawnPx, spawnPy, KEY_SPRITE_OPPONENT);
-    this.remotePlayer.setScale(0.20);
-    this.remotePlayer.setOrigin(0.5, 0.75);
-    this.remotePlayer.setDepth(1);
-    this.remotePlayer.setAlpha(0.55);
-    this.remotePlayer.setTint(0x66aaff);
-
-    this.remoteLabel = this.add.text(spawnPx, spawnPy - TILE_SIZE, data.opponent.username, {
-      fontSize:   '10px',
-      color:      '#99ccff',
-      fontFamily: 'monospace',
-    }).setOrigin(0.5, 1).setDepth(3).setAlpha(0.85);
-
-    // ── Sprite joueur local ──────────────────────────────────────────────────
-    this.localPlayer = this.add.sprite(spawnPx, spawnPy, KEY_SPRITE_PLAYER);
-    this.localPlayer.setScale(0.20);
-    this.localPlayer.setOrigin(0.5, 0.75);
-    this.localPlayer.setDepth(2);
-
-    // ── Animations (walk + idle × 4 directions) ──────────────────────────────
-    // Une animation Phaser porte sa propre référence de texture (fixée à la
-    // création) : il faut donc un jeu d'anims distinct par texture, sinon le
-    // fantôme adverse affiche les frames du sprite local dès qu'on joue l'anim.
+    // ── Animations du joueur local (walk + idle × 4 directions) ──────────────
     (Object.entries(ANIM_FRAMES) as [Direction, { walk: number[]; idle: number }][])
       .forEach(([dir, { walk, idle }]) => {
         if (!this.anims.exists(`walk_${dir}`)) {
@@ -201,26 +193,61 @@ export class DuelScene extends BaseScene {
             repeat:    0,
           });
         }
-        if (!this.anims.exists(`remote_walk_${dir}`)) {
-          this.anims.create({
-            key:       `remote_walk_${dir}`,
-            frames:    this.anims.generateFrameNumbers(KEY_SPRITE_OPPONENT, { frames: walk }),
-            frameRate: FRAME_RATE,
-            repeat:    -1,
-          });
-        }
-        if (!this.anims.exists(`remote_idle_${dir}`)) {
-          this.anims.create({
-            key:       `remote_idle_${dir}`,
-            frames:    this.anims.generateFrameNumbers(KEY_SPRITE_OPPONENT, { frames: [idle] }),
-            frameRate: 1,
-            repeat:    0,
-          });
-        }
       });
 
+    // ── Sprite joueur local ──────────────────────────────────────────────────
+    this.localPlayer = this.add.sprite(spawnPx, spawnPy, KEY_SPRITE_PLAYER);
+    this.localPlayer.setScale(0.20);
+    this.localPlayer.setOrigin(0.5, 0.75);
+    this.localPlayer.setDepth(2);
     this.localPlayer.anims.play('idle_down');
-    this.remotePlayer.anims.play('remote_idle_down');
+
+    // ── Fantômes adverses (1 à 3), chacun avec sa propre texture + anims ────
+    for (const opponent of data.opponents) {
+      const key = opponentTextureKey(opponent.id);
+
+      const sprite = this.add.sprite(spawnPx, spawnPy, key);
+      sprite.setScale(0.20);
+      sprite.setOrigin(0.5, 0.75);
+      sprite.setDepth(1);
+      sprite.setAlpha(0.55);
+      sprite.setTint(0x66aaff);
+
+      const label = this.add.text(spawnPx, spawnPy - TILE_SIZE, opponent.username, {
+        fontSize:   '10px',
+        color:      '#99ccff',
+        fontFamily: 'monospace',
+      }).setOrigin(0.5, 1).setDepth(3).setAlpha(0.85);
+
+      (Object.entries(ANIM_FRAMES) as [Direction, { walk: number[]; idle: number }][])
+        .forEach(([dir, { walk, idle }]) => {
+          const walkKey = `remote_walk_${opponent.id}_${dir}`;
+          const idleKey = `remote_idle_${opponent.id}_${dir}`;
+          if (!this.anims.exists(walkKey)) {
+            this.anims.create({
+              key:       walkKey,
+              frames:    this.anims.generateFrameNumbers(key, { frames: walk }),
+              frameRate: FRAME_RATE,
+              repeat:    -1,
+            });
+          }
+          if (!this.anims.exists(idleKey)) {
+            this.anims.create({
+              key:       idleKey,
+              frames:    this.anims.generateFrameNumbers(key, { frames: [idle] }),
+              frameRate: 1,
+              repeat:    0,
+            });
+          }
+        });
+
+      sprite.anims.play(`remote_idle_${opponent.id}_down`);
+      this.remotes.set(opponent.id, {
+        sprite, label,
+        gridX: this.gridX, gridY: this.gridY,
+        moving: false, lastDir: 'down',
+      });
+    }
 
     this.spawnEnemies(data.grid);
 
@@ -237,8 +264,24 @@ export class DuelScene extends BaseScene {
       right: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D),
     };
 
-    // Écoute les mises à jour du joueur distant (depuis React via game.events)
-    this.game.events.on('remote_state', this.handleRemoteState, this);
+    // Écoute les mises à jour serveur (depuis React via game.events) :
+    // positions des adversaires et des ennemis, toutes deux pilotées par le
+    // tick autoritaire du serveur (cf. backend_doc/duel-server-authoritative-enemies.md).
+    this.game.events.on('remote_states',  this.handleRemoteStates,  this);
+    this.game.events.on('remote_enemies', this.handleRemoteEnemies, this);
+    // Le mouvement local est prédictif (tween immédiat, sans attendre le
+    // serveur) : sans ce signal explicite, le joueur continue de se déplacer
+    // visuellement après sa mort côté serveur alors que ses inputs sont déjà
+    // ignorés — cf. DuelGamePage.tsx `me.alive === false`.
+    this.game.events.on('i_died', this.handleIDied, this);
+
+    // Signale à React que les listeners ci-dessus sont prêts : tout
+    // game_state émis PENDANT le chargement des assets (preload) était
+    // silencieusement perdu (aucun listener encore inscrit) — React rejoue
+    // alors son dernier état connu pour rattraper l'écart. Sans ça, un
+    // adversaire qui termine très vite pendant que cette scène charge encore
+    // reste figé au spawn pour toujours sur cet écran.
+    this.game.events.emit('scene_ready');
   }
 
   // ── update ────────────────────────────────────────────────────────────────
@@ -265,6 +308,10 @@ export class DuelScene extends BaseScene {
   }
 
   // ── tryMove ───────────────────────────────────────────────────────────────
+  // Mouvement prédictif côté client (feedback immédiat) ; le serveur reste
+  // seul autoritaire sur la collision ennemie et l'arrivée réelle en EXIT
+  // (cf. duelHandler.ts `player_input`) — le client ne fait ici que geler
+  // son propre input une fois la case EXIT visuellement atteinte.
 
   private tryMove(dx: number, dy: number, dir: Direction): void {
     const nx = this.gridX + dx;
@@ -299,165 +346,151 @@ export class DuelScene extends BaseScene {
           (dir === 'down'  && (this.cursors.down.isDown  || this.wasd.down.isDown));
         if (stillPressed) this.moveDuration = Math.max(60, this.moveDuration - 15);
 
-        const hitEnemy = this.enemies.some(
-          e => e.gridX === this.gridX && e.gridY === this.gridY,
-        );
-        if (hitEnemy && !this.finished) {
-          this.finished = true;
-          this.game.events.emit('player_caught');
-        }
-
         if (this.grid[ny][nx] === TILE.EXIT && !this.finished) {
           this.finished = true;
-          this.game.events.emit('player_reached_exit');
         }
       },
     });
   }
 
-  // ── handleRemoteState ─────────────────────────────────────────────────────
-  // Reçoit le PlayerState de l'adversaire depuis React et l'anime vers sa
-  // nouvelle position sur la grille.
+  // ── handleIDied ───────────────────────────────────────────────────────────
+  // Gèle l'input local : le serveur a déjà marqué ce joueur `alive: false`
+  // (collision ennemie ou forfait de reconnexion) et ignore ses player_input
+  // depuis. Réutilise le même gate que l'arrivée en EXIT (`update()` ignore
+  // tout input tant que `this.finished` est vrai).
 
-  private handleRemoteState(state: PlayerState): void {
-    const nx = state.position.x;
-    const ny = state.position.y;
+  private handleIDied(): void {
+    this.finished = true;
+  }
 
-    this.remoteLastDir = state.direction;
+  // ── handleRemoteStates ────────────────────────────────────────────────────
+  // Reçoit le PlayerState de chaque adversaire depuis React et anime le
+  // fantôme correspondant vers sa nouvelle position. Un adversaire mort/fini
+  // arrête naturellement de bouger : le serveur ne fait plus progresser sa
+  // position, donc plus aucune nouvelle valeur ne diffère de la précédente.
 
-    if (nx === this.remoteGridX && ny === this.remoteGridY) return;
+  private handleRemoteStates(states: PlayerState[]): void {
+    for (const state of states) {
+      const ghost = this.remotes.get(state.id);
+      if (!ghost) continue;
 
-    this.remoteGridX = nx;
-    this.remoteGridY = ny;
+      const nx = state.position.x;
+      const ny = state.position.y;
 
-    const targetX = nx * TILE_SIZE + TILE_SIZE / 2;
-    const targetY = ny * TILE_SIZE + TILE_SIZE / 2;
+      ghost.lastDir = state.direction;
 
-    this.remotePlayer.anims.play(`remote_walk_${state.direction}`, true);
+      if (nx === ghost.gridX && ny === ghost.gridY) continue;
 
-    if (this.remoteMoving) {
-      // Déjà en mouvement : on saute directement à la cible
-      this.remotePlayer.setPosition(targetX, targetY);
-      this.remoteLabel.setPosition(targetX, targetY - TILE_SIZE);
-      return;
+      ghost.gridX = nx;
+      ghost.gridY = ny;
+
+      const targetX = nx * TILE_SIZE + TILE_SIZE / 2;
+      const targetY = ny * TILE_SIZE + TILE_SIZE / 2;
+
+      ghost.sprite.anims.play(`remote_walk_${state.id}_${state.direction}`, true);
+
+      if (ghost.moving) {
+        // Déjà en mouvement : on saute directement à la cible
+        ghost.sprite.setPosition(targetX, targetY);
+        ghost.label.setPosition(targetX, targetY - TILE_SIZE);
+        continue;
+      }
+
+      ghost.moving = true;
+      this.tweens.add({
+        targets:  [ghost.sprite, ghost.label],
+        x: (target: Phaser.GameObjects.GameObject) => (target === ghost.label ? targetX : targetX),
+        y: (target: Phaser.GameObjects.GameObject) => (target === ghost.label ? targetY - TILE_SIZE : targetY),
+        duration: 140,
+        ease:     'Linear',
+        onComplete: () => {
+          ghost.moving = false;
+          ghost.sprite.anims.play(`remote_idle_${state.id}_${ghost.lastDir}`);
+        },
+      });
     }
-
-    this.remoteMoving = true;
-    this.tweens.add({
-      targets:  [this.remotePlayer, this.remoteLabel],
-      x: (target: Phaser.GameObjects.GameObject) => {
-        return target === this.remoteLabel ? targetX : targetX;
-      },
-      y: (target: Phaser.GameObjects.GameObject) => {
-        return target === this.remoteLabel ? targetY - TILE_SIZE : targetY;
-      },
-      duration: 140,
-      ease:     'Linear',
-      onComplete: () => {
-        this.remoteMoving = false;
-        this.remotePlayer.anims.play(`remote_idle_${this.remoteLastDir}`);
-      },
-    });
   }
 
   // ── spawnEnemies ──────────────────────────────────────────────────────────
+  // Crée uniquement les sprites visuels, à leur position de spawn définie par
+  // la grille. Le déplacement n'est plus simulé localement : il est piloté
+  // par le tick serveur via handleRemoteEnemies() (cf. duelHandler.ts).
 
   private spawnEnemies(grid: Grid): void {
-    this.enemies = [];
+    this.enemySprites.clear();
 
-    for (let row = 0; row < GRID_SIZE; row++) {
-      for (let col = 0; col < GRID_SIZE; col++) {
-        const tile = grid[row][col];
-        if (tile !== TILE.ENEMY_H && tile !== TILE.ENEMY_V) continue;
+    for (const enemy of extractEnemiesFromGrid(grid)) {
+      const px  = enemy.x * TILE_SIZE + TILE_SIZE / 2;
+      const py  = enemy.y * TILE_SIZE + TILE_SIZE / 2;
+      const key = enemy.kind === 'horizontal' ? KEY_SPRITE_ENEMY_H : KEY_SPRITE_ENEMY_V;
+      const fallbackColor = enemy.kind === 'horizontal' ? 0xe53935 : 0xff8c00;
 
-        const px           = col * TILE_SIZE + TILE_SIZE / 2;
-        const py           = row * TILE_SIZE + TILE_SIZE / 2;
-        const key          = tile === TILE.ENEMY_H ? KEY_SPRITE_ENEMY_H : KEY_SPRITE_ENEMY_V;
-        const fallbackColor = tile === TILE.ENEMY_H ? 0xe53935 : 0xff8c00;
+      let obj: EnemyGameObject;
 
-        let obj: EnemyGameObject;
+      if (this.textures.exists(key)) {
+        const sprite = this.add.sprite(px, py, key)
+          .setScale(0.2)
+          .setCrop(15, 15, ENEMY_FRAME_W - 30, ENEMY_FRAME_H - 30)
+          .setOrigin(0.5, 0.75)
+          .setDepth(2);
 
-        if (this.textures.exists(key)) {
-          const sprite = this.add.sprite(px, py, key)
-            .setScale(0.2)
-            .setCrop(15, 15, ENEMY_FRAME_W - 30, ENEMY_FRAME_H - 30)
-            .setOrigin(0.5, 0.75)
-            .setDepth(2);
+        (Object.entries(ENEMY_ANIM_FRAMES) as [Direction, number[]][]).forEach(([dir, frames]) => {
+          const animKey = `${key}_walk_${dir}`;
+          if (!this.anims.exists(animKey)) {
+            this.anims.create({
+              key:       animKey,
+              frames:    this.anims.generateFrameNumbers(key, { frames }),
+              frameRate: FRAME_RATE,
+              repeat:    -1,
+            });
+          }
+        });
 
-          (Object.entries(ENEMY_ANIM_FRAMES) as [Direction, number[]][]).forEach(([dir, frames]) => {
-            const animKey = `${key}_walk_${dir}`;
-            if (!this.anims.exists(animKey)) {
-              this.anims.create({
-                key:       animKey,
-                frames:    this.anims.generateFrameNumbers(key, { frames }),
-                frameRate: FRAME_RATE,
-                repeat:    -1,
-              });
-            }
-          });
-
-          sprite.anims.play(`${key}_walk_down`);
-          obj = sprite;
-        } else {
-          obj = this.add.rectangle(px, py, TILE_SIZE, TILE_SIZE, fallbackColor).setDepth(2);
-        }
-
-        this.enemies.push(
-          tile === TILE.ENEMY_H
-            ? new HorizontalEnemy(col, row, obj)
-            : new VerticalEnemy(col, row, obj),
-        );
+        sprite.anims.play(`${key}_walk_down`);
+        obj = sprite;
+      } else {
+        obj = this.add.rectangle(px, py, TILE_SIZE, TILE_SIZE, fallbackColor).setDepth(2);
       }
-    }
 
-    this.time.addEvent({
-      delay:         400,
-      loop:          true,
-      callback:      this.moveEnemies,
-      callbackScope: this,
-    });
+      this.enemySprites.set(enemy.id, obj);
+    }
   }
 
+  // ── handleRemoteEnemies ───────────────────────────────────────────────────
+  // Tween chaque sprite ennemi vers la position reçue du serveur (même
+  // cadence que le tick serveur, 400ms — cf. duelHandler.ts ENEMY_TICK_MS).
 
-	private moveEnemies(): void {
-		for (const enemy of this.enemies) {
-			const next = enemy.computeNextPosition(this.grid);
-			enemy.gridX = next.x;
-			enemy.gridY = next.y;
-			enemy.rect.setDepth(10 + enemy.gridY);
+  private handleRemoteEnemies(enemies: EnemyState[]): void {
+    for (const enemy of enemies) {
+      const obj = this.enemySprites.get(enemy.id);
+      if (!obj) continue;
 
-			this.tweens.add({
-				targets: enemy.rect,
-				x: next.x * TILE_SIZE + TILE_SIZE / 2,
-				y: next.y * TILE_SIZE + TILE_SIZE / 2,
-				duration: 350,
-				ease: 'Linear',
-			});
-			if (enemy.rect instanceof Phaser.GameObjects.Sprite) {
-				const key = enemy instanceof HorizontalEnemy ? KEY_SPRITE_ENEMY_H : KEY_SPRITE_ENEMY_V;
-				const animKey = `${key}_walk_${enemy.lastDirection}`;
-				if (enemy.rect.anims.currentAnim?.key !== animKey) {
-					enemy.rect.anims.play(animKey, true);
-				}
-			}
-		}
+      const targetX = enemy.position.x * TILE_SIZE + TILE_SIZE / 2;
+      const targetY = enemy.position.y * TILE_SIZE + TILE_SIZE / 2;
 
-		const caught = this.enemies.some(
-			e => e.gridX === this.gridX && e.gridY === this.gridY,
-		);
-		if (caught && !this.finished) {
-			this.finished = true;
-			this.game.events.emit('player_caught');
-		}
-	}
+      if (obj instanceof Phaser.GameObjects.Sprite) {
+        const key = enemy.kind === 'horizontal' ? KEY_SPRITE_ENEMY_H : KEY_SPRITE_ENEMY_V;
+        const animKey = `${key}_walk_${enemy.direction}`;
+        if (obj.anims.currentAnim?.key !== animKey) {
+          obj.anims.play(animKey, true);
+        }
+      }
 
-
-
-
+      this.tweens.add({
+        targets:  obj,
+        x:        targetX,
+        y:        targetY,
+        duration: 350,
+        ease:     'Linear',
+      });
+    }
+  }
 
   // ── shutdown ──────────────────────────────────────────────────────────────
 
   shutdown(): void {
-    this.game.events.off('remote_state', this.handleRemoteState, this);
+    this.game.events.off('remote_states',  this.handleRemoteStates,  this);
+    this.game.events.off('remote_enemies', this.handleRemoteEnemies, this);
+    this.game.events.off('i_died',         this.handleIDied,         this);
   }
 }
