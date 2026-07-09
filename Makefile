@@ -172,13 +172,18 @@ docker-up: certs ## Build and start all services in detached mode
 	fi
 	$(COMPOSE) up --build -d postgres
 	$(COMPOSE) up --build -d --no-deps vault
+	@$(MAKE) vault-wait
+	@if docker exec vault vault status 2>/dev/null | grep -q 'Initialized.*true'; then \
+		printf "$(CYAN)Vault already initialized, unsealing...$(RESET)\n"; \
+		$(MAKE) vault-unseal; \
+	else \
+		printf "$(CYAN)First run detected, initializing Vault...$(RESET)\n"; \
+		$(MAKE) vault-init; \
+	fi
 	$(COMPOSE) up --build -d
-	sleep 3
-	@$(MAKE) vault-unseal
 	@printf "$(GREEN)Services running:$(RESET)\n"
 	@printf "  Frontend: http://localhost:5173\n"
-	@printf "  Backend:  http://localhost:3001/api/health\n"
-	@printf "  Postgres: localhost:5432\n"
+	@printf "  WAF:      http://localhost:8080\n"
 
 docker-down: ## Stop and remove containers (keeps volumes)
 	$(COMPOSE) down
