@@ -6,7 +6,7 @@
 		test test-backend test-frontend \
 		docker-build docker-up docker-down docker-down-v docker-logs docker-logs-backend docker-restart \
 		db-generate db-migrate db-seed db-studio \
-		certs \
+		certs vault-init\
 		clean fclean re
 
 # ── Colors ────────────────────────────────────────────────────────────────────
@@ -151,6 +151,9 @@ certs: ## Generates self-signed TLS certs for Vault (skips if already present)
 docker-build: ## Build Docker images (no cache)
 	$(COMPOSE) build --no-cache
 
+vault-init: ## First-time Vault setup (called automatically by docker-up)
+	@./vault/vault-init.sh
+
 vault-wait:
 	@echo "Waiting for Vault API..."
 	@until docker exec vault wget --no-check-certificate -qO- https://127.0.0.1:8200/v1/sys/seal-status >/dev/null 2>&1; do \
@@ -173,12 +176,10 @@ docker-up: certs ## Build and start all services in detached mode
 	$(COMPOSE) up --build -d postgres
 	$(COMPOSE) up --build -d --no-deps vault
 	@$(MAKE) vault-wait
-	@if docker exec vault vault status 2>/dev/null | grep -q 'Initialized.*true'; then \
-		printf "$(CYAN)Vault already initialized, unsealing...$(RESET)\n"; \
-		$(MAKE) vault-unseal; \
-	else \
-		printf "$(CYAN)First run detected, initializing Vault...$(RESET)\n"; \
+	@if [ ! -f vault/secrets/init-output.txt ]; then \
 		$(MAKE) vault-init; \
+	else \
+		$(MAKE) vault-unseal; \
 	fi
 	$(COMPOSE) up --build -d
 	@printf "$(GREEN)Services running:$(RESET)\n"
