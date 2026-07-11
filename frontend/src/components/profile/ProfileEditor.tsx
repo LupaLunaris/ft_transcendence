@@ -141,16 +141,13 @@ export function ProfileEditor() {
 			type="file"
 			accept="image/*"
 			onChange={(e) => {
-			const file = e.target.files?.[0];
-			if (!file) return;
+				const selectedFile = e.target.files?.[0];
+				if (!selectedFile) return;
 
-			const selectedFile = e.target.files?.[0];
-			if (!selectedFile) return;
+				setFile(selectedFile);
 
-			setFile(selectedFile);
-
-			const url = URL.createObjectURL(selectedFile);
-			setPreview(url);
+				if (preview) URL.revokeObjectURL(preview);
+				setPreview(URL.createObjectURL(selectedFile));
 			}}
 			className="text-sm text-silver-300"
 		/>
