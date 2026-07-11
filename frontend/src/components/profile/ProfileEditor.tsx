@@ -10,7 +10,6 @@ const AVATARS = [
   '/assets/avatars/Elise_avatar.png',
 ];
 
-
 export function ProfileEditor() {
   const { user, updateUser } = useAuth();
   const { t } = useTranslation();
@@ -19,18 +18,27 @@ export function ProfileEditor() {
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar ?? AVATARS[0]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [usernameError, setUsernameError] = useState('');
 
   async function handleSave() {
+    const normalizedUsername = username.trim();
+
+    if (!/^[a-zA-Z0-9]{3,20}$/.test(normalizedUsername)) {
+      setUsernameError(t('profile_editor_username_validation'));
+      return;
+    }
+
     try {
       setSaving(true);
+      setUsernameError('');
+      setMessage('');
 
       const updatedUser = await api.auth.updateProfile({
-        username,
+        username: normalizedUsername,
         avatar: selectedAvatar,
       });
 
       updateUser(updatedUser);
-
       setMessage(t('profile_editor_update_success'));
     } catch {
       setMessage(t('profile_editor_update_error'));
@@ -46,15 +54,26 @@ export function ProfileEditor() {
       </h2>
 
       <div className="mb-6">
-        <label className="block text-silver-400 mb-2">
+        <label htmlFor="profile-username" className="block text-silver-400 mb-2">
           {t('profile_editor_username')}
         </label>
 
         <input
+          id="profile-username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => {
+            setUsername(e.target.value);
+            if (usernameError) setUsernameError('');
+          }}
+          aria-invalid={Boolean(usernameError)}
+          aria-describedby={usernameError ? 'profile-username-error' : undefined}
           className="w-full rounded-lg border border-surface-border bg-neutral-900 px-4 py-2 text-gold-100"
         />
+        {usernameError && (
+          <p id="profile-username-error" className="mt-2 text-sm text-coral-400" role="alert">
+            {usernameError}
+          </p>
+        )}
       </div>
 
       <div className="mb-6">
@@ -63,11 +82,11 @@ export function ProfileEditor() {
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {AVATARS.map((avatar) => (
+          {AVATARS.map((avatar, index) => (
             <button
               key={avatar}
               type="button"
-			  aria-label={`Choisir l'avatar ${avatar}`}
+              aria-label={t('profile_editor_avatar_option', { number: index + 1 })}
               onClick={() => setSelectedAvatar(avatar)}
               className={`rounded-xl border p-2 ${
                 selectedAvatar === avatar
@@ -76,10 +95,10 @@ export function ProfileEditor() {
               }`}
             >
               <img
-				src={avatar}
-				alt={`Avatar ${avatar}`}
-				className="w-full rounded-lg"
-				/>
+                src={avatar}
+                alt={t('profile_editor_avatar_option', { number: index + 1 })}
+                className="w-full rounded-lg"
+              />
             </button>
           ))}
         </div>
@@ -94,7 +113,7 @@ export function ProfileEditor() {
       </button>
 
       {message && (
-        <p className="mt-3 text-sm text-silver-400">
+        <p className="mt-3 text-sm text-silver-400" role="status">
           {message}
         </p>
       )}
