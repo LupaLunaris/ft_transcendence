@@ -73,7 +73,7 @@ export function Navbar() {
 				  <Avatar
 					avatarUrl={user.avatar ?? undefined}
 					username={user.username}
-					className="w-8 h-8"
+					className="w-full h-full"
 					/>
 				</div>
 				<span>{user.username}</span>
