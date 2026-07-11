@@ -137,11 +137,11 @@ export function Navbar() {
 					flex items-center justify-center
 					text-xs font-bold uppercase
 					">
-				  {user.avatar ? (
-					<img src={user.avatar} alt={user.username} className="w-full h-full rounded-full object-cover" />
-				  ) : (
-					user.username.slice(0, 2).toUpperCase()
-				  )}
+				  <Avatar
+					avatarUrl={user.avatar ?? undefined}
+					username={user.username}
+					className="w-full h-full"
+					/>
 				</div>
 				<span>{user.username}</span>
 			  </Link>
