@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* auth.context.tsx                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jpaulis <jpaulis@student.42belgium.be        +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jpaulis         #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jpaulis        ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import {
   createContext,
@@ -42,59 +31,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // On mount: restore session from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem(TOKEN_KEY);
-    if (!stored) {
-      setLoading(false);
-      return;
-    }
+	const stored = localStorage.getItem(TOKEN_KEY);
+	if (!stored) {
+	  setLoading(false);
+	  return;
+	}
 
-    setToken(stored);
+	setToken(stored);
 
-    api.auth
-      .getMe()
-      .then((me) => setUser(me))
-      .catch(() => {
-        localStorage.removeItem(TOKEN_KEY);
-        setToken(null);
-      })
-      .finally(() => setLoading(false));
+	api.auth
+	  .getMe()
+	  .then((me) => setUser(me))
+	  .catch(() => {
+		localStorage.removeItem(TOKEN_KEY);
+		setToken(null);
+	  })
+	  .finally(() => setLoading(false));
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const { user: me, token: jwt } = await api.auth.login({ identifier: email, password });
-    localStorage.setItem(TOKEN_KEY, jwt);
-    setToken(jwt);
-    setUser(me);
+	const { user: me, token: jwt } = await api.auth.login({ identifier: email, password });
+	localStorage.setItem(TOKEN_KEY, jwt);
+	setToken(jwt);
+	setUser(me);
   }, []);
 
   const register = useCallback(
-    async (username: string, email: string, password: string) => {
-      const { user: me, token: jwt } = await api.auth.register({
-        username,
-        email,
-        password,
-      });
-      localStorage.setItem(TOKEN_KEY, jwt);
-      setToken(jwt);
-      setUser(me);
-    },
-    [],
+	async (username: string, email: string, password: string) => {
+	  const { user: me, token: jwt } = await api.auth.register({
+		username,
+		email,
+		password,
+	  });
+	  localStorage.setItem(TOKEN_KEY, jwt);
+	  setToken(jwt);
+	  setUser(me);
+	},
+	[],
   );
 
   const logout = useCallback(() => {
-    localStorage.removeItem(TOKEN_KEY);
-    setToken(null);
-    setUser(null);
+	localStorage.removeItem(TOKEN_KEY);
+	setToken(null);
+	setUser(null);
   }, []);
 
   const updateUser = useCallback((updated: UserPublic) => {
-    setUser(updated);
+	setUser(updated);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser }}>
-      {children}
-    </AuthContext.Provider>
+	<AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser }}>
+	  {children}
+	</AuthContext.Provider>
   );
 }
 

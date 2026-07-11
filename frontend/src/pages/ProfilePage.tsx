@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* ProfilePage.tsx                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jpaulis <jpaulis@student.42belgium.be        +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jpaulis         #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jpaulis        ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Layout } from '@/components/layout/Layout';
 import { Spinner } from '@/components/ui/Spinner';
@@ -22,25 +11,25 @@ export function ProfilePage() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <Layout>
-        <div className="py-20 flex justify-center">
-          <Spinner />
-        </div>
-      </Layout>
-    );
+	return (
+	  <Layout>
+		<div className="py-20 flex justify-center">
+		  <Spinner />
+		</div>
+	  </Layout>
+	);
   }
 
   if (!user) {
-    return (
-      <Layout>
-        <div className="max-w-2xl mx-auto px-4 py-12 text-center text-white/60">
-          <p>
+	return (
+	  <Layout>
+		<div className="max-w-2xl mx-auto px-4 py-12 text-center text-white/60">
+		  <p>
 			{t('profile_page_offline_error')}
 		  </p>
-        </div>
-      </Layout>
-    );
+		</div>
+	  </Layout>
+	);
   }
 
 	return (
