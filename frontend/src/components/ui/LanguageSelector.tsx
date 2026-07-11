@@ -45,7 +45,7 @@ export function LanguageSelector() {
 			  onClick={() => { i18n.changeLanguage(code); setOpen(false); }}
 			  className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between
 						  hover:bg-surface-raised transition-colors
-						  ${i18n.language.startsWith(code)
+						  ${(i18n.language ?? 'en').startsWith(code)
 							? 'text-gold-300'
 							: 'text-silver-300'}`}
 			>
