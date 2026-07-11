@@ -4,6 +4,7 @@
     "common.register": "Registreren",
     "common.welcome": "Welkom, avonturier",
     "common.mail_placeholder": "avonturier@voorbeeld.com",
+    "login_page.email_or_username_label": "E-mail of gebruikersnaam",
     "common.connect": "Inloggen",
     "common.online": "Online",
     "common.to_register": "Inschrijven",
@@ -49,6 +50,7 @@
     "register_page.validation_confirm_password": "Wachtwoorden komen niet overeen",
     "register_page.register_error": "Registratie mislukt",
     "register_page.mail_label": "Avonturiersnaam",
+    "register_page.email_label": "E-mail",
     "register_page.confirm_password": "Wachtwoord bevestigen",
     "register_page.adventure": "Sluit je aan bij het avontuur",
     "register_page.create": "Account aanmaken",
@@ -56,7 +58,7 @@
 
     "login_page.login_error": "Aanmelden mislukt",
     "login_page.no_account": "Nog geen account?",
-	"login_page.validation_email_required": "E-mail is verplicht",
+	"login_page.validation_email_required": "E-mail of gebruikersnaam is verplicht",
 	"login_page.validation_email": "Ongeldig e-mailadres",
 	"login_page.validation_password_required": "Wachtwoord is verplicht",
 
@@ -217,6 +219,8 @@
     "profile_editor_update_error": "Fout bij het bijwerken.",
     "profile_editor_update_profile": "Profiel bewerken",
     "profile_editor_username": "Gebruikersnaam",
+    "profile_editor_username_validation": "Gebruikersnaam moet 3 tot 20 letters of cijfers bevatten.",
+    "profile_editor_avatar_option": "Avatar {{number}}",
     "profile_editor_avatar": "Kies een avatar",
     "profile_editor_saving": "Opslaan...",
     "profile_editor_save": "Opslaan",
