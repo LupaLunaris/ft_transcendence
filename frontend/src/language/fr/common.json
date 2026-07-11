@@ -4,6 +4,7 @@
     "common.register": "Inscription",
     "common.welcome": "Bienvenue, aventurier",
     "common.mail_placeholder": "aventurier@exemple.com",
+    "login_page.email_or_username_label": "E-mail ou nom d'utilisateur",
     "common.connect": "Se connecter",
     "common.online": "En ligne",
     "common.to_register": "S'inscrire",
@@ -50,6 +51,7 @@
 
     "register_page.register_error": "Échec de l'inscription",
     "register_page.mail_label": "Nom d'aventurier",
+    "register_page.email_label": "E-mail",
     "register_page.confirm_password": "Confirmer le mot de passe",
     "register_page.adventure": "Rejoignez l'aventure",
     "register_page.create": "Créer mon compte",
@@ -57,7 +59,7 @@
 
     "login_page.login_error": "Échec de la connexion",
     "login_page.no_account": "Pas encore de compte ?",
-	"login_page.validation_email_required": "L'email est obligatoire",
+	"login_page.validation_email_required": "L'e-mail ou le nom d'utilisateur est obligatoire",
 	"login_page.validation_email": "Email invalide",
 	"login_page.validation_password_required": "Le mot de passe est obligatoire",
 
@@ -218,6 +220,8 @@
     "profile_editor_update_error": "Erreur lors de la mise à jour.",
     "profile_editor_update_profile": "Modifier le profil",
     "profile_editor_username": "Nom d'utilisateur",
+    "profile_editor_username_validation": "Le nom d'utilisateur doit contenir de 3 à 20 lettres ou chiffres.",
+    "profile_editor_avatar_option": "Avatar {{number}}",
     "profile_editor_avatar": "Choisir un avatar",
     "profile_editor_saving": "Sauvegarde...",
     "profile_editor_save": "Sauvegarder",
