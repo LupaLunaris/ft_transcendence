@@ -170,6 +170,7 @@
     "not_found_page.back_homepage": "Retour à l'accueil",
 
     "profile_page.profile": "Profil",
+	"profile_editor_upload_avatar": "Importer une image",
 
     "tower_page.title": "La Tour",
     "tower_page.success": "Tour complétée ! Tu es le Maître des Profondeurs.",
