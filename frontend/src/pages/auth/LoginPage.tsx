@@ -81,14 +81,14 @@ export function LoginPage() {
 
 			<form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
 			<Input
-				label="Email"
-				type="email"
+				label={t('login_page.email_or_username_label')}
+				type="text"
 				value={email}
 				onChange={(e) => setEmail(e.target.value)}
 				placeholder={t('common.mail_placeholder')}
 				error={errors.email}
 				required
-				autoComplete="email"
+				autoComplete="username"
 			/>
 			<Input
 				label={t('common.password')}
