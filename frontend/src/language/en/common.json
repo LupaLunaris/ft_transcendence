@@ -4,6 +4,7 @@
     "common.register": "Register",
     "common.welcome": "Welcome, adventurer",
     "common.mail_placeholder": "adventurer@example.com",
+    "login_page.email_or_username_label": "Email or username",
     "common.connect": "Sign in",
     "common.online": "Online",
     "common.to_register": "Join",
@@ -49,6 +50,7 @@
     "register_page.validation_confirm_password": "Passwords do not match",
     "register_page.register_error": "Registration failed",
     "register_page.mail_label": "Adventurer name",
+    "register_page.email_label": "Email",
     "register_page.confirm_password": "Confirm password",
     "register_page.adventure": "Join the adventure",
     "register_page.create": "Create my account",
@@ -56,7 +58,7 @@
 
     "login_page.login_error": "Login failed",
     "login_page.no_account": "Don't have an account yet?",
-	"login_page.validation_email_required": "Email is required",
+	"login_page.validation_email_required": "Email or username is required",
 	"login_page.validation_email": "Invalid email",
 	"login_page.validation_password_required": "Password is required",
 
@@ -217,6 +219,8 @@
     "profile_editor_update_error": "Error while updating.",
     "profile_editor_update_profile": "Edit profile",
     "profile_editor_username": "Username",
+    "profile_editor_username_validation": "Username must contain 3 to 20 letters or numbers.",
+    "profile_editor_avatar_option": "Avatar {{number}}",
     "profile_editor_avatar": "Choose an avatar",
     "profile_editor_saving": "Saving...",
     "profile_editor_save": "Save",
