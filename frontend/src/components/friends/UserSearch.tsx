@@ -57,6 +57,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
           type="text"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
+          aria-label={t('friends_search_search_player')}
           placeholder={t('friends_search_search_player')}
           className="flex-1 rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm text-silver-100 placeholder:text-silver-500 outline-none focus:border-gold-500/60"
         />
@@ -71,7 +72,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
       </form>
 
       {error && (
-        <p className="mt-3 text-sm text-red-200">
+        <p className="mt-3 text-sm text-red-200" role="alert">
           {error}
         </p>
       )}
