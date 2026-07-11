@@ -56,6 +56,9 @@
 
     "login_page.login_error": "Aanmelden mislukt",
     "login_page.no_account": "Nog geen account?",
+	"login_page.validation_email_required": "E-mail is verplicht",
+	"login_page.validation_email": "Ongeldig e-mailadres",
+	"login_page.validation_password_required": "Wachtwoord is verplicht",
 
     "game_page.backlabel_editor": "Terug naar de editor",
     "game_page.backlabel_train": "Terug naar training",

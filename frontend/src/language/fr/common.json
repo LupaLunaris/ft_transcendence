@@ -57,6 +57,9 @@
 
     "login_page.login_error": "Échec de la connexion",
     "login_page.no_account": "Pas encore de compte ?",
+	"login_page.validation_email_required": "L'email est obligatoire",
+	"login_page.validation_email": "Email invalide",
+	"login_page.validation_password_required": "Le mot de passe est obligatoire",
 
     "game_page.backlabel_editor": "Retour à l'éditeur",
     "game_page.backlabel_train": "Retour aux entraînements",

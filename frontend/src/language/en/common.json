@@ -56,6 +56,9 @@
 
     "login_page.login_error": "Login failed",
     "login_page.no_account": "Don't have an account yet?",
+	"login_page.validation_email_required": "Email is required",
+	"login_page.validation_email": "Invalid email",
+	"login_page.validation_password_required": "Password is required",
 
     "game_page.backlabel_editor": "Back to the editor",
     "game_page.backlabel_train": "Back to training",
