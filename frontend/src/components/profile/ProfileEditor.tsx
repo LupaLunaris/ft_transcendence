@@ -95,7 +95,7 @@ export function ProfileEditor() {
 			<img
 				key={preview || selectedAvatar}
 				src={preview ? preview : selectedAvatar}
-				alt={user?.username}
+				alt={user?.username ?? username}
 				className="w-full h-full object-cover"
 			/>
 			</div>
