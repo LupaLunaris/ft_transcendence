@@ -85,7 +85,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
 			  className="flex items-center justify-between gap-4 rounded-lg border border-surface-border bg-surface-raised p-3"
 			>
 			  <div className="flex items-center gap-3 min-w-0">
-				<div className="w-11 h-11 rounded-full ... overflow-hidden">
+				<div className="w-11 h-11 rounded-full bg-gradient-to-br from-diamond-500/20 to-surface-muted border border-gold-500/40 shadow-gold-soft shrink-0 overflow-hidden">
 					<Avatar
 						avatarUrl={user.avatar ?? undefined}
 						username={user.username}
