@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api, type UserSearchResult } from '@/services/api.service';
 import { useTranslation } from 'react-i18next';
+import { Avatar } from '@/components/profile/Avatar';
 
 interface UserSearchProps {
   onFriendAdded: () => void;
@@ -14,40 +15,40 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
   const { t } = useTranslation();
 
   async function handleSearch(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+	event.preventDefault();
 
-    const trimmedQuery = query.trim();
+	const trimmedQuery = query.trim();
 
-    if (trimmedQuery.length < 2) {
-      setResults([]);
-      setError(t('friends_search_characters'));
-      return;
-    }
+	if (trimmedQuery.length < 2) {
+	  setResults([]);
+	  setError(t('friends_search_characters'));
+	  return;
+	}
 
-    try {
-      setLoading(true);
-      setError(null);
+	try {
+	  setLoading(true);
+	  setError(null);
 
-      const users = await api.users.search(trimmedQuery);
-      setResults(users);
-    } catch {
-      setError(t('friends_search_error'));
-    } finally {
-      setLoading(false);
-    }
+	  const users = await api.users.search(trimmedQuery);
+	  setResults(users);
+	} catch {
+	  setError(t('friends_search_error'));
+	} finally {
+	  setLoading(false);
+	}
   }
 
   async function handleAddFriend(userId: string) {
-    try {
-      setError(null);
+	try {
+	  setError(null);
 
-      await api.friends.add(userId);
-      onFriendAdded();
+	  await api.friends.add(userId);
+	  onFriendAdded();
 
-      setResults((current) => current.filter((user) => user.id !== userId));
-    } catch {
-      setError(t('friends_search_add_friend_error'));
-    }
+	  setResults((current) => current.filter((user) => user.id !== userId));
+	} catch {
+	  setError(t('friends_search_add_friend_error'));
+	}
   }
 
   return (
@@ -57,6 +58,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
           type="text"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
+          aria-label={t('friends_search_search_player')}
           placeholder={t('friends_search_search_player')}
           className="flex-1 rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm text-silver-100 placeholder:text-silver-500 outline-none focus:border-gold-500/60"
         />
@@ -71,7 +73,7 @@ export function UserSearch({ onFriendAdded }: UserSearchProps) {
       </form>
 
       {error && (
-        <p className="mt-3 text-sm text-red-200">
+        <p className="mt-3 text-sm text-red-200" role="alert">
           {error}
         </p>
       )}
