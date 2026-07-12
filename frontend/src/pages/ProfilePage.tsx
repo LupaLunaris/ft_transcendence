@@ -5,6 +5,7 @@ import { useAuth } from '@/context/auth.context';
 import { useTranslation } from 'react-i18next';
 import { FriendsList } from '@/components/friends/FriendsList';
 import { ProfileEditor } from '@/components/profile/ProfileEditor';
+import { Avatar } from '@/components/profile/Avatar';
 
 export function ProfilePage() {
   const { t } = useTranslation();
@@ -46,16 +47,12 @@ export function ProfilePage() {
 
 		<div className="gold-edge bg-surface-raised border border-surface-border rounded-xl p-6">
 			<div className="flex flex-col sm:flex-row items-center gap-6">
-			<div className="w-24 h-24 rounded-full bg-gradient-to-br from-diamond-500/20 to-surface-muted border border-gold-500/40 shadow-gold-soft flex items-center justify-center text-3xl font-bold font-fantasy text-gold-200 shrink-0 overflow-hidden">
-				{user.avatar ? (
-				<img
-					src={user.avatar}
-					alt={user.username}
-					className="w-full h-full object-cover"
-				/>
-				) : (
-				user.username.slice(0, 2).toUpperCase()
-				)}
+			<div className="w-24 h-24 rounded-full bg-gradient-to-br from-diamond-500/20 to-surface-muted border border-gold-500/40 shadow-gold-soft flex items-center justify-center shrink-0 overflow-hidden">
+			<Avatar
+				avatarUrl={user.avatar ?? undefined}
+				username={user.username}
+				className="w-full h-full"
+			/>
 			</div>
 
 			<div className="flex-1 text-center sm:text-left">

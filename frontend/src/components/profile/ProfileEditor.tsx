@@ -16,6 +16,7 @@ export function ProfileEditor() {
 
   const [username, setUsername] = useState(user?.username ?? '');
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar ?? AVATARS[0]);
+  const [preview, setPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [usernameError, setUsernameError] = useState('');
