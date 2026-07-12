@@ -19,154 +19,105 @@ export function ProfileEditor() {
   const [preview, setPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
-  const [file, setFile] = useState<File | null>(null);
+  const [usernameError, setUsernameError] = useState('');
 
-	async function handleSave() {
-	try {
-		setSaving(true);
+  async function handleSave() {
+    const normalizedUsername = username.trim();
 
-		let updatedUser;
+    if (!/^[a-zA-Z0-9]{3,20}$/.test(normalizedUsername)) {
+      setUsernameError(t('profile_editor_username_validation'));
+      return;
+    }
 
-		// 🔥 CAS 1 — upload fichier
-		if (file) {
-		const formData = new FormData();
-		formData.append("avatar", file);
-		formData.append("username", username);
+    try {
+      setSaving(true);
+      setUsernameError('');
+      setMessage('');
 
-		const res = await fetch("/api/users/avatar", {
-			method: "POST",
-			headers: {
-			Authorization: `Bearer ${localStorage.getItem("token")}`,
-			},
-			body: formData,
-		});
+      const updatedUser = await api.auth.updateProfile({
+        username: normalizedUsername,
+        avatar: selectedAvatar,
+      });
 
-		if (!res.ok) throw new Error("Upload failed");
-
-		updatedUser = await res.json();
-		}
-
-		// 🔥 CAS 2 — avatars prédéfinis
-		else {
-		updatedUser = await api.auth.updateProfile({
-			username,
-			avatar: selectedAvatar,
-		});
-		}
-
-		updateUser(updatedUser);
-		setPreview(null);
-		setFile(null);
-
-		setMessage(t('profile_editor_update_success'));
-	} catch {
-		setMessage(t('profile_editor_update_error'));
-	} finally {
-		setSaving(false);
-	}
-	}
+      updateUser(updatedUser);
+      setMessage(t('profile_editor_update_success'));
+    } catch {
+      setMessage(t('profile_editor_update_error'));
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
-	<div className="gold-edge bg-surface-raised border border-surface-border rounded-xl p-6">
-	  <h2 className="font-fantasy text-2xl text-silver-100 mb-4">
-		{t('profile_editor_update_profile')}
-	  </h2>
+    <div className="gold-edge bg-surface-raised border border-surface-border rounded-xl p-6">
+      <h2 className="font-fantasy text-2xl text-silver-100 mb-4">
+        {t('profile_editor_update_profile')}
+      </h2>
 
-	  <div className="mb-6">
-		<label className="block text-silver-400 mb-2">
-		  {t('profile_editor_username')}
-		</label>
+      <div className="mb-6">
+        <label htmlFor="profile-username" className="block text-silver-400 mb-2">
+          {t('profile_editor_username')}
+        </label>
 
-		<input
-		  value={username}
-		  onChange={(e) => setUsername(e.target.value)}
-		  className="w-full rounded-lg border border-surface-border bg-neutral-900 px-4 py-2 text-gold-100"
-		/>
-	  </div>
+        <input
+          id="profile-username"
+          value={username}
+          onChange={(e) => {
+            setUsername(e.target.value);
+            if (usernameError) setUsernameError('');
+          }}
+          aria-invalid={Boolean(usernameError)}
+          aria-describedby={usernameError ? 'profile-username-error' : undefined}
+          className="w-full rounded-lg border border-surface-border bg-neutral-900 px-4 py-2 text-gold-100"
+        />
+        {usernameError && (
+          <p id="profile-username-error" className="mt-2 text-sm text-coral-400" role="alert">
+            {usernameError}
+          </p>
+        )}
+      </div>
 
-	  <div className="mb-6">
-		<p className="text-silver-400 mb-3">
-		  {t('profile_editor_avatar')}
-		</p>
+      <div className="mb-6">
+        <p className="text-silver-400 mb-3">
+          {t('profile_editor_avatar')}
+        </p>
 
-		<div className="mb-4 flex flex-col items-center gap-2">
-		<div className="relative">
-			<div className="w-24 h-24 rounded-full overflow-hidden border border-gold-500/40">
-			<img
-				key={preview || selectedAvatar}
-				src={preview ? preview : selectedAvatar}
-				alt={user?.username ?? username}
-				className="w-full h-full object-cover"
-			/>
-			</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {AVATARS.map((avatar, index) => (
+            <button
+              key={avatar}
+              type="button"
+              aria-label={t('profile_editor_avatar_option', { number: index + 1 })}
+              onClick={() => setSelectedAvatar(avatar)}
+              className={`rounded-xl border p-2 ${
+                selectedAvatar === avatar
+                  ? 'border-gold-500'
+                  : 'border-surface-border'
+              }`}
+            >
+              <img
+                src={avatar}
+                alt={t('profile_editor_avatar_option', { number: index + 1 })}
+                className="w-full rounded-lg"
+              />
+            </button>
+          ))}
+        </div>
+      </div>
 
-			{preview && (
-			<span className="absolute -top-2 -right-2 bg-gold-500 text-black text-xs px-2 py-0.5 rounded-full font-semibold">
-				Preview
-			</span>
-			)}
-		</div>
-		</div>
+      <button
+        onClick={() => void handleSave()}
+        disabled={saving}
+        className="rounded-lg bg-gold-500/20 border border-gold-500 px-4 py-2 text-gold-300"
+      >
+        {saving ? t('profile_editor_saving') : t('profile_editor_save')}
+      </button>
 
-		<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-		  {AVATARS.map((avatar) => (
-			<button
-			  key={avatar}
-			  type="button"
-			  aria-label={`Choisir l'avatar ${avatar}`}
-			  onClick={() => {
-				setSelectedAvatar(avatar);
-				setPreview(null);
-				}}
-			  className={`rounded-xl border p-2 ${
-				selectedAvatar === avatar
-				  ? 'border-gold-500'
-				  : 'border-surface-border'
-			  }`}
-			>
-			  <img
-				src={avatar}
-				alt={`Avatar ${avatar}`}
-				className="w-full rounded-lg"
-				/>
-			</button>
-		  ))}
-		</div>
-		<div className="mt-4">
-		<label className="block text-silver-400 mb-2">
-			{t('profile_editor_upload_avatar')}
-		</label>
-
-		<input
-			type="file"
-			accept="image/*"
-			onChange={(e) => {
-				const selectedFile = e.target.files?.[0];
-				if (!selectedFile) return;
-
-				setFile(selectedFile);
-
-				if (preview) URL.revokeObjectURL(preview);
-				setPreview(URL.createObjectURL(selectedFile));
-			}}
-			className="text-sm text-silver-300"
-		/>
-		</div>
-	  </div>
-
-	  <button
-		onClick={() => void handleSave()}
-		disabled={saving}
-		className="rounded-lg bg-gold-500/20 border border-gold-500 px-4 py-2 text-gold-300"
-	  >
-		{saving ? t('profile_editor_saving') : t('profile_editor_save')}
-	  </button>
-
-	  {message && (
-		<p className="mt-3 text-sm text-silver-400">
-		  {message}
-		</p>
-	  )}
-	</div>
+      {message && (
+        <p className="mt-3 text-sm text-silver-400" role="status">
+          {message}
+        </p>
+      )}
+    </div>
   );
 }
