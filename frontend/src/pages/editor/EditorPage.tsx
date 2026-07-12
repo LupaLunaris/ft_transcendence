@@ -370,9 +370,10 @@ export function EditorPage() {
 		  </div>
 		</div>
 
-		<div className="flex gap-6 flex-wrap">
-		  {/* Left panel: tile selector + name */}
-		  <div className="flex flex-col gap-5 w-44 shrink-0">
+		<div className="flex gap-6">
+		  {/* LEFT PANEL */}
+		<div className="flex flex-col gap-5 w-44 shrink-0">
+			{/* Tiles + nom map etc */}
 			<Input
 			  label={adminMode ? t('editor_page.level_name_label') : t('editor_page.map_name_label')}
 			  value={mapName}
@@ -383,13 +384,10 @@ export function EditorPage() {
 			/>
 			<TileSelector selected={selectedTile} onChange={setSelectedTile} />
 		  </div>
-		  <MapSettingsPanel
-			settings={settings}
-			onChange={setSettings}
-			/>
 
-		  {/* Grid */}
-		  <div className="flex-1 overflow-auto">
+		  {/* CENTER = GRID */}
+		<div className="flex-1 flex justify-center">
+			{/* GRID */}
 			<EditorGrid
 			  grid={grid}
 			  selectedTile={selectedTile}
@@ -398,67 +396,82 @@ export function EditorPage() {
 			/>
 		  </div>
 
-		  {/* Maps Grid */}
-		  {!adminMode && (
-			<div className="flex flex-col gap-2 w-52 shrink-0">
-			  <p className="text-xs font-medium text-white/50 uppercase tracking-wide mb-1">
+		  <div className="flex flex-col gap-5 w-72 shrink-0">
+
+		{/* SETTINGS */}
+		<MapSettingsPanel
+			settings={settings}
+			onChange={setSettings}
+		/>
+
+		{/* MES MAPS */}
+		{!adminMode && (
+			<div className="bg-[#111] border border-[#444] rounded-lg p-4 flex flex-col gap-2">
+			
+			<p className="text-xs font-medium text-white/50 uppercase tracking-wide mb-1">
 				{t('editor_page.my_maps')}
-			  </p>
-			  {loadingMyMaps ? (
+			</p>
+
+			{loadingMyMaps ? (
 				<div className="flex justify-center pt-4">
-				  <Spinner size="sm" className="text-deep-400" />
+				<Spinner size="sm" className="text-deep-400" />
 				</div>
-			  ) : myMaps.length === 0 ? (
+			) : myMaps.length === 0 ? (
 				<p className="text-white/30 text-xs">
-				  {t('editor_page.no_saved_maps')}
+				{t('editor_page.no_saved_maps')}
 				</p>
-			  ) : (
+			) : (
 				myMaps.map((m) => (
-				  <div
+				<div
 					key={m.id}
 					className={[
-					  'flex items-center justify-between gap-2 px-3 py-2 rounded border text-sm transition-colors',
-					  m.id === mapId
+					'flex items-center justify-between gap-2 px-3 py-2 rounded border text-sm transition-colors',
+					m.id === mapId
 						? 'bg-deep-500 border-deep-300 text-white'
 						: 'bg-surface-raised border-surface-border text-white/70 hover:text-white',
 					].join(' ')}
-				  >
+				>
 					<button
-					  className="flex-1 text-left truncate min-w-0"
-					  onClick={() => handleLoadMap(m)}
+					className="flex-1 text-left truncate min-w-0"
+					onClick={() => handleLoadMap(m)}
 					>
-					  <span className="block truncate font-medium">{m.name}</span>
+					<span className="block truncate font-medium">{m.name}</span>
 					</button>
+
 					<Button
-					  variant="danger"
-					  size="sm"
-					  onClick={() => {
+					variant="danger"
+					size="sm"
+					onClick={() => {
 						setMapToDelete(m.id);
 						setShowDeleteModal(true);
-					  }}
+					}}
 					>
-					  {t('editor_page.delete')}
+					{t('editor_page.delete')}
 					</Button>
-				  </div>
+				</div>
 				))
-			  )}
-			  <Button
+			)}
+
+			<Button
 				variant="ghost"
 				size="sm"
 				onClick={() => {
-				  setGrid(makeEmptyGrid());
-				  setMapName('');
-				  setMapId(null);
-				  setIsPublished(false);
-				  setCreatorCompleted(false);
-				  setHasUnsavedChanges(false);
-				  navigate('/editor', { replace: true });
+				setGrid(makeEmptyGrid());
+				setMapName('');
+				setMapId(null);
+				setIsPublished(false);
+				setCreatorCompleted(false);
+				setHasUnsavedChanges(false);
+				navigate('/editor', { replace: true });
 				}}
-			  >
+			>
 				{t('editor_page.create_new_map')}
-			  </Button>
+			</Button>
+
 			</div>
-		  )}
+		)}
+
+		</div>
 
 		  {/* Admin right panel */}
 		  {adminMode && (

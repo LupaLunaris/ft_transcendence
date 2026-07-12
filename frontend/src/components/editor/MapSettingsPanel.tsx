@@ -7,40 +7,48 @@ interface Props {
 
 export default function MapSettingsPanel({ settings, onChange }: Props) {
   return (
-	<div>
-	  <h3>Map Settings</h3>
+	<div className="bg-[#111] border border-[#444] rounded-lg p-4 flex flex-col gap-4">
 
-	  <label>
-		Size:
+	  <h3 className="text-sm font-bold uppercase text-gray-300">
+		Map Settings
+	  </h3>
+
+	  {/* SIZE */}
+	  <div className="flex flex-col gap-1">
+		<label className="text-xs text-gray-400">Size</label>
 		<select
 		  value={settings.size}
 		  onChange={(e) =>
 			onChange({ ...settings, size: Number(e.target.value) })
 		  }
+		  className="bg-black border border-gray-600 p-1 rounded"
 		>
 		  <option value={15}>15</option>
 		  <option value={25}>25</option>
 		  <option value={35}>35</option>
 		</select>
-	  </label>
+	  </div>
 
-	  <label>
-		Enemies:
+	  {/* ENEMIES */}
+	  <div className="flex flex-col gap-1">
+		<label className="text-xs text-gray-400">Enemies</label>
 		<select
 		  value={settings.enemyCount}
 		  onChange={(e) =>
 			onChange({ ...settings, enemyCount: Number(e.target.value) })
 		  }
+		  className="bg-black border border-gray-600 p-1 rounded"
 		>
 		  <option value={0}>0</option>
 		  <option value={2}>2</option>
 		  <option value={5}>5</option>
 		  <option value={10}>10</option>
 		</select>
-	  </label>
+	  </div>
 
-	  <label>
-		Speed:
+	  {/* SPEED */}
+	  <div className="flex flex-col gap-1">
+		<label className="text-xs text-gray-400">Speed</label>
 		<select
 		  value={settings.enemySpeed}
 		  onChange={(e) =>
@@ -49,12 +57,14 @@ export default function MapSettingsPanel({ settings, onChange }: Props) {
 			  enemySpeed: e.target.value as MapSettings["enemySpeed"],
 			})
 		  }
+		  className="bg-black border border-gray-600 p-1 rounded"
 		>
-		  <option value="slow">slow</option>
-		  <option value="normal">normal</option>
-		  <option value="fast">fast</option>
+		  <option value="slow">Slow</option>
+		  <option value="normal">Normal</option>
+		  <option value="fast">Fast</option>
 		</select>
-	  </label>
+	  </div>
+
 	</div>
   );
 }
