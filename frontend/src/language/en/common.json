@@ -169,6 +169,7 @@
     "not_found_page.back_homepage": "Back to home",
 
     "profile_page.profile": "Profile",
+	"profile_editor_upload_avatar": "Upload an image",
 
     "tower_page.title": "The Tower",
     "tower_page.success": "Tower completed! You are the Master of the Depths.",

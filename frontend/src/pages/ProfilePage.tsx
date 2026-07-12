@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* ProfilePage.tsx                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jpaulis <jpaulis@student.42belgium.be        +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jpaulis         #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jpaulis        ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Layout } from '@/components/layout/Layout';
 import { Spinner } from '@/components/ui/Spinner';
@@ -16,31 +5,32 @@ import { useAuth } from '@/context/auth.context';
 import { useTranslation } from 'react-i18next';
 import { FriendsList } from '@/components/friends/FriendsList';
 import { ProfileEditor } from '@/components/profile/ProfileEditor';
+import { Avatar } from '@/components/profile/Avatar';
 
 export function ProfilePage() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <Layout>
-        <div className="py-20 flex justify-center">
-          <Spinner />
-        </div>
-      </Layout>
-    );
+	return (
+	  <Layout>
+		<div className="py-20 flex justify-center">
+		  <Spinner />
+		</div>
+	  </Layout>
+	);
   }
 
   if (!user) {
-    return (
-      <Layout>
-        <div className="max-w-2xl mx-auto px-4 py-12 text-center text-white/60">
-          <p>
+	return (
+	  <Layout>
+		<div className="max-w-2xl mx-auto px-4 py-12 text-center text-white/60">
+		  <p>
 			{t('profile_page_offline_error')}
 		  </p>
-        </div>
-      </Layout>
-    );
+		</div>
+	  </Layout>
+	);
   }
 
 	return (
@@ -57,16 +47,12 @@ export function ProfilePage() {
 
 		<div className="gold-edge bg-surface-raised border border-surface-border rounded-xl p-6">
 			<div className="flex flex-col sm:flex-row items-center gap-6">
-			<div className="w-24 h-24 rounded-full bg-gradient-to-br from-diamond-500/20 to-surface-muted border border-gold-500/40 shadow-gold-soft flex items-center justify-center text-3xl font-bold font-fantasy text-gold-200 shrink-0 overflow-hidden">
-				{user.avatar ? (
-				<img
-					src={user.avatar}
-					alt={user.username}
-					className="w-full h-full object-cover"
-				/>
-				) : (
-				user.username.slice(0, 2).toUpperCase()
-				)}
+			<div className="w-24 h-24 rounded-full bg-gradient-to-br from-diamond-500/20 to-surface-muted border border-gold-500/40 shadow-gold-soft flex items-center justify-center shrink-0 overflow-hidden">
+			<Avatar
+				avatarUrl={user.avatar ?? undefined}
+				username={user.username}
+				className="w-full h-full"
+			/>
 			</div>
 
 			<div className="flex-1 text-center sm:text-left">
