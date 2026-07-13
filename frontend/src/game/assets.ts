@@ -42,3 +42,12 @@ export const ASSET_SPRITE_PLAYER_JER = '/assets/sprites/jerem.png';
 export const ASSET_SPRITE_PLAYER_HERO = '/assets/sprites/hero_walking.png';
 export const ASSET_SPRITE_ENEMY_H = '/assets/sprites/enemy_test.png'; //enemy_h enemy_v
 export const ASSET_SPRITE_ENEMY_V = '/assets/sprites/enemy_test.png';
+
+// Maps the avatar portrait URL (stored in user.avatar) to the in-game spritesheet.
+export const AVATAR_TO_SPRITE: Record<string, string> = {
+  '/assets/avatars/Martin_avatar2.png':    '/assets/sprites/martinPlayer.png',
+  '/assets/avatars/Jerem_avatar.png':  '/assets/sprites/jerem.png',
+  '/assets/avatars/Jen_avatar.png':     '/assets/sprites/JenTopBiche.png',
+  '/assets/avatars/Elise_avatar.png': '/assets/sprites/elise.png',
+};
+export const DEFAULT_PLAYER_SPRITE = '/assets/sprites/martinPlayer.png';

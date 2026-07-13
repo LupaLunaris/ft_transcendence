@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Difficulty, DuelStartPayload } from '@ft/shared';
 import { useAuth } from '@/context/auth.context';
@@ -41,6 +41,8 @@ const DIFFICULTY_COLOR: Record<Difficulty, string> = {
 };
 
 const PAGE_SIZE = 20;
+// Doit rester synchronisé avec MAX_RACE_PLAYERS dans backend/src/socket/duelHandler.ts
+const MAX_LOBBY_PLAYERS = 4;
 
 export function DuelPage() {
   const navigate    = useNavigate();
@@ -63,6 +65,14 @@ export function DuelPage() {
     onDuelStart: handleDuelStart,
     onError: (msg) => setError(msg),
   });
+
+  // Force un re-render chaque seconde pour rafraîchir le compte à rebours
+  // affiché (dérivé de countdown_ends_at - Date.now(), pas d'état serveur poussé).
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => tick(t => t + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   function handleDifficulty(value: Difficulty | undefined) {
     setDifficulty(value);
@@ -134,11 +144,13 @@ export function DuelPage() {
         {!loading && !mapsError && maps.length > 0 && (
           <div className="flex flex-col gap-3">
             {maps.map((map) => {
+              const entry = lobbyEntries.find(e => e.map_id === map.id);
+              const count = entry?.players.length ?? 0;
               const isRegistered = myRegistrations.has(map.id);
-              const opponentEntry = lobbyEntries.find(
-                e => e.map_id === map.id && e.player.id !== user?.id,
-              );
-              const hasOpponent = !!opponentEntry;
+              const isFull = count >= MAX_LOBBY_PLAYERS;
+              const secondsLeft = entry?.countdown_ends_at
+                ? Math.max(0, Math.ceil((entry.countdown_ends_at - Date.now()) / 1000))
+                : null;
 
               return (
                 <div
@@ -155,18 +167,12 @@ export function DuelPage() {
                     </p>
                   </div>
 
-                  {/* Zone joueur + bouton */}
+                  {/* Zone lobby + bouton */}
                   <div className="flex items-center gap-3">
-                    {/* Adversaire en attente */}
-                    {hasOpponent && !isRegistered && (
+                    {count > 0 && (
                       <span className="text-sm text-white/70 font-medium">
-                        {opponentEntry.player.username}
-                      </span>
-                    )}
-                    {/* Moi-même inscrit */}
-                    {isRegistered && (
-                      <span className="text-sm text-deep-300 font-medium">
-                        {user?.username}
+                        {t('duel_page.registered_count', { count, max: MAX_LOBBY_PLAYERS })}
+                        {secondsLeft !== null && ` · ${t('duel_page.starts_in', { seconds: secondsLeft })}`}
                       </span>
                     )}
 
@@ -179,22 +185,14 @@ export function DuelPage() {
                       >
                         {t('duel_page.registered')}
                       </Button>
-                    ) : hasOpponent ? (
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => joinLobby(map.id)}
-                      >
-                        {t('duel_page.challenge')}
-                      </Button>
                     ) : (
                       <Button
                         variant="primary"
                         size="sm"
-                        disabled={maxReached || !connected}
+                        disabled={maxReached || !connected || isFull}
                         onClick={() => { setError(null); joinLobby(map.id); }}
                       >
-                        {t('common.to_register')}
+                        {isFull ? t('duel_page.full') : t('common.to_register')}
                       </Button>
                     )}
                   </div>

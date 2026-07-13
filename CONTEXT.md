@@ -62,36 +62,45 @@ type Direction = 'up' | 'down' | 'left' | 'right'
 interface Position { x: number; y: number }           // x=col, y=row dans la grille
 interface PlayerState {
   id: string; username: string; avatar: string | null;
-  position: Position; direction: Direction; alive: boolean;
+  position: Position; direction: Direction; alive: boolean; finished: boolean;
 }
+type EnemyKind = 'horizontal' | 'vertical'
+interface EnemyState { id: string; kind: EnemyKind; position: Position; direction: Direction }
 interface GameState {
-  race_id: string; map_id: string; players: PlayerState[];
+  race_id: string; map_id: string; players: PlayerState[]; enemies: EnemyState[];
   tick: number; started: boolean; finished: boolean;
 }
-interface RaceResult {
-  winner_id: string; loser_id: string; duration_ms: number;
-  map_id: string; created_at: string;
+interface RaceRankingEntry {
+  user_id: string; username: string; rank: number;
+  duration_ms: number | null; finished: boolean;   // duration_ms null si pas fini (mort/forfait)
 }
+interface RaceResult { race_id: string; map_id: string; ranking: RaceRankingEntry[]; created_at: string }
 
-// socket.types.ts
-interface LobbyEntry { map_id: string; player: { id, username, avatar } }
-interface DuelStartPayload { race_id, map_id, grid: Grid, opponent: { id, username, avatar } }
+// socket.types.ts — généralisé 2-4 joueurs (plus de opponent/player singuliers)
+interface LobbyEntry { map_id: string; players: { id, username, avatar }[]; countdown_ends_at: number | null }
+interface DuelStartPayload { race_id, map_id, grid: Grid, opponents: { id, username, avatar }[] }  // 1 à 3 adversaires
 interface ClientToServerEvents {
   player_input: (data: { direction: Direction }) => void;
   join_lobby:   (data: { map_id: string }) => void;
   leave_lobby:  () => void;
   join_race:    (data: { race_id: string }) => void;  // rejoint la room de course
-  player_died:  () => void;                           // mort par ennemi (côté client)
+  // player_died SUPPRIMÉ — collision ennemie détectée uniquement côté serveur (tick)
 }
 interface ServerToClientEvents {
   game_state:    (state: GameState) => void;
   race_finished: (result: RaceResult) => void;
-  player_joined: (player: PlayerState) => void;
-  player_left:   (data: { player_id: string }) => void;
+  player_joined: (player: PlayerState) => void;   // non utilisé actuellement
+  player_left:   (data: { player_id: string }) => void;  // non utilisé actuellement
   error_event:   (data: { message: string; code: number }) => void;
-  lobby_state:   (data: { entries: LobbyEntry[] }) => void;  // état global lobby
-  duel_start:    (payload: DuelStartPayload) => void;        // match trouvé
+  lobby_state:   (data: { entries: LobbyEntry[] }) => void;
+  duel_start:    (payload: DuelStartPayload) => void;
 }
+
+// shared/src/game/enemyLogic.ts (nouveau) — logique de rebond déterministe
+// partagée entre backend (tick autoritaire) et frontend (types + parsing grille)
+type EnemyRuntimeState = { id: string; kind: EnemyKind; x: number; y: number; dx: 1|-1; dy: 1|-1; direction: Direction }
+function stepEnemy(state, grid): EnemyRuntimeState   // pure, un pas de simulation
+function extractEnemiesFromGrid(grid): EnemyRuntimeState[]   // parse ENEMY_H/ENEMY_V, id = `enemy_${row}_${col}`
 ```
 
 ---
@@ -110,16 +119,17 @@ interface ServerToClientEvents {
 - Mouvement : tween 150ms case par case, accélération progressive → 60ms min
 - Émissions Phaser→React : `this.game.events.emit('player_reached_exit', elapsed_ms)` et `player_caught`
 
-### DuelScene (`frontend/src/game/scenes/DuelScene.ts`) — multijoueur
+### DuelScene (`frontend/src/game/scenes/DuelScene.ts`) — multijoueur 2-4 joueurs
 - Étend `BaseScene`
-- Reçoit `{ grid, my_id, my_username, opponent: { id, username, avatar } }` via `create()`
-- Joueur local : sprite normal, caméra suit le joueur
-- Joueur distant : sprite teinté bleu (0x66aaff), alpha 0.55, label pseudo au-dessus
-- Émissions Phaser→React :
-  - `emit_player_input` → React → `socket.emit('player_input', { direction })`
-  - `player_caught` → React → `socket.emit('player_died')`
-  - `player_reached_exit` — victoire locale (confirmée côté serveur)
-- Écoute `game.events.on('remote_state', handleRemoteState)` — tween vers nouvelle position
+- Reçoit `{ grid, my_id, my_username, my_sprite?, opponents: {id,username,avatar}[], opponent_sprites: Record<user_id,string> }` via `create()`
+- Joueur local : sprite normal (texture `KEY_SPRITE_PLAYER`), caméra suit le joueur
+- Adversaires (1 à 3) : `this.remotes: Map<user_id, RemoteGhost>` — un fantôme par adversaire, chacun avec sa **propre texture** `sprite_opponent_${id}` et son **propre jeu d'anims** `remote_walk_${id}_${dir}`/`remote_idle_${id}_${dir}` (teinté bleu 0x66aaff, alpha 0.55, label pseudo au-dessus)
+  (une anim Phaser garde sa texture d'origine même jouée sur un autre sprite → nécessite un jeu d'animations par texture et par adversaire, cf. `frontend_doc/duel-remote-ghost-sprite-identity.md` et `frontend_doc/duel-nplayer-remote-rendering.md`)
+- Ennemis : **plus de simulation locale** — `spawnEnemies()` crée seulement les sprites visuels via `extractEnemiesFromGrid()` (shared), positions/animations pilotées par le serveur via `handleRemoteEnemies()` (tween 350ms, cadence 400ms). `ENEMY_FRAME_W/H = 240×343`, `.setCrop()` — cf. `frontend_doc/duel-enemy-sprite-crop-freeze.md`
+- Collision joueur/ennemi et arrivée en EXIT : **autoritaires côté serveur**, vérifiées à la fois dans `player_input` (juste après la mise à jour de position) et dans le tick ennemi (400ms) — les deux sont nécessaires, cf. `backend_doc/duel-server-authoritative-enemies.md`. Le client ne fait que geler son propre input : `this.finished = true`, en atteignant visuellement l'EXIT **ou** sur l'event `i_died` (mort confirmée par le serveur, cf. ci-dessous)
+- Émissions Phaser→React : `emit_player_input` → React → `socket.emit('player_input', { direction })`
+- Écoute `game.events.on('remote_states', handleRemoteStates)`, `game.events.on('remote_enemies', handleRemoteEnemies)` et `game.events.on('i_died', handleIDied)` — mouvement local prédictif (tween immédiat) donc sans ce dernier event un joueur tué ne le sait jamais (continue à se déplacer visuellement, ses inputs sont juste ignorés côté serveur)
+- `create()` émet `game.events.emit('scene_ready')` en dernière ligne — `DuelGamePage.tsx` rejoue alors son dernier `game_state` connu (`lastGameStateRef`) vers `remote_states`/`remote_enemies`/`i_died`, pour rattraper tout ce qui a été émis (et perdu, faute de listener) pendant le chargement des textures — cf. `frontend_doc/duel-nplayer-remote-rendering.md` (sinon un adversaire qui finit très vite pendant que cette scène charge encore reste figé au spawn indéfiniment)
 
 ### GameCanvas (`frontend/src/game/GameCanvas.tsx`)
 - Props : `{ grid, player_id, onExit: (ms)=>void, onDeath?: ()=>void }`
@@ -132,29 +142,36 @@ interface ServerToClientEvents {
 
 ---
 
-## Architecture Socket.IO Duel (implémentée)
+## Architecture Socket.IO Duel — 2 à 4 joueurs (implémentée)
 
 ### `backend/src/socket/duelHandler.ts`
 Monofichier — tout le cycle duel en un seul endroit :
 
+**Constantes :** `MIN_RACE_PLAYERS=2` `MAX_RACE_PLAYERS=4` `LOBBY_COUNTDOWN_MS=30_000` `DISCONNECT_GRACE_MS=10_000` `ENEMY_TICK_MS=400`
+
 **État en mémoire :**
 ```
-lobbies:    Map<map_id, LobbyRegistration>    // 1 joueur en attente par map
-socketRegs: Map<socket_id, Set<map_id>>       // inscriptions d'un socket
-activeRaces: Map<race_id, ActiveRace>
-socketRace: Map<socket_id, race_id>
+lobbies:     Map<map_id, LobbyQueue>          // file d'attente 1-4 joueurs par map + countdown_timer
+socketRegs:  Map<socket_id, Set<map_id>>      // inscriptions d'un socket
+activeRaces: Map<race_id, ActiveRace>         // players: Map<user_id, RacePlayer>, enemies: EnemyRuntimeState[], enemy_tick_timer
+socketRace:  Map<socket_id, race_id>
 ```
 
 **Flux duel :**
-1. Client A → `join_lobby({ map_id })` → inscrit dans `lobbies`
-2. Client B → `join_lobby({ map_id })` → match trouvé → `duel_start` émis aux deux (pas de broadcast)
-3. Chaque client → `join_race({ race_id })` → rejoint `race:${race_id}`, la course démarre quand 2 présents
-4. `player_input` → mouvement serveur-autoritaire, `game_state` broadcasté à la room
-5. Exit atteint → `race_finished` + nettoyage
-6. `player_died` (ennemi client) → `race_finished` avec le survivant gagnant
-7. `disconnect` → adversaire gagne par forfait
+1. `join_lobby({map_id})` → ajouté à la `LobbyQueue` de la map ; le countdown de 30s démarre dès le **premier** joueur inscrit
+2. À 4 joueurs → `tryStartRace()` immédiat (countdown annulé). À expiration du countdown : si ≥2 joueurs → démarre avec ce qu'il y a ; si 1 seul → countdown relancé pour 30s de plus (pas de course solo)
+3. `tryStartRace()` crée l'`ActiveRace` (`enemies` extrait via `extractEnemiesFromGrid`), émet `duel_start` à chacun avec `opponents` = les autres joueurs du groupe
+4. Chaque client → `join_race({race_id})` → rejoint `race:${race_id}` ; la course démarre (`race.started=true`) quand `room.size === race.players.size` ; démarre aussi `enemy_tick_timer` (`setInterval` 400ms : `stepEnemy()` sur chaque ennemi, détection collision avec les joueurs vivants, `game_state` broadcasté)
+5. `player_input` → mouvement serveur-autoritaire ; **collision ennemie vérifiée à deux endroits** : ici (juste après la mise à jour de `player.position`) et dans le tick ennemi (étape 4). Nécessaire dans les deux sens — sinon un joueur qui marche sur la case d'un ennemi entre deux ticks (400ms) n'est jamais détecté si l'ennemi a déjà bougé au tick suivant (bug corrigé le 2026-07-07, cf. `backend_doc/duel-server-authoritative-enemies.md`). EXIT atteint (si pas de collision) → `player.finished=true` + `finish_time`, **la course ne se termine pas pour les autres** (`isRaceOver()` = tous `finished || !alive`)
+6. `isRaceOver()` vrai → `finishRace()` calcule le classement (`buildRanking()` : finishers triés par `duration_ms` croissant, puis non-finishers par `death_time` décroissant) et émet `race_finished` avec `RaceResult.ranking`
+7. `disconnect` pendant une course active (joueur encore vivant/pas fini) → délai de grâce **10000ms** — `RacePlayer.connected=false` + `setTimeout` → `resolvePlayerLoss()` si toujours déconnecté à expiration ; annulé si le même `user.id` rejoint via `join_race` avant. **Ne termine plus toute la course** : seul ce joueur est résolu, `isRaceOver()` décide de la suite. Désinscription du lobby en attente : toujours immédiate, sans délai.
+8. `player_died` (event client) **supprimé du protocole** — toute collision ennemie est détectée côté serveur (étape 5), plus jamais signalée par le client
 
-**Limite lobby :** max 3 inscriptions simultanées par socket
+**Limite lobby :** max 3 maps simultanées par socket (inchangé) ; max 4 joueurs par course
+
+Docs de référence : `backend_doc/duel-nplayer-lobby-and-race-lifecycle.md`,
+`backend_doc/duel-server-authoritative-enemies.md`,
+`backend_doc/duel-reconnection-grace-period.md` (superseded, voir note en tête de fichier).
 
 ### `backend/src/server.ts`
 - Appelle `registerDuelHandlers(io)` — c'est là que l'auth JWT et les handlers sont montés
@@ -189,16 +206,17 @@ socketRace: Map<socket_id, race_id>
 
 ### DuelPage (`frontend/src/pages/duel/DuelPage.tsx`)
 - Liste les maps publiées avec pagination et filtre difficulté
-- Affiche le lobby global (qui attend sur quelle map)
-- Hook `useDuelLobby` gère la connexion Socket.IO et les events
-- Bouton "S'inscrire" / "Défier" / "Inscrit" selon l'état
+- Affiche le lobby global : par map, `{{count}}/4 inscrits` + `Départ dans {{seconds}}s` (dérivé de `LobbyEntry.countdown_ends_at`, re-rendu chaque seconde via un tick local)
+- Hook `useDuelLobby` gère la connexion Socket.IO et les events ; `myRegistrations` dérivé de `LobbyEntry.players.some(p => p.id === userId)`
+- Bouton "S'inscrire" / "Inscrit" / "Complet" selon l'état (le bouton "Défier" 1v1 a disparu — c'est maintenant une file d'attente, pas un défi ciblé)
 
 ### DuelGamePage (`frontend/src/pages/duel/DuelGamePage.tsx`)
-- Reçoit `DuelStartPayload` via `location.state` (navigate depuis DuelPage)
+- Reçoit `DuelStartPayload` (`opponents[]`) via `location.state` (navigate depuis DuelPage)
 - Crée un 2ème socket pour le jeu (séparé du socket lobby)
-- Crée `DuelScene` via Phaser après `game.events.once('ready')`
-- Overlay "En attente..." jusqu'à `game_state.started === true`
-- Overlay résultat (victoire/défaite) sur `race_finished`
+- Crée `DuelScene` via Phaser après `game.events.once('ready')`, avec `opponent_sprites: Record<user_id,string>` résolu via `AVATAR_TO_SPRITE`
+- `game_state` → `remote_states` (tous les adversaires) + `remote_enemies` émis vers Phaser ; si `me.alive === false` → `setMyAlive(false)` + `game.events.emit('i_died')` (sinon le joueur mort continue de bouger visuellement sans le savoir, cf. `backend_doc/duel-server-authoritative-enemies.md`)
+- Overlay "En attente..." jusqu'à `game_state.started === true` ; "Terminé ! En attente des autres…" si le joueur local a fini ; "Éliminé ! En attente des autres…" si mort — dans les deux cas tant que `race_finished` n'est pas arrivé
+- Overlay résultat : classement complet (`RaceResult.ranking`), victoire si `rank === 1`
 
 ---
 
@@ -226,11 +244,19 @@ socketRace: Map<socket_id, race_id>
 - Éditeur de maps (create/edit/delete/publish/unpublish/complete)
 - Mode solo (`/play/:map_id`) — GameScene avec ennemis
 - Mode tour (`/tower` + `/play/tower/:order_index`) — 8 niveaux AdminMap
-- Mode duel (`/duel` + `/duel/game`) — Socket.IO temps réel, 2 joueurs
+- Mode duel (`/duel` + `/duel/game`) — Socket.IO temps réel, **2 à 4 joueurs**, ennemis serveur-autoritaires, reconnexion 10s, classement complet
 - Admin : éditeur de niveaux de la tour dans EditorPage
 - Scores : leaderboard par map, enregistrement après course solo
 
-## Ce qui reste (branche actuelle : feature/add-maps-panel-and-saved-maps)
+## Ce qui reste (branche actuelle : feature/multi-player-fair-play)
 - Panel maps dans l'éditeur : affiché, delete fonctionnel (commit 924e5f2)
 - Potentiel : persistance des scores en fin de duel (non implémentée côté duelHandler)
 - RacePage (`/play/:map_id/race`) : encore placeholder
+- `GameScene.ts` (solo) n'utilise pas `shared/game/enemyLogic.ts` — garde sa propre classe `entities/Enemy.ts`, ce qui est correct (pas de sync à assurer en solo) mais crée une duplication d'algorithme assumée (cf. `backend_doc/duel-server-authoritative-enemies.md`)
+
+## /duel généralisé à 2-4 joueurs — implémenté (2026-07-07)
+Docs de référence (mises à jour post-implémentation, avec les écarts par rapport à la version planifiée) :
+- `backend_doc/duel-nplayer-lobby-and-race-lifecycle.md`
+- `backend_doc/duel-server-authoritative-enemies.md`
+- `frontend_doc/duel-nplayer-remote-rendering.md`
+- `backend_doc/duel-reconnection-grace-period.md` (superseded — voir note en tête)

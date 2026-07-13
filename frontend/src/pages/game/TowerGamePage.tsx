@@ -13,6 +13,7 @@
 import { useCallback, useState, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth.context';
+import { AVATAR_TO_SPRITE, DEFAULT_PLAYER_SPRITE } from '@/game/assets';
 import { useApi } from '@/hooks/useApi';
 import { api, type TowerLevelFull } from '@/services/api.service';
 import { Spinner } from '@/components/ui/Spinner';
@@ -129,6 +130,7 @@ return (
         key={gameKey}
         grid={level.grid_json}
         player_id={user!.id}
+        player_sprite={AVATAR_TO_SPRITE[user!.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE}
         onExit={handleExit}
         onDeath={handleDeath}
       />

@@ -31,6 +31,8 @@ import { TowerGamePage } from '@/pages/game/TowerGamePage';
 import { DuelPage }      from '@/pages/duel/DuelPage';
 import { DuelGamePage }  from '@/pages/duel/DuelGamePage';
 import { NotFoundPage }  from '@/pages/NotFoundPage';
+import { TermsOfServicePage } from '@/pages/legal/TermsOfServicePage';
+import { PrivacyPolicyPage } from '@/pages/legal/PrivacyPolicyPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -66,7 +68,9 @@ function AppRoutes() {
       <Route path="/play/:map_id/race"       element={<ProtectedRoute><RacePage /></ProtectedRoute>} />
       <Route path="/duel"                    element={<ProtectedRoute><DuelPage /></ProtectedRoute>} />
       <Route path="/duel/game"               element={<ProtectedRoute><DuelGamePage /></ProtectedRoute>} />
-
+      <Route path="/terms"                   element={<TermsOfServicePage />} />
+      <Route path="/privacy"                 element={<PrivacyPolicyPage />} />
+  
       {/* 404 */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

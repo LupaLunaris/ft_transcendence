@@ -14,19 +14,16 @@ import Phaser from 'phaser';
 import { TILE, GRID_SIZE, type Grid, type Direction } from '@ft/shared';
 import { BaseScene, TILE_SIZE } from './BaseScene';
 import {
-	KEY_SPRITE_PLAYER, ASSET_SPRITE_PLAYER,
-	ASSET_SPRITE_PLAYER_ELI,ASSET_SPRITE_PLAYER_JER,ASSET_SPRITE_PLAYER_JEN, ASSET_SPRITE_PLAYER_HERO,
+	KEY_SPRITE_PLAYER,
 	KEY_SPRITE_ENEMY_H, ASSET_SPRITE_ENEMY_H,
 	KEY_SPRITE_ENEMY_V, ASSET_SPRITE_ENEMY_V,
+	DEFAULT_PLAYER_SPRITE,
 } from '../assets';
 import { type Enemy, HorizontalEnemy, VerticalEnemy, type EnemyGameObject } from '../entities/Enemy';
 
 // ─── Constantes de la scène ───────────────────────────────────────────────────
 
 const FRAME_RATE = 8;  // fps animation marche
-
-
-
 
 
 //ATTENTION CE COMENTAIRE N"EST PAS LA PAR ERREUR- Ne pas suprimer
@@ -86,6 +83,7 @@ export class GameScene extends BaseScene {
 	private grid: Grid = [];
 	private gridX = 0;
 	private gridY = 0;
+	private playerSpriteUrl = DEFAULT_PLAYER_SPRITE;
 
 	private player!: Phaser.GameObjects.Sprite;
 
@@ -109,9 +107,14 @@ export class GameScene extends BaseScene {
 		super({ key: 'GameScene' });
 	}
 
+	// ── init ─────────────────────────────────────────────────────────────────────
+	// Phaser appelle init() avant preload() — c'est ici qu'on capture le sprite.
+
+	init(data: { player_sprite?: string }): void {
+		if (data.player_sprite) this.playerSpriteUrl = data.player_sprite;
+	}
+
 	// ── preload ──────────────────────────────────────────────────────────────────
-	// Phaser appelle preload() avant create().
-	// load.spritesheet() charge player.png et le découpe en frames 36×64.
 
 	preload(): void {
 		this.preloadTileAssets();
@@ -124,7 +127,7 @@ export class GameScene extends BaseScene {
 			frameHeight: ENEMY_V_FRAME_H,
 		});
 		if (!this.textures.exists(KEY_SPRITE_PLAYER)) {
-			this.load.spritesheet(KEY_SPRITE_PLAYER,ASSET_SPRITE_PLAYER_JER, {
+			this.load.spritesheet(KEY_SPRITE_PLAYER, this.playerSpriteUrl, {
 				frameWidth: FRAME_W,
 				frameHeight: FRAME_H,
 			});

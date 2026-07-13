@@ -6,7 +6,7 @@
 /*   By: Jdebrull <jdebrull@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/12 11:31:30 by Jdebrull          #+#    #+#             */
-/*   Updated: 2026/06/12 11:31:34 by Jdebrull         ###   ########.fr       */
+/*   Updated: 2026/07/07 00:00:00 by Jdebrull         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,22 @@ import type {
   Direction,
   GameState,
   RaceResult,
+  RaceRankingEntry,
   LobbyEntry,
   DuelStartPayload,
   ClientToServerEvents,
   ServerToClientEvents,
 } from '@ft/shared';
-import { TILE, GRID_SIZE } from '@ft/shared';
+import { TILE, GRID_SIZE, extractEnemiesFromGrid, stepEnemy, type EnemyRuntimeState } from '@ft/shared';
 import { onlineUsers } from '../state/online.state';
+
+// ─── Constantes ──────────────────────────────────────────────────────────────
+
+const MIN_RACE_PLAYERS = 2;
+const MAX_RACE_PLAYERS = 4;
+const LOBBY_COUNTDOWN_MS = 30_000;
+const DISCONNECT_GRACE_MS = 10_000;
+const ENEMY_TICK_MS = 400;
 
 // ─── Types internes ───────────────────────────────────────────────────────────
 
@@ -34,9 +43,11 @@ interface SocketUser {
   avatar: string | null;
 }
 
-interface LobbyRegistration {
-  user: SocketUser;
-  socket_id: string;
+interface LobbyQueue {
+  players: SocketUser[]; // 1 à MAX_RACE_PLAYERS, ordre d'arrivée
+  socket_ids: Map<string, string>; // user_id → socket_id (pour retirer un joueur précis)
+  countdown_timer?: ReturnType<typeof setTimeout>;
+  countdown_ends_at: number | null;
 }
 
 interface RacePlayer {
@@ -46,14 +57,20 @@ interface RacePlayer {
   direction: Direction;
   alive: boolean;
   finished: boolean;
+  connected: boolean;
   start_time: number;
+  finish_time?: number;
+  death_time?: number;
+  disconnect_timer?: ReturnType<typeof setTimeout>;
 }
 
 interface ActiveRace {
   race_id: string;
   map_id: string;
   grid: Grid;
-  players: Map<string, RacePlayer>;
+  players: Map<string, RacePlayer>; // user_id → RacePlayer
+  enemies: EnemyRuntimeState[];
+  enemy_tick_timer?: ReturnType<typeof setInterval>;
   started: boolean;
   finished: boolean;
   tick: number;
@@ -62,8 +79,8 @@ interface ActiveRace {
 
 // ─── État en mémoire ──────────────────────────────────────────────────────────
 
-// map_id → joueur en attente
-const lobbies = new Map<string, LobbyRegistration>();
+// map_id → file d'attente
+const lobbies = new Map<string, LobbyQueue>();
 // socket_id → ensemble de map_ids où ce joueur est inscrit
 const socketRegs = new Map<string, Set<string>>();
 // race_id → état de la course
@@ -74,9 +91,10 @@ const socketRace = new Map<string, string>();
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getLobbyEntries(): LobbyEntry[] {
-  return Array.from(lobbies.entries()).map(([map_id, reg]) => ({
+  return Array.from(lobbies.entries()).map(([map_id, queue]) => ({
     map_id,
-    player: { id: reg.user.id, username: reg.user.username, avatar: reg.user.avatar },
+    players: queue.players.map(u => ({ id: u.id, username: u.username, avatar: u.avatar })),
+    countdown_ends_at: queue.countdown_ends_at,
   }));
 }
 
@@ -100,6 +118,13 @@ function buildGameState(race: ActiveRace): GameState {
       position:  p.position,
       direction: p.direction,
       alive:     p.alive,
+      finished:  p.finished,
+    })),
+    enemies: race.enemies.map(e => ({
+      id:        e.id,
+      kind:      e.kind,
+      position:  { x: e.x, y: e.y },
+      direction: e.direction,
     })),
     tick:     race.tick,
     started:  race.started,
@@ -107,12 +132,50 @@ function buildGameState(race: ActiveRace): GameState {
   };
 }
 
+// Un joueur est résolu quand il a fini (EXIT) ou n'est plus en course (mort/forfait).
+function isRaceOver(race: ActiveRace): boolean {
+  return Array.from(race.players.values()).every(p => p.finished || !p.alive);
+}
+
+function buildRanking(race: ActiveRace): RaceRankingEntry[] {
+  const players = Array.from(race.players.values());
+
+  const finishers = players
+    .filter(p => p.finished)
+    .sort((a, b) => (a.finish_time! - a.start_time) - (b.finish_time! - b.start_time));
+
+  // Non-finishers classés après, par ordre de survie décroissante
+  // (celui qui a tenu le plus longtemps est mieux classé).
+  const others = players
+    .filter(p => !p.finished)
+    .sort((a, b) => (b.death_time ?? Date.now()) - (a.death_time ?? Date.now()));
+
+  return [...finishers, ...others].map((p, i) => ({
+    user_id:     p.user.id,
+    username:    p.user.username,
+    rank:        i + 1,
+    duration_ms: p.finished ? (p.finish_time! - p.start_time) : null,
+    finished:    p.finished,
+  }));
+}
+
 function cleanupLobby(socket_id: string): void {
   const regs = socketRegs.get(socket_id);
   if (!regs) return;
   for (const map_id of regs) {
-    const entry = lobbies.get(map_id);
-    if (entry?.socket_id === socket_id) lobbies.delete(map_id);
+    const queue = lobbies.get(map_id);
+    if (!queue) continue;
+    const user_id = Array.from(queue.socket_ids.entries())
+      .find(([, sid]) => sid === socket_id)?.[0];
+    if (!user_id) continue;
+
+    queue.players = queue.players.filter(u => u.id !== user_id);
+    queue.socket_ids.delete(user_id);
+
+    if (queue.players.length === 0) {
+      if (queue.countdown_timer) clearTimeout(queue.countdown_timer);
+      lobbies.delete(map_id);
+    }
   }
   socketRegs.delete(socket_id);
 }
@@ -120,8 +183,43 @@ function cleanupLobby(socket_id: string): void {
 function cleanupRace(race_id: string): void {
   const race = activeRaces.get(race_id);
   if (!race) return;
-  for (const p of race.players.values()) socketRace.delete(p.socket_id);
+  if (race.enemy_tick_timer) clearInterval(race.enemy_tick_timer);
+  for (const p of race.players.values()) {
+    socketRace.delete(p.socket_id);
+    if (p.disconnect_timer) clearTimeout(p.disconnect_timer);
+  }
   activeRaces.delete(race_id);
+}
+
+function finishRace(io: Server<ClientToServerEvents, ServerToClientEvents>, race: ActiveRace): void {
+  if (race.finished) return;
+  race.finished = true;
+  const result: RaceResult = {
+    race_id:    race.race_id,
+    map_id:     race.map_id,
+    ranking:    buildRanking(race),
+    created_at: new Date().toISOString(),
+  };
+  io.to(`race:${race.race_id}`).emit('race_finished', result);
+  cleanupRace(race.race_id);
+}
+
+// Marque un joueur forfait (mort/déconnexion résolue) et termine la course
+// si c'était le dernier joueur non résolu.
+function resolvePlayerLoss(
+  io: Server<ClientToServerEvents, ServerToClientEvents>,
+  race: ActiveRace,
+  user_id: string,
+): void {
+  if (race.finished) return;
+  const player = race.players.get(user_id);
+  if (!player || !player.alive) return;
+
+  player.alive = false;
+  player.death_time = Date.now();
+  io.to(`race:${race.race_id}`).emit('game_state', buildGameState(race));
+
+  if (isRaceOver(race)) finishRace(io, race);
 }
 
 // ─── Enregistrement des handlers ─────────────────────────────────────────────
@@ -148,6 +246,69 @@ export function registerDuelHandlers(
     }
   });
 
+  // ── Démarrage effectif d'une course à partir d'une file d'attente ─────────
+  async function tryStartRace(map_id: string): Promise<void> {
+    const queue = lobbies.get(map_id);
+    if (!queue) return;
+
+    if (queue.players.length < MIN_RACE_PLAYERS) {
+      // Personne d'autre ne s'est inscrit à temps : on relance l'attente
+      // plutôt que d'annuler l'inscription du joueur déjà présent.
+      queue.countdown_ends_at = Date.now() + LOBBY_COUNTDOWN_MS;
+      queue.countdown_timer = setTimeout(() => void tryStartRace(map_id), LOBBY_COUNTDOWN_MS);
+      io.emit('lobby_state', { entries: getLobbyEntries() });
+      return;
+    }
+
+    if (queue.countdown_timer) clearTimeout(queue.countdown_timer);
+    lobbies.delete(map_id);
+
+    const map = await prisma.map.findUnique({ where: { id: map_id } });
+    if (!map) {
+      for (const socket_id of queue.socket_ids.values()) {
+        io.to(socket_id).emit('error_event', { message: 'Map introuvable', code: 404 });
+      }
+      return;
+    }
+
+    const grid: Grid = JSON.parse(map.grid_json);
+    const spawn = findSpawn(grid);
+    const race_id = crypto.randomUUID();
+
+    const players = new Map<string, RacePlayer>();
+    for (const user of queue.players) {
+      players.set(user.id, {
+        user,
+        socket_id: queue.socket_ids.get(user.id)!,
+        position:  { ...spawn },
+        direction: 'down',
+        alive:     true,
+        finished:  false,
+        connected: true,
+        start_time: 0,
+      });
+    }
+
+    const race: ActiveRace = {
+      race_id, map_id, grid, players,
+      enemies:  extractEnemiesFromGrid(grid),
+      started:  false, finished: false, tick: 0, created_at: Date.now(),
+    };
+    activeRaces.set(race_id, race);
+
+    for (const user of queue.players) {
+      const payload: DuelStartPayload = {
+        race_id, map_id, grid,
+        opponents: queue.players
+          .filter(u => u.id !== user.id)
+          .map(u => ({ id: u.id, username: u.username, avatar: u.avatar })),
+      };
+      io.to(queue.socket_ids.get(user.id)!).emit('duel_start', payload);
+    }
+
+    io.emit('lobby_state', { entries: getLobbyEntries() });
+  }
+
   io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     const user = socket.data.user as SocketUser;
     onlineUsers.add(user.id);
@@ -157,7 +318,7 @@ export function registerDuelHandlers(
     socket.emit('lobby_state', { entries: getLobbyEntries() });
 
     // ── join_lobby ────────────────────────────────────────────────────────────
-    socket.on('join_lobby', async ({ map_id }) => {
+    socket.on('join_lobby', ({ map_id }) => {
       const myRegs = socketRegs.get(socket.id) ?? new Set<string>();
 
       if (myRegs.size >= 3 && !myRegs.has(map_id)) {
@@ -169,67 +330,36 @@ export function registerDuelHandlers(
         return;
       }
 
-      const existing = lobbies.get(map_id);
+      let queue = lobbies.get(map_id);
 
-      if (existing && existing.user.id !== user.id) {
-        // Match trouvé — lancer la course
-        lobbies.delete(map_id);
-        const prevRegs = socketRegs.get(existing.socket_id);
-        if (prevRegs) {
-          prevRegs.delete(map_id);
-          if (prevRegs.size === 0) socketRegs.delete(existing.socket_id);
-        }
-
-        const map = await prisma.map.findUnique({ where: { id: map_id } });
-        if (!map) {
-          socket.emit('error_event', { message: 'Map introuvable', code: 404 });
-          return;
-        }
-        const grid: Grid = JSON.parse(map.grid_json);
-        const spawn = findSpawn(grid);
-        const race_id = crypto.randomUUID();
-
-        const race: ActiveRace = {
-          race_id,
-          map_id,
-          grid,
-          players: new Map([
-            [existing.user.id, {
-              user: existing.user, socket_id: existing.socket_id,
-              position: { ...spawn }, direction: 'down',
-              alive: true, finished: false, start_time: 0,
-            }],
-            [user.id, {
-              user, socket_id: socket.id,
-              position: { ...spawn }, direction: 'down',
-              alive: true, finished: false, start_time: 0,
-            }],
-          ]),
-          started: false, finished: false, tick: 0, created_at: Date.now(),
-        };
-        activeRaces.set(race_id, race);
-
-        const p1: DuelStartPayload = {
-          race_id, map_id, grid,
-          opponent: { id: user.id, username: user.username, avatar: user.avatar },
-        };
-        const p2: DuelStartPayload = {
-          race_id, map_id, grid,
-          opponent: { id: existing.user.id, username: existing.user.username, avatar: existing.user.avatar },
-        };
-        io.to(existing.socket_id).emit('duel_start', p1);
-        socket.emit('duel_start', p2);
-        io.emit('lobby_state', { entries: getLobbyEntries() });
-
-      } else if (!existing) {
-        // Inscription en attente
-        lobbies.set(map_id, { user, socket_id: socket.id });
-        myRegs.add(map_id);
-        socketRegs.set(socket.id, myRegs);
-        io.emit('lobby_state', { entries: getLobbyEntries() });
-      } else {
-        socket.emit('error_event', { message: 'Déjà inscrit', code: 400 });
+      if (queue && queue.players.length >= MAX_RACE_PLAYERS) {
+        socket.emit('error_event', { message: 'Lobby complet', code: 400 });
+        return;
       }
+
+      if (!queue) {
+        queue = { players: [], socket_ids: new Map(), countdown_ends_at: null };
+        lobbies.set(map_id, queue);
+      }
+
+      queue.players.push(user);
+      queue.socket_ids.set(user.id, socket.id);
+      myRegs.add(map_id);
+      socketRegs.set(socket.id, myRegs);
+
+      if (queue.players.length >= MAX_RACE_PLAYERS) {
+        void tryStartRace(map_id);
+        return;
+      }
+
+      // Le countdown démarre dès l'inscription du premier joueur sur cette
+      // map ; tryStartRace() le relance tout seul si <2 joueurs à expiration.
+      if (!queue.countdown_timer) {
+        queue.countdown_ends_at = Date.now() + LOBBY_COUNTDOWN_MS;
+        queue.countdown_timer = setTimeout(() => void tryStartRace(map_id), LOBBY_COUNTDOWN_MS);
+      }
+
+      io.emit('lobby_state', { entries: getLobbyEntries() });
     });
 
     // ── leave_lobby ──────────────────────────────────────────────────────────
@@ -248,15 +378,36 @@ export function registerDuelHandlers(
       socket.join(`race:${race_id}`);
       socketRace.set(socket.id, race_id);
 
-      // Mise à jour socket_id : le game socket ≠ lobby socket
+      // Mise à jour socket_id : le game socket ≠ lobby socket ; gère aussi
+      // la reconnexion (même user_id, nouveau socket).
       const player = race.players.get(user.id);
-      if (player) player.socket_id = socket.id;
+      if (player) {
+        player.socket_id = socket.id;
+        player.connected = true;
+        if (player.disconnect_timer) {
+          clearTimeout(player.disconnect_timer);
+          player.disconnect_timer = undefined;
+        }
+      }
 
       const room = io.sockets.adapter.rooms.get(`race:${race_id}`);
-      if (room && room.size === 2 && !race.started) {
+      if (room && room.size === race.players.size && !race.started) {
         race.started = true;
         const now = Date.now();
         for (const p of race.players.values()) p.start_time = now;
+
+        race.enemy_tick_timer = setInterval(() => {
+          race.enemies = race.enemies.map(e => stepEnemy(e, race.grid));
+
+          for (const p of race.players.values()) {
+            if (!p.alive || p.finished) continue;
+            const hit = race.enemies.some(e => e.x === p.position.x && e.y === p.position.y);
+            if (hit) resolvePlayerLoss(io, race, p.user.id);
+          }
+
+          if (!race.finished) io.to(`race:${race_id}`).emit('game_state', buildGameState(race));
+        }, ENEMY_TICK_MS);
+
         io.to(`race:${race_id}`).emit('game_state', buildGameState(race));
       }
     });
@@ -284,75 +435,53 @@ export function registerDuelHandlers(
       player.direction = direction;
       race.tick++;
 
+      // Vérifie aussi la collision ici (en plus du tick ennemi) : sinon un
+      // joueur qui marche sur la case d'un ennemi entre deux ticks (400ms)
+      // n'est jamais détecté si l'ennemi a déjà bougé au tick suivant —
+      // cf. backend_doc/duel-server-authoritative-enemies.md.
+      const hitEnemy = race.enemies.some(e => e.x === nx && e.y === ny);
+      if (hitEnemy) {
+        resolvePlayerLoss(io, race, user.id);
+        return;
+      }
+
       if (race.grid[ny][nx] === TILE.EXIT) {
-        player.finished = true;
-        race.finished   = true;
-        const elapsed   = Date.now() - player.start_time;
-        const loser     = Array.from(race.players.values()).find(p => p.user.id !== user.id);
-        const result: RaceResult = {
-          winner_id:   user.id,
-          loser_id:    loser?.user.id ?? '',
-          duration_ms: elapsed,
-          map_id:      race.map_id,
-          created_at:  new Date().toISOString(),
-        };
+        player.finished    = true;
+        player.finish_time = Date.now();
+
         io.to(`race:${race_id}`).emit('game_state', buildGameState(race));
-        io.to(`race:${race_id}`).emit('race_finished', result);
-        cleanupRace(race_id);
+        if (isRaceOver(race)) finishRace(io, race);
         return;
       }
 
       io.to(`race:${race_id}`).emit('game_state', buildGameState(race));
     });
 
-    // ── player_died ──────────────────────────────────────────────────────────
-    socket.on('player_died', () => {
-      const race_id = socketRace.get(socket.id);
-      if (!race_id) return;
-      const race = activeRaces.get(race_id);
-      if (!race || race.finished) return;
-
-      const player = race.players.get(user.id);
-      if (!player) return;
-      player.alive  = false;
-      race.finished = true;
-
-      const winner  = Array.from(race.players.values()).find(p => p.user.id !== user.id);
-      const result: RaceResult = {
-        winner_id:   winner?.user.id ?? '',
-        loser_id:    user.id,
-        duration_ms: Date.now() - (player.start_time || race.created_at),
-        map_id:      race.map_id,
-        created_at:  new Date().toISOString(),
-      };
-      io.to(`race:${race_id}`).emit('game_state', buildGameState(race));
-      io.to(`race:${race_id}`).emit('race_finished', result);
-      cleanupRace(race_id);
-    });
-
     // ── disconnect ───────────────────────────────────────────────────────────
     socket.on('disconnect', () => {
       onlineUsers.delete(user.id);
       console.log(`[duel] ${user.username} disconnected`);
+      // Désinscription immédiate des lobbies en attente — pas de délai de
+      // grâce hors course active.
       cleanupLobby(socket.id);
 
       const race_id = socketRace.get(socket.id);
+      socketRace.delete(socket.id);
+
       if (race_id) {
         const race = activeRaces.get(race_id);
-        if (race && !race.finished) {
-          race.finished = true;
-          const player = race.players.get(user.id);
-          if (player) player.alive = false;
-          const winner = Array.from(race.players.values()).find(p => p.user.id !== user.id);
-          const result: RaceResult = {
-            winner_id:   winner?.user.id ?? '',
-            loser_id:    user.id,
-            duration_ms: Date.now() - race.created_at,
-            map_id:      race.map_id,
-            created_at:  new Date().toISOString(),
-          };
-          io.to(`race:${race_id}`).emit('race_finished', result);
-          cleanupRace(race_id);
+        const player = race?.players.get(user.id);
+
+        // Ignore si un autre socket a déjà repris ce joueur (reconnexion plus
+        // rapide que la propagation de l'event 'disconnect' de l'ancien socket).
+        if (race && !race.finished && player && player.socket_id === socket.id && player.alive && !player.finished) {
+          player.connected = false;
+          player.disconnect_timer = setTimeout(() => {
+            const stillDisconnected = race.players.get(user.id);
+            if (stillDisconnected && !stillDisconnected.connected) {
+              resolvePlayerLoss(io, race, user.id);
+            }
+          }, DISCONNECT_GRACE_MS);
         }
       }
 
