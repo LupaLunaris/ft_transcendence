@@ -176,10 +176,10 @@ docker-up: certs ## Build and start all services in detached mode
 	$(COMPOSE) up --build -d postgres
 	$(COMPOSE) up --build -d --no-deps vault
 	@$(MAKE) vault-wait
-	@if [ ! -f vault/secrets/init-output.txt ]; then \
-		$(MAKE) vault-init; \
-	else \
+	@if docker exec vault vault status 2>/dev/null | grep -q 'Initialized.*true'; then \
 		$(MAKE) vault-unseal; \
+	else \
+		$(MAKE) vault-init; \
 	fi
 	$(COMPOSE) up --build -d
 	@printf "$(GREEN)Services running:$(RESET)\n"
@@ -191,6 +191,7 @@ docker-down: ## Stop and remove containers (keeps volumes)
 
 docker-down-v: ## Stop and remove containers AND volumes (wipes DB data)
 	$(COMPOSE) down -v
+	rm -f vault/secrets/init-output.txt
 
 docker-logs: ## Stream logs from all services
 	$(COMPOSE) logs -f

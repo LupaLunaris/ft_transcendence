@@ -40,7 +40,8 @@ openssl x509 -req \
   -days 825 -sha256 \
   -extfile vault-ext.cnf
 
-rm vault.csr vault-ext.cnf ca-cert.srl
+rm vault.csr vault-ext.cnf
+rm -f ca-cert.srl
 
 # Permissions: key must be readable by the vault container's unprivileged user
 chmod 644 ca-cert.pem vault-cert.pem vault-key.pem
