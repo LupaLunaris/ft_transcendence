@@ -4,6 +4,8 @@ networks:
 
 volumes:
   postgres_data:
+  vault_data:
+  vault_logs:
 
 services:
   postgres:
@@ -25,6 +27,54 @@ services:
       timeout: 5s
       retries: 5
 
+  vault:
+    image: hashicorp/vault:1.17
+    container_name: vault
+    restart: unless-stopped
+    environment:
+      - SKIP_CHOWN=1
+      - VAULT_ADDR=https://127.0.0.1:8200
+      - VAULT_CACERT=/vault/certs/ca-cert.pem
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/config:/vault/config
+      - ./vault/certs:/vault/certs:ro
+      - vault_data:/vault/file
+      - vault_logs:/vault/logs
+    networks:
+      - ft_network
+    command: server
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "--no-check-certificate", "https://127.0.0.1:8200/v1/sys/health?standbyok=true"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  waf:
+    image: owasp/modsecurity-crs:nginx-alpine
+    container_name: waf
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      - BACKEND=http://backend:3001
+      - MODSEC_RULE_ENGING=ON
+      - PARANOIA=1
+      - ANOMALY_INBOUND=5
+      - ANOMALY_OUTBOUND=4
+      - PORT=8080
+      - SSL_PORT=8443
+      - MODSEC_AUDIT_LOG=/tmp/modsec_audit.log
+      - MODSEC_AUDIT_LOG_FORMAT=JSON
+      - MODSEC_AUDIT_LOG_TYPE=Serial
+    volumes:
+      - ./nginx/modsec/modsecurity.conf:/etc/nginx/modsec/modsecurity.conf:ro
+    networks:
+      - ft_network
+    ports:
+    - "8080:8080"
+
   backend:
     build:
       context: .
@@ -33,18 +83,24 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      vault:
+        condition: service_started
     environment:
-      DATABASE_URL: ${DATABASE_URL}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      VAULT_ADDR: https://vault:8200
+      VAULT_ROLE_ID: ${VAULT_ROLE_ID}
+      VAULT_SECRET_ID: ${VAULT_SECRET_ID}
+      VAULT_CACERT: /vault/certs/ca-cert.pem
+      NODE_EXTRA_CA_CERTS: /vault/certs/ca-cert.pem
       FRONTEND_URL: ${FRONTEND_URL}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
       NODE_ENV: ${NODE_ENV}
-    ports:
-      - "3001:3001"
+    #ports:
+    #  - "3001:3001"
     networks:
       - ft_network
     volumes:
       - ./backend/src:/app/backend/src
+      - ./vault/certs:/vault/certs:ro
       - /app/node_modules
       - /app/backend/node_modules
 
@@ -58,8 +114,11 @@ services:
     environment:
       VITE_API_URL: /api/v1
       VITE_BACKEND_URL: ${BACKEND_URL}
-      BACKEND_INTERNAL_URL: http://backend:3001
-      NODE_ENV: ${NODE_ENV}
+      BACKEND_INTERNAL_URL: http://waf:8080
+      NODE_ENV: development
+      VITE_HMR_HOST: localhost
+      VITE_HMR_PORT: 5173
+      VITE_HMR_PROTOCOL: ws
     ports:
       - "5173:5173"
     networks:

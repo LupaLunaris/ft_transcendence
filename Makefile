@@ -6,6 +6,7 @@
 		test test-backend test-frontend \
 		docker-build docker-up docker-down docker-down-v docker-logs docker-logs-backend docker-restart \
 		db-generate db-migrate db-seed db-studio \
+		certs vault-init\
 		clean fclean re
 
 # ── Colors ────────────────────────────────────────────────────────────────────
@@ -27,7 +28,7 @@ help: ## Show available commands
 	@grep -E '^(install|dev|docker-up|docker-down|start):.*## ' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS=":.*?## "}; {printf "  $(GREEN)%-22s$(RESET)%s\n", $$1, $$2}'
 	@printf "\n$(CYAN)Advanced commands (optional)$(RESET)\n"
-	@grep -E '^(dev-backend|dev-frontend|build|build-shared|test|test-backend|test-frontend|docker-build|docker-logs|docker-logs-backend|docker-restart):.*## ' $(MAKEFILE_LIST) \
+	@grep -E '^(dev-backend|dev-frontend|build|build-shared|test|test-backend|test-frontend|docker-build|docker-logs|docker-logs-backend|docker-restart|certs):.*## ' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS=":.*?## "}; {printf "  $(GREEN)%-22s$(RESET)%s\n", $$1, $$2}'
 	@printf "\n$(CYAN)Database commands$(RESET)\n"
 	@grep -E '^db-.*:.*## ' $(MAKEFILE_LIST) \
@@ -136,6 +137,13 @@ test-frontend: ## Run frontend tests (Vitest + Testing Library)
 	npm test --workspace=frontend
 
 # ─────────────────────────────────────────────────────────────────────────────
+# SECURITY - Vault TLS certificates
+# ─────────────────────────────────────────────────────────────────────────────
+
+certs: ## Generates self-signed TLS certs for Vault (skips if already present)
+	@./vault/generate-certs.sh
+
+# ─────────────────────────────────────────────────────────────────────────────
 # DOCKER
 # ─────────────────────────────────────────────────────────────────────────────
 # Note: requires a .env at the project root (copy .env.example and fill values)
@@ -143,22 +151,47 @@ test-frontend: ## Run frontend tests (Vitest + Testing Library)
 docker-build: ## Build Docker images (no cache)
 	$(COMPOSE) build --no-cache
 
-docker-up: ## Build and start all services in detached mode
+vault-init: ## First-time Vault setup (called automatically by docker-up)
+	@./vault/vault-init.sh
+
+vault-wait:
+	@echo "Waiting for Vault API..."
+	@until docker exec vault wget --no-check-certificate -qO- https://127.0.0.1:8200/v1/sys/seal-status >/dev/null 2>&1; do \
+		sleep 1; \
+	done
+	@echo "Vault API is reachable."
+
+vault-unseal: vault-wait
+	@printf "$(CYAN)Unsealing Vault...$(RESET)\n"
+	@docker exec vault vault operator unseal "$$(sed -E 's/\x1B\[[0-9;]*[mK]//g' vault/secrets/init-output.txt | grep 'Unseal Key 1:' | awk '{print $$NF}' | tr -d '\r')"
+	@docker exec vault vault operator unseal "$$(sed -E 's/\x1B\[[0-9;]*[mK]//g' vault/secrets/init-output.txt | grep 'Unseal Key 2:' | awk '{print $$NF}' | tr -d '\r')"
+	@docker exec vault vault operator unseal "$$(sed -E 's/\x1B\[[0-9;]*[mK]//g' vault/secrets/init-output.txt | grep 'Unseal Key 3:' | awk '{print $$NF}' | tr -d '\r')"
+	@docker exec vault vault status
+
+docker-up: certs ## Build and start all services in detached mode
 	@if [ ! -f .env ]; then \
 		printf "$(RED)Error: .env not found. Copy .env.example and fill in values.$(RESET)\n"; \
 		exit 1; \
 	fi
+	$(COMPOSE) up --build -d postgres
+	$(COMPOSE) up --build -d --no-deps vault
+	@$(MAKE) vault-wait
+	@if docker exec vault vault status 2>/dev/null | grep -q 'Initialized.*true'; then \
+		$(MAKE) vault-unseal; \
+	else \
+		$(MAKE) vault-init; \
+	fi
 	$(COMPOSE) up --build -d
 	@printf "$(GREEN)Services running:$(RESET)\n"
 	@printf "  Frontend: http://localhost:5173\n"
-	@printf "  Backend:  http://localhost:3001/api/health\n"
-	@printf "  Postgres: localhost:5432\n"
+	@printf "  WAF:      http://localhost:8080\n"
 
 docker-down: ## Stop and remove containers (keeps volumes)
 	$(COMPOSE) down
 
 docker-down-v: ## Stop and remove containers AND volumes (wipes DB data)
 	$(COMPOSE) down -v
+	rm -f vault/secrets/init-output.txt
 
 docker-logs: ## Stream logs from all services
 	$(COMPOSE) logs -f
@@ -166,8 +199,11 @@ docker-logs: ## Stream logs from all services
 docker-logs-backend: ## Stream backend logs only
 	$(COMPOSE) logs -f backend
 
-docker-restart: ## Tear down, rebuild, and restart all services
+docker-restart: certs ## Tear down, rebuild, and restart all services
 	$(COMPOSE) down
+	$(COMPOSE) up --build -d postgres
+	$(COMPOSE) up --build -d --no-deps vault
+	@$(MAKE) vault-unseal
 	$(COMPOSE) up --build -d
 
 # ─────────────────────────────────────────────────────────────────────────────
