@@ -1,48 +1,42 @@
 # Dependencies
-
 node_modules/
 
 # Environment files
-
 .env
 .env.local
 .env.*.local
 
 # Logs
-
 *.log
 logs/
 
 # Build folders
-
 dist/
 build/
 
 # Cache
-
 .cache/
 .tmp/
 temp/
 
 # IDE / editor
-
 .vscode/
 .idea/
 
 # OS files
-
 .DS_Store
 Thumbs.db
 
 # Coverage
-
 coverage/
 
 # Database local files
-
 *.sqlite
 *.db
 
 # Docker overrides
-
 docker-compose.override.yml
+
+# Vaultstuff
+vault/certs/*.pem
+vault/secrets/
