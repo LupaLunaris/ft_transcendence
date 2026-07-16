@@ -63,6 +63,7 @@ services:
       - PARANOIA=1
       - ANOMALY_INBOUND=5
       - ANOMALY_OUTBOUND=4
+      - ALLOWED_METHODS=GET HEAD POST PUT DELETE OPTIONS
       - PORT=8080
       - SSL_PORT=8443
       - MODSEC_AUDIT_LOG=/tmp/modsec_audit.log

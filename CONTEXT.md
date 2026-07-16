@@ -203,6 +203,7 @@ Docs de référence : `backend_doc/duel-nplayer-lobby-and-race-lifecycle.md`,
 - Mode admin (`user.is_admin`) : switch pour éditer les niveaux AdminMap de la tour
 - Delete map : modal de confirmation → `api.maps.delete(id)` → `refetchMyMaps()`
 - Hooks utilisés : `useMyMaps()` pour le panel latéral
+- `creator_completed` reset : `PUT /maps/:id` remet `creator_completed=false` dès que `grid` change (`backend/src/routes/maps.routes.ts`). Empêche de republier une map modifiée sans l'avoir re-testée (flow : unpublish → edit grid → publish échouait sinon, cf. `history_debug/2026-07-16_creator-completed-reset-on-edit.md`). `handleSave` capture la réponse de `api.maps.update`/`create` et appelle `setCreatorCompleted(...)` pour que le bouton Publier reflète l'état sans reload.
 
 ### DuelPage (`frontend/src/pages/duel/DuelPage.tsx`)
 - Liste les maps publiées avec pagination et filtre difficulté
@@ -234,8 +235,15 @@ Docs de référence : `backend_doc/duel-nplayer-lobby-and-race-lifecycle.md`,
 - Docker fonctionne (`make docker-up`)
 - PostgreSQL connecté, migrations appliquées (migration unique 20260527000000_init_postgres)
 - Frontend accessible sur http://localhost:5173
-- Backend accessible sur http://localhost:3001
-- Proxy Vite → backend via `BACKEND_INTERNAL_URL=http://backend:3001` (docker-compose.yml)
+- Backend accessible sur http://localhost:3001 (pas de port publié directement, passe par `waf`)
+- Proxy Vite → `waf:8080` (ModSecurity/OWASP CRS) → `backend:3001` (`BACKEND_INTERNAL_URL=http://waf:8080` dans docker-compose.yml)
+- Vault (AppRole) fournit `DATABASE_URL`/`JWT_SECRET` au backend au démarrage (`backend/src/bootstrap.ts`, appelé depuis `index.ts` avant tout import de `server.ts`)
+
+### WAF (ModSecurity/OWASP CRS) — service `waf`
+- Seul `nginx/modsec/modsecurity.conf` est monté dans le conteneur (`main.conf`, `crs-setup.conf`, `override.conf` du repo sont orphelins, non montés — `crs-setup.conf` contient d'ailleurs un typo `/etx/` qui le rendrait de toute façon cassé)
+- Réglage des règles CRS **uniquement** via variables d'environnement du service `waf` dans `docker-compose.yml`, lues par `/docker-entrypoint.d/95-configure-rules.sh` + `configure-rules.v3.conf` de l'image
+- `ALLOWED_METHODS=GET HEAD POST PUT DELETE OPTIONS` — **obligatoire**, sinon toute requête PUT/DELETE (sauvegarde/suppression de map, etc.) est bloquée 403 par la règle CRS 911100 (défaut : `GET HEAD POST OPTIONS` seulement). Bug rencontré et corrigé le 2026-07-16, cf. `history_debug/2026-07-16_waf-blocks-put-delete-maps.md`
+- Si une nouvelle méthode HTTP est utilisée côté API (ex. PATCH), l'ajouter à `ALLOWED_METHODS`
 
 ---
 
