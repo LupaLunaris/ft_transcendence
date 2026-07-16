@@ -390,7 +390,7 @@ export function EditorPage() {
 			{/* GRID */}
 			<EditorGrid
 			  grid={grid}
-			  onTileClick={(!adminMode && isPublished) ? () => {} : setTile}
+			  selectedTile={selectedTile}
 			  onTileClick={(!adminMode && isPublished) ? () => {} : setTile}
 			  onTileRightClick={(!adminMode && isPublished) ? undefined : clearTile}
 			/>

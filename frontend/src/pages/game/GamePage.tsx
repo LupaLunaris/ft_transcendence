@@ -84,6 +84,7 @@ export function GamePage() {
 	  </div>
 	);
   }
+  console.log("MAP SETTINGS FRONT:", map.settings);
 
   const backLabel = map && user && map.creator_id === user.id
 	? t('game_page.backlabel_editor')
