@@ -1,15 +1,5 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* EditorGrid.tsx                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: evan-dro <evan-dro@student.42belgium.be      +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by evan-dro        #+#    #+#               */
-/* Updated: 2026/05/21 00:00:00 by evan-dro       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
+import { TILE_SIZE } from '@/game/scenes/BaseScene';
 import { TILE, GRID_SIZE, type Grid, type TileValue } from '@ft/shared';
 
 interface EditorGridProps {
@@ -20,21 +10,21 @@ interface EditorGridProps {
 }
 
 function tileColor(tile: TileValue, row: number, col: number): string {
-  const isOuterWall =
-    row === 0 ||
-    row === GRID_SIZE - 1 ||
-    col === 0 ||
-    col === GRID_SIZE - 1;
+	const isOuterWall =
+		row === 0 ||
+		row === GRID_SIZE - 1 ||
+		col === 0 ||
+		col === GRID_SIZE - 1;
 
   if (tile === TILE.WALL && isOuterWall) return '#2a2520';
   if (tile === TILE.WALL) return '#5b4a3a';
 
   switch (tile) {
-    case TILE.EXIT:    return '#10b981';
-    case TILE.SPAWN:   return '#3b82f6';
-    case TILE.ENEMY_H: return '#d97706';
-    case TILE.ENEMY_V: return '#be185d';
-    default:           return '#121826';
+	case TILE.EXIT:    return '#10b981';
+	case TILE.SPAWN:   return '#3b82f6';
+	case TILE.ENEMY_H: return '#d97706';
+	case TILE.ENEMY_V: return '#be185d';
+	default:           return '#121826';
   }
 }
 
@@ -44,39 +34,43 @@ function tileBorder(tile: TileValue): string {
 }
 
 export function EditorGrid({ grid, onTileClick, onTileRightClick }: EditorGridProps) {
+  const size = grid.length || GRID_SIZE;
+
   return (
-    <div
-      className="inline-block border border-surface-border rounded overflow-hidden cursor-crosshair select-none"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${GRID_SIZE}, 22px)`,
-        gap: 0,
-      }}
-    >
-      {grid.map((row, rowIdx) =>
-        row.map((tile, colIdx) => (
-          <div
-            key={`${rowIdx}-${colIdx}`}
-            style={{
-              width: 22,
-              height: 22,
-              backgroundColor: tileColor(tile, rowIdx, colIdx),
-              border: tileBorder(tile),
-              transition: 'opacity 0.05s',
-            }}
-            className="hover:opacity-75"
-            onClick={() => onTileClick(colIdx, rowIdx)}
-            onContextMenu={(e) => {
-              e.preventDefault();
-              onTileRightClick?.(colIdx, rowIdx);
-            }}
-            onMouseEnter={(e) => {
-              if (e.buttons === 1) onTileClick(colIdx, rowIdx);
-              if (e.buttons === 2) onTileRightClick?.(colIdx, rowIdx);
-            }}
-          />
-        )),
-      )}
-    </div>
+	<div
+	  className="grid border border-surface-border rounded overflow-hidden cursor-crosshair select-none"
+	  style={{
+		gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
+		gridAutoRows: '1fr',
+		width: `min(100%, ${size * TILE_SIZE}px)`,
+		aspectRatio: '1 / 1',
+		gap: 0,
+	  }}
+	>
+	  {grid.flatMap((row, rowIdx) =>
+  		row.map((tile, colIdx) => (
+		  <div
+			key={`${rowIdx}-${colIdx}`}
+			style={{
+			  width: '100%',
+			  aspectRatio: '1 / 1',
+			  backgroundColor: tileColor(tile, rowIdx, colIdx),
+			  border: tileBorder(tile),
+			  transition: 'opacity 0.05s',
+			}}
+			className="hover:opacity-75"
+			onClick={() => onTileClick(colIdx, rowIdx)}
+			onContextMenu={(e) => {
+			  e.preventDefault();
+			  onTileRightClick?.(colIdx, rowIdx);
+			}}
+			onMouseEnter={(e) => {
+			  if (e.buttons === 1) onTileClick(colIdx, rowIdx);
+			  if (e.buttons === 2) onTileRightClick?.(colIdx, rowIdx);
+			}}
+		  />
+		)),
+	  )}
+	</div>
   );
 }
