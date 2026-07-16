@@ -352,7 +352,7 @@ export class GameScene extends BaseScene {
 		const speedMap = {
 		slow: 800,
 		normal: 400,
-		fast: 100,
+		fast: 150,
 		};
 
 		const delay = speedMap[this.settings.enemySpeed] ?? 400;

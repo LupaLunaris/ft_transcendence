@@ -34,14 +34,16 @@ function tileBorder(tile: TileValue): string {
 }
 
 export function EditorGrid({ grid, onTileClick, onTileRightClick }: EditorGridProps) {
+  const size = grid.length || GRID_SIZE;
+
   return (
 	<div
-	  className="inline-block border border-surface-border rounded overflow-hidden cursor-crosshair select-none"
+	  className="grid border border-surface-border rounded overflow-hidden cursor-crosshair select-none"
 	  style={{
-		display: 'grid',
-		gridTemplateColumns: `repeat(${GRID_SIZE}, ${TILE_SIZE}px)`,
-		width: 'fit-content',
-		height: 'fit-content',
+		gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
+		gridAutoRows: '1fr',
+		width: `min(100%, ${size * TILE_SIZE}px)`,
+		aspectRatio: '1 / 1',
 		gap: 0,
 	  }}
 	>
@@ -50,8 +52,8 @@ export function EditorGrid({ grid, onTileClick, onTileRightClick }: EditorGridPr
 		  <div
 			key={`${rowIdx}-${colIdx}`}
 			style={{
-			  width: TILE_SIZE,
-			  height: TILE_SIZE,
+			  width: '100%',
+			  aspectRatio: '1 / 1',
 			  backgroundColor: tileColor(tile, rowIdx, colIdx),
 			  border: tileBorder(tile),
 			  transition: 'opacity 0.05s',

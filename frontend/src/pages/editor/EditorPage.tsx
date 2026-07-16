@@ -360,7 +360,7 @@ export function EditorPage() {
 		  </div>
 		</div>
 
-		<div className="grid gap-6 lg:grid-cols-[11rem_minmax(0,1fr)_18rem]">
+		<div className="grid items-start gap-6 lg:grid-cols-[11rem_minmax(0,1fr)_18rem]">
 		  {/* LEFT PANEL */}
 		<div className="flex flex-col gap-5 w-44 shrink-0">
 			{/* Tiles + nom map etc */}
@@ -376,7 +376,7 @@ export function EditorPage() {
 		  </div>
 
 		  {/* CENTER = GRID */}
-		<div className="min-w-0 flex justify-center overflow-auto pb-2">
+		<div className="min-w-0 self-start flex justify-center overflow-auto pb-2">
 			{/* GRID */}
 			<EditorGrid
 			  grid={grid}
@@ -386,10 +386,10 @@ export function EditorPage() {
 			/>
 		  </div>
 
-		  <div className="flex flex-col gap-5">
+		  <div className="min-h-0 self-start flex flex-col gap-5">
 		{/* MES MAPS */}
 		{!adminMode && (
-			<div className="bg-[#111] border border-[#444] rounded-lg p-4 flex flex-col gap-2">
+			<div className="max-h-[calc(100vh-14rem)] overflow-y-auto bg-[#111] border border-[#444] rounded-lg p-4 flex flex-col gap-2">
 			
 			<p className="text-xs font-medium text-white/50 uppercase tracking-wide mb-1">
 				{t('editor_page.my_maps')}
