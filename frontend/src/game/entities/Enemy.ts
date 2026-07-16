@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* Enemy.ts                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: malafont <malafont@student.42belgium.be       +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/21 00:00:00 by malafont        #+#    #+#               */
-/* Updated: 2026/05/21 00:00:00 by malafont       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import Phaser from 'phaser';
 import { TILE, GRID_SIZE, type Grid, type Direction } from '@ft/shared';
