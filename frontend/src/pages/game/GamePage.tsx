@@ -1,6 +1,7 @@
 
 import { useCallback, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import type { Difficulty } from '@ft/shared';
 import { useAuth } from '@/context/auth.context';
 import { useMap } from '@/hooks/useMap';
 import { AVATAR_TO_SPRITE, DEFAULT_PLAYER_SPRITE } from '@/game/assets';
@@ -12,11 +13,32 @@ import { api } from '@/services/api.service';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
 
+type EnemySpeed = 'slow' | 'normal' | 'fast';
+
+type GameSettings = {
+  size: number;
+  enemyCount: number;
+  enemySpeed: EnemySpeed;
+};
+
+const DIFFICULTY_TO_SPEED: Record<Difficulty, EnemySpeed> = {
+  easy: 'slow',
+  medium: 'normal',
+  hard: 'fast',
+};
+
+function getEnemyDifficulty(value: unknown): Difficulty {
+  return value === 'easy' || value === 'hard' || value === 'medium'
+    ? value
+    : 'medium';
+}
+
 export function GamePage() {
   const { map_id } = useParams<{ map_id: string }>();
   const { user } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const { map, loading, error } = useMap(map_id);
   const [dead, setDead] = useState(false);
   const [gameKey, setGameKey] = useState(0);
@@ -84,11 +106,20 @@ export function GamePage() {
 	  </div>
 	);
   }
-  console.log("MAP SETTINGS FRONT:", map.settings);
 
   const backLabel = map && user && map.creator_id === user.id
 	? t('game_page.backlabel_editor')
 	: t('game_page.backlabel_train');
+  const savedSettings = (map as typeof map & { settings?: Partial<GameSettings> }).settings;
+  const enemyDifficulty = getEnemyDifficulty(
+	(location.state as { enemyDifficulty?: unknown } | null)?.enemyDifficulty,
+  );
+  const enemySpeed = DIFFICULTY_TO_SPEED[enemyDifficulty];
+  const settings: GameSettings = {
+	size: savedSettings?.size ?? map.grid.length,
+	enemyCount: savedSettings?.enemyCount ?? 2,
+	enemySpeed,
+  };
 
   return (
 	<>
@@ -97,13 +128,9 @@ export function GamePage() {
 		  {map.name}
 		</h2>
 		<GameCanvas
-			key={map.id + (map.settings?.enemySpeed ?? "normal")}
+			key={`${map.id}-${gameKey}-${enemySpeed}`}
 			grid={map.grid}
-			settings={(map as any).settings ?? {
-				size: 25,
-				enemyCount: 2,
-				enemySpeed: "normal",
-				}}
+			settings={settings}
 			player_id={user!.id}
 			player_sprite={AVATAR_TO_SPRITE[user!.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE}
 			onExit={handleExit}

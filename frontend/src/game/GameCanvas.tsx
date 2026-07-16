@@ -8,7 +8,7 @@ import { GRID_SIZE } from '@ft/shared';
 
 interface GameCanvasProps {
   grid: Grid;
-  settings: any;
+  settings?: any;
   player_id: string;
   player_sprite?: string;
   onExit: (time_ms: number) => void;

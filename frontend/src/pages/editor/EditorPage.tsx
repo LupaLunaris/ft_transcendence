@@ -14,7 +14,6 @@ import { EditorGrid } from '@/components/editor/EditorGrid';
 import { TileSelector } from '@/components/editor/TileSelector';
 import { useMyMaps } from '@/hooks/useMap';
 import { useTranslation } from 'react-i18next';
-import MapSettingsPanel from "@/components/editor/MapSettingsPanel";
 
 const ERROR_MAP: Record<string, string> = {
   'Invalid grid: must be 25x25 with WALL borders, valid tile values, exactly 1 SPAWN and 1 EXIT': 'errors.invalid_grid',
@@ -46,15 +45,6 @@ export function EditorPage() {
   const { t } = useTranslation();
 
   const [grid, setGrid] = useState<Grid>(makeEmptyGrid);
-  const [settings, setSettings] = useState<{
-	size: number;
-	enemyCount: number;
-	enemySpeed: 'slow' | 'normal' | 'fast';
-	}>({
-	size: GRID_SIZE,
-	enemyCount: 2,
-	enemySpeed: 'normal',
-	});
   const [selectedTile, setSelectedTile] = useState<TileValue>(TILE.EMPTY);
   const [mapName, setMapName] = useState('');
   const [mapId, setMapId] = useState<string | null>(id ?? null);
@@ -370,7 +360,7 @@ export function EditorPage() {
 		  </div>
 		</div>
 
-		<div className="flex gap-6">
+		<div className="grid gap-6 lg:grid-cols-[11rem_minmax(0,1fr)_18rem]">
 		  {/* LEFT PANEL */}
 		<div className="flex flex-col gap-5 w-44 shrink-0">
 			{/* Tiles + nom map etc */}
@@ -386,7 +376,7 @@ export function EditorPage() {
 		  </div>
 
 		  {/* CENTER = GRID */}
-		<div className="flex-1 flex justify-center">
+		<div className="min-w-0 flex justify-center overflow-auto pb-2">
 			{/* GRID */}
 			<EditorGrid
 			  grid={grid}
@@ -396,14 +386,7 @@ export function EditorPage() {
 			/>
 		  </div>
 
-		  <div className="flex flex-col gap-5 w-72 shrink-0">
-
-		{/* SETTINGS */}
-		<MapSettingsPanel
-			settings={settings}
-			onChange={setSettings}
-		/>
-
+		  <div className="flex flex-col gap-5">
 		{/* MES MAPS */}
 		{!adminMode && (
 			<div className="bg-[#111] border border-[#444] rounded-lg p-4 flex flex-col gap-2">
@@ -471,11 +454,9 @@ export function EditorPage() {
 			</div>
 		)}
 
-		</div>
-
 		  {/* Admin right panel */}
 		  {adminMode && (
-			<div className="flex flex-col gap-2 w-40 shrink-0">
+			<div className="flex flex-col gap-2">
 			  <p className="text-xs font-medium text-white/50 uppercase tracking-wide mb-1">
 				{t('editor_page.tower_levels')}
 			  </p>
@@ -514,6 +495,8 @@ export function EditorPage() {
 			  )}
 			</div>
 		  )}
+
+		</div>
 		</div>
 	  </div>
 

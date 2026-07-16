@@ -1,4 +1,5 @@
 import { Grid } from "@ft/shared/dist/types/tiles.types";
+import type { Difficulty } from "@ft/shared";
 
 export type EnemySpeed = "slow" | "normal" | "fast";
 

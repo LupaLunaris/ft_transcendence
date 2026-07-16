@@ -19,37 +19,27 @@ import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { useTranslation } from 'react-i18next';
 
-const DIFFICULTIES: { value: Difficulty | undefined; key: string }[] = [
-  { value: undefined, key: 'duel_page.difficulty_all' },
+const DIFFICULTIES: { value: Difficulty; key: string }[] = [
   { value: 'easy',   key: 'duel_page.difficulty_easy' },
   { value: 'medium', key: 'duel_page.difficulty_medium' },
   { value: 'hard',   key: 'duel_page.difficulty_hard' },
 ] as const;
 
-const DIFFICULTY_LABEL: Record<Difficulty, string> = {
-  easy:   'duel_page.difficulty_easy',
-  medium: 'duel_page.difficulty_medium',
-  hard:   'duel_page.difficulty_hard',
-};
-
-const DIFFICULTY_COLOR: Record<Difficulty, string> = {
-  easy: 'text-deep-300',
-  medium: 'text-yellow-400',
-  hard: 'text-coral-400',
-};
-
 const PAGE_SIZE = 20;
 
 export function TrainingPage() {
   const navigate = useNavigate();
-  const [difficulty, setDifficulty] = useState<Difficulty | undefined>();
+  const [enemyDifficulty, setEnemyDifficulty] = useState<Difficulty>('medium');
   const [page, setPage] = useState(1);
-  const { maps, total, loading, error } = usePublishedMaps(page, difficulty);
+  const { maps, total, loading, error } = usePublishedMaps(page);
   const { t } = useTranslation();
 
-  function handleDifficulty(value: Difficulty | undefined) {
-    setDifficulty(value);
-    setPage(1);
+  function handlePlay(mapId: string) {
+    navigate(`/play/${mapId}`, {
+      state: {
+        enemyDifficulty,
+      },
+    });
   }
 
   return (
@@ -59,15 +49,18 @@ export function TrainingPage() {
           ⚔️ {t('navbar.train')}
         </h1>
 
-        {/* Difficulty filter */}
+        <div className="flex flex-col gap-2">
+          <p className="text-xs font-medium text-white/50 uppercase tracking-wide">
+            Vitesse des ennemis
+          </p>
         <div className="flex gap-2 flex-wrap">
           {DIFFICULTIES.map(({ value, key }) => (
             <button
               key={key}
-              onClick={() => handleDifficulty(value)}
+              onClick={() => setEnemyDifficulty(value)}
               className={[
                 'px-3 py-1 rounded text-sm font-medium border transition-colors',
-                difficulty === value
+                enemyDifficulty === value
                   ? 'bg-deep-700 border-deep-400 text-white'
                   : 'bg-transparent border-surface-border text-white/60 hover:text-white',
               ].join(' ')}
@@ -75,6 +68,7 @@ export function TrainingPage() {
               {t(key)}
             </button>
           ))}
+        </div>
         </div>
 
         {/* Content */}
@@ -103,16 +97,14 @@ export function TrainingPage() {
               >
                 <div>
                   <p className="font-medium text-white">{map.name}</p>
-                  <p className={`text-xs mt-0.5 ${DIFFICULTY_COLOR[map.difficulty]}`}>
-                    {t(DIFFICULTY_LABEL[map.difficulty])}
-                    {' · '}
+                  <p className="text-xs mt-0.5 text-white/50">
                     {t('duel_page.play_count', { count: map.play_count })}
                   </p>
                 </div>
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={() => navigate(`/play/${map.id}`)}
+                  onClick={() => handlePlay(map.id)}
                 >
                   {t('training_page.play')}
                 </Button>
