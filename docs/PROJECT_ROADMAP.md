@@ -80,11 +80,11 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 | Frontend responsive | Élise | Jennifer | Martin | 25/07 | 🟡 | Desktop, tablette et mobile. |
 | Frontend accessible | Élise | Jennifer | Martin | 25/07 | 🟡 | Navigation clavier, labels, contraste... |
 | Backend Express fonctionnel | Jerem | Jennifer | Martin | 20/07 | ✅ | |
-| Base de données avec schéma cohérent | Martin + Jennifer | Jerem | Élise | 20/07 | 🟡 | À revoir pendant leaderboard |
-| ORM (Prisma) correctement configuré | Jennifer + Martin | Jerem | Élise | 20/07 | 🟡 | |
+| Base de données avec schéma cohérent | Martin + Jennifer | Jerem | Élise | 20/07 | ✅ | |
+| ORM (Prisma) correctement configuré | Jennifer + Martin | Jerem | Élise | 20/07 | ✅ | |
 | Authentification sécurisée (JWT + bcrypt) | Jerem | Élise | Jennifer | 20/07 | ✅ | |
 | Validation des formulaires (Frontend) | Jennifer | Élise | Martin | 20/07 | ✅ | |
-| Validation des formulaires (Backend) | Martin | Jerem | Élise | 20/07 | 🟡 | Dernière vérif |
+| Validation des formulaires (Backend) | Martin | Jerem | Élise | 20/07 | ✅ | |
 | HTTPS fonctionnel | Jerem | Jennifer | Martin | 20/07 | 🟡 | |
 | Docker : lancement avec une seule commande | Jerem | Martin | Jennifer | 20/07 | ✅ | |
 | Compatible Google Chrome | Élise | Jennifer | Martin | 25/07 | ✅ | |
@@ -93,8 +93,8 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 | Gestion correcte des actions simultanées | Martin | Jerem | Jennifer | 25/07 | ✅ | |
 | Synchronisation temps réel correcte | Martin | Jerem | Jennifer | 25/07 | ✅ | |
 | Aucune corruption de données | Jerem | Jennifer | Élise | 25/07 | ✅ | |
-| Fichier `.env` ignoré par Git | Jerem | Jennifer | Martin | 20/07 | ✅ | |
-| Fichier `.env.example` complet | Jerem | Jennifer | Martin | 20/07 | ✅ | |
+| Fichier `.env` ignoré par Git | Jerem | Jennifer | Martin | 20/07 | 🟡 | |
+| Fichier `.env.example` complet | Jerem | Jennifer | Martin | 20/07 | 🟡 | |
 | Privacy Policy accessible et complète | Élise | Martin | Jennifer | 20/07 | ✅ | IA |
 | Terms of Service accessibles et complètes | Élise | Martin | Jennifer | 20/07 | ✅ | IA |
 
