@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* enemyLogic.ts                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jdebrull <jdebrull@student.42belgium.be       +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/07/07 00:00:00 by jdebrull        #+#    #+#               */
-/* Updated: 2026/07/07 00:00:00 by jdebrull       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 // Logique de déplacement des ennemis, partagée entre le serveur (tick
 // autoritaire du mode duel) et le client (mode solo). Portage 1:1 de
