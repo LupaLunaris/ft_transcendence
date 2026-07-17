@@ -7,10 +7,6 @@ export function getLevelFromXp(xp: number): number {
   return Math.floor(xp / XP_PER_LEVEL) + 1;
 }
 
-function isUniqueConstraintError(error: unknown): boolean {
-  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
-}
-
 async function getCurrentRewardState(
   tx: Prisma.TransactionClient,
   userId: string,
@@ -29,23 +25,32 @@ async function getCurrentRewardState(
   };
 }
 
+// Vérifie l'existence avant d'insérer plutôt que d'intercepter une violation
+// de contrainte unique : une fois qu'une requête échoue à l'intérieur d'une
+// transaction Postgres, la transaction entière passe en état "aborted" et
+// toute requête suivante sur ce même tx échoue (25P02), même si l'erreur a
+// été catchée côté JS — il n'y a pas de savepoint implicite. Continuer à
+// interroger `tx` après un P2002 catché faisait donc échouer (et rollback)
+// toute la transaction englobante, y compris les écritures déjà réussies
+// avant (ex: l'upsert du meilleur score), dès qu'un joueur rejouait une map
+// déjà complétée — cf. history_debug pour l'incident correspondant.
 async function unlockAchievement(
   tx: Prisma.TransactionClient,
   userId: string,
   code: AchievementCode,
 ): Promise<RewardResult['achievements_unlocked'][number] | null> {
-  try {
-    const achievement = await tx.userAchievement.create({
-      data: { user_id: userId, code },
-    });
-    return {
-      code: achievement.code as AchievementCode,
-      unlocked_at: achievement.unlocked_at.toISOString(),
-    };
-  } catch (error) {
-    if (isUniqueConstraintError(error)) return null;
-    throw error;
-  }
+  const already = await tx.userAchievement.findUnique({
+    where: { user_id_code: { user_id: userId, code } },
+  });
+  if (already) return null;
+
+  const achievement = await tx.userAchievement.create({
+    data: { user_id: userId, code },
+  });
+  return {
+    code: achievement.code as AchievementCode,
+    unlocked_at: achievement.unlocked_at.toISOString(),
+  };
 }
 
 async function awardXpOnce(
@@ -58,21 +63,21 @@ async function awardXpOnce(
     achievements?: AchievementCode[];
   },
 ): Promise<RewardResult> {
-  try {
-    await tx.xpEvent.create({
-      data: {
-        user_id: params.userId,
-        action: params.action,
-        key: params.key,
-        xp: params.xp,
-      },
-    });
-  } catch (error) {
-    if (isUniqueConstraintError(error)) {
-      return getCurrentRewardState(tx, params.userId);
-    }
-    throw error;
+  const already = await tx.xpEvent.findUnique({
+    where: { action_key: { action: params.action, key: params.key } },
+  });
+  if (already) {
+    return getCurrentRewardState(tx, params.userId);
   }
+
+  await tx.xpEvent.create({
+    data: {
+      user_id: params.userId,
+      action: params.action,
+      key: params.key,
+      xp: params.xp,
+    },
+  });
 
   const user = await tx.user.update({
     where: { id: params.userId },
@@ -146,5 +151,19 @@ export async function rewardFirstMapPublication(
     key: userId,
     xp: 15,
     achievements: ['FIRST_CREATOR'],
+  });
+}
+
+export async function rewardDuelVictory(
+  tx: Prisma.TransactionClient,
+  userId: string,
+  raceId: string,
+): Promise<RewardResult> {
+  return awardXpOnce(tx, {
+    userId,
+    action: 'DUEL_VICTORY',
+    key: `${userId}:${raceId}`,
+    xp: 25,
+    achievements: ['DUEL_CHAMPION'],
   });
 }

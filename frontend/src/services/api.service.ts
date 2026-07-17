@@ -26,6 +26,7 @@ import type {
   Difficulty,
   UpdateProfileRequest,
   RewardResult,
+  LeaderboardEntry,
 } from '@ft/shared';
 
 interface TowerLevel {
@@ -217,6 +218,12 @@ class ApiService {
 
     getLeaderboard: (map_id: string): Promise<ScoreEntry[]> =>
       this.request<ScoreEntry[]>('GET', `/scores/leaderboard/${map_id}`),
+
+    getMapPointsLeaderboard: (map_id: string): Promise<LeaderboardEntry[]> =>
+      this.request<LeaderboardEntry[]>('GET', `/scores/leaderboard/${map_id}/points`),
+
+    getGlobalLeaderboard: (): Promise<LeaderboardEntry[]> =>
+      this.request<LeaderboardEntry[]>('GET', '/scores/leaderboard/global'),
   };
 }
 

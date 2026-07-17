@@ -234,8 +234,15 @@
     "achievement.first_escape": "Première sortie",
     "achievement.first_creator": "Premier créateur",
     "achievement.explorer": "Explorateur",
+    "achievement.duel_champion": "Champion des duels",
     "toast_xp_gained": "+{{xp}} XP",
     "toast_achievement_unlocked": "Achievement débloqué : {{name}}",
+
+    "leaderboard.map_title": "🏆 Classement de la map",
+    "leaderboard.global_title": "🏆 Classement général",
+    "leaderboard.points_value": "{{points}} pts",
+    "leaderboard.time_value": "{{time}}s",
+    "leaderboard.empty": "Aucun classement pour le moment.",
 
     "footer.rights": "Tous droits réservés.",
     "footer.terms": "Conditions d'utilisation",

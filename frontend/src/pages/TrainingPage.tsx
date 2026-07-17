@@ -14,7 +14,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Difficulty } from '@ft/shared';
 import { usePublishedMaps } from '@/hooks/useMap';
+import { useGlobalLeaderboard } from '@/hooks/useLeaderboard';
+import { useAuth } from '@/context/auth.context';
 import { Layout } from '@/components/layout/Layout';
+import { Leaderboard } from '@/components/leaderboard/Leaderboard';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { useTranslation } from 'react-i18next';
@@ -29,9 +32,11 @@ const PAGE_SIZE = 20;
 
 export function TrainingPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [enemyDifficulty, setEnemyDifficulty] = useState<Difficulty>('medium');
   const [page, setPage] = useState(1);
   const { maps, total, loading, error } = usePublishedMaps(page);
+  const { entries: leaderboardEntries, loading: leaderboardLoading } = useGlobalLeaderboard();
   const { t } = useTranslation();
 
   function handlePlay(mapId: string) {
@@ -44,7 +49,8 @@ export function TrainingPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-6">
+      <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-6 items-start">
+      <div className="flex-1 min-w-0 flex flex-col gap-6">
         <h1 className="text-2xl font-semibold font-fantasy text-white tracking-wide">
           ⚔️ {t('navbar.train')}
         </h1>
@@ -137,6 +143,15 @@ export function TrainingPage() {
             </Button>
           </div>
         )}
+      </div>
+
+      <Leaderboard
+        title={t('leaderboard.global_title')}
+        entries={leaderboardEntries}
+        loading={leaderboardLoading}
+        highlightUserId={user?.id}
+        className="w-full lg:w-64 shrink-0"
+      />
       </div>
     </Layout>
   );

@@ -27,7 +27,8 @@ model User {
   scores Score[]
   achievements UserAchievement[]
   xp_events    XpEvent[]
-  
+  ranking_points MapRankingPoints[]
+
   friendships_sent      Friendship[] @relation("FriendshipRequester")
   friendships_received  Friendship[] @relation("FriendshipAddressee")
 }
@@ -46,6 +47,7 @@ model Map {
 
   creator User    @relation(fields: [creator_id], references: [id], onDelete: Cascade)
   scores  Score[]
+  ranking_points MapRankingPoints[]
 }
 
 model AdminMap {
@@ -56,17 +58,39 @@ model AdminMap {
   created_at  DateTime @default(now())
 }
 
+// Un seul enregistrement par (user, map) : le meilleur temps du joueur sur
+// cette map (record personnel), pas un historique des essais.
 model Score {
   id                 String   @id @default(uuid())
   completion_time_ms Int
   created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
   user_id            String
   map_id             String
 
   user User @relation(fields: [user_id], references: [id])
   map  Map  @relation(fields: [map_id], references: [id], onDelete: Cascade)
 
+  @@unique([user_id, map_id])
   @@index([map_id, completion_time_ms])
+}
+
+// Points de classement de vitesse par map : recalculés à chaque nouveau
+// record personnel sur la map (cf. scoring.service.ts#recalculateMapPoints).
+// 1er = 5 points, 2e = 4, ... 5e = 1 ; au-delà du top 5, aucune ligne.
+model MapRankingPoints {
+  id         String   @id @default(uuid())
+  map_id     String
+  user_id    String
+  points     Int
+  updated_at DateTime @updatedAt
+
+  map  Map  @relation(fields: [map_id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([map_id, user_id])
+  @@index([user_id])
+  @@index([map_id])
 }
 
 model UserAchievement {

@@ -46,6 +46,10 @@ vi.mock('@/hooks/useMap', () => ({
   useMap: () => ({ map: mapRef.current, loading: false, error: null }),
 }));
 
+vi.mock('@/hooks/useLeaderboard', () => ({
+  useMapLeaderboard: () => ({ entries: [], loading: false, error: null }),
+}));
+
 // ── Component under test ────────────────────────────────────────────────────
 import { GamePage } from '@/pages/game/GamePage';
 

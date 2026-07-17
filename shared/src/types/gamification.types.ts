@@ -1,4 +1,4 @@
-export type AchievementCode = 'FIRST_ESCAPE' | 'FIRST_CREATOR' | 'EXPLORER';
+export type AchievementCode = 'FIRST_ESCAPE' | 'FIRST_CREATOR' | 'EXPLORER' | 'DUEL_CHAMPION';
 
 export interface UserAchievement {
   code: AchievementCode;

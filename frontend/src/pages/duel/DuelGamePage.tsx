@@ -25,9 +25,21 @@ import type {
 import { useAuth } from '@/context/auth.context';
 import { DuelScene } from '@/game/scenes/DuelScene';
 import { AVATAR_TO_SPRITE, DEFAULT_PLAYER_SPRITE } from '@/game/assets';
+import { useMapLeaderboard } from '@/hooks/useLeaderboard';
+import { Leaderboard } from '@/components/leaderboard/Leaderboard';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
+import { useToast } from '@/components/ui/useToast';
+import type { AchievementCode } from '@ft/shared';
+import { api } from '@/services/api.service';
 import { useTranslation } from 'react-i18next';
+
+const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
+  FIRST_ESCAPE: 'first_escape',
+  FIRST_CREATOR: 'first_creator',
+  EXPLORER: 'explorer',
+  DUEL_CHAMPION: 'duel_champion',
+};
 
 type DuelSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
@@ -90,10 +102,12 @@ function ResultOverlay({
 export function DuelGamePage() {
   const location  = useLocation();
   const navigate  = useNavigate();
-  const { user, token } = useAuth();
+  const { user, token, updateUser } = useAuth();
   const { t } = useTranslation();
+  const { showToast } = useToast();
 
   const state = location.state as DuelStartPayload | null;
+  const { entries: leaderboardEntries, loading: leaderboardLoading } = useMapLeaderboard(state?.map_id);
 
   const containerRef  = useRef<HTMLDivElement>(null);
   const gameRef       = useRef<Phaser.Game | null>(null);
@@ -150,6 +164,22 @@ export function DuelGamePage() {
 
     socket.on('race_finished', (res) => {
       setResult(res);
+    });
+
+    // Émis uniquement au vainqueur de la course (cf. duelHandler.ts#finishRace)
+    socket.on('reward_earned', (reward) => {
+      if (reward.xp_gained > 0) {
+        showToast(t('toast_xp_gained', { xp: reward.xp_gained }), 'success');
+      }
+      reward.achievements_unlocked.forEach((achievement) => {
+        showToast(
+          t('toast_achievement_unlocked', { name: t(`achievement.${ACHIEVEMENT_LABEL[achievement.code]}`) }),
+          'success',
+        );
+      });
+      api.auth.getMe().then(updateUser).catch(() => {
+        // The next profile load will refresh XP if this background refresh fails.
+      });
     });
 
     socket.on('error_event', ({ message }) => {
@@ -228,8 +258,9 @@ export function DuelGamePage() {
   if (!state) return null;
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-4 p-4">
-      {/* En-tête avec pseudos adversaires */}
+    <div className="min-h-screen bg-surface flex flex-row items-start justify-center gap-4 p-4">
+    <div className="flex flex-col items-center gap-4 flex-1">
+    {/* En-tête avec pseudos adversaires */}
       <div className="flex items-center gap-4 text-sm text-white/60 flex-wrap justify-center">
         <span className="text-white font-medium">{user?.username}</span>
         <span className="text-white/30">vs</span>
@@ -290,6 +321,15 @@ export function DuelGamePage() {
       <p className="text-white/40 text-sm">
         {t('duel_game_page.instructions')}
       </p>
+    </div>
+
+      <Leaderboard
+        title={t('leaderboard.map_title')}
+        entries={leaderboardEntries}
+        loading={leaderboardLoading}
+        highlightUserId={user?.id}
+        className="w-64 mt-12 hidden md:flex"
+      />
     </div>
   );
 }
