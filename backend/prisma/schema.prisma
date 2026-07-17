@@ -15,6 +15,7 @@ model User {
   username           String   @unique
   password_hash      String
   avatar             String?
+  xp                 Int      @default(0)
   diamonds           Int      @default(0)
   tower_progress     Int      @default(0)
   created_maps_count Int      @default(0)
@@ -24,6 +25,8 @@ model User {
 
   maps   Map[]
   scores Score[]
+  achievements UserAchievement[]
+  xp_events    XpEvent[]
   
   friendships_sent      Friendship[] @relation("FriendshipRequester")
   friendships_received  Friendship[] @relation("FriendshipAddressee")
@@ -64,6 +67,32 @@ model Score {
   map  Map  @relation(fields: [map_id], references: [id], onDelete: Cascade)
 
   @@index([map_id, completion_time_ms])
+}
+
+model UserAchievement {
+  id          String   @id @default(uuid())
+  user_id     String
+  code        String
+  unlocked_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, code])
+  @@index([user_id])
+}
+
+model XpEvent {
+  id         String   @id @default(uuid())
+  user_id    String
+  action     String
+  key        String
+  xp         Int
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([action, key])
+  @@index([user_id])
 }
 
 model Friendship {

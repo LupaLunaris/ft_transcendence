@@ -10,10 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+import type { UserAchievement } from './gamification.types';
+
 export interface UserPublic {
   id: string;
   username: string;
   avatar: string | null;
+  xp: number;
+  level: number;
+  achievements: UserAchievement[];
   diamonds: number;
   tower_progress: number;
   created_maps_count: number;

@@ -1,7 +1,7 @@
 
 import { useCallback, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import type { Difficulty } from '@ft/shared';
+import type { AchievementCode, Difficulty, RewardResult } from '@ft/shared';
 import { useAuth } from '@/context/auth.context';
 import { useMap } from '@/hooks/useMap';
 import { AVATAR_TO_SPRITE, DEFAULT_PLAYER_SPRITE } from '@/game/assets';
@@ -27,6 +27,12 @@ const DIFFICULTY_TO_SPEED: Record<Difficulty, EnemySpeed> = {
   hard: 'fast',
 };
 
+const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
+  FIRST_ESCAPE: 'first_escape',
+  FIRST_CREATOR: 'first_creator',
+  EXPLORER: 'explorer',
+};
+
 function getEnemyDifficulty(value: unknown): Difficulty {
   return value === 'easy' || value === 'hard' || value === 'medium'
     ? value
@@ -35,7 +41,7 @@ function getEnemyDifficulty(value: unknown): Difficulty {
 
 export function GamePage() {
   const { map_id } = useParams<{ map_id: string }>();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,19 +71,44 @@ export function GamePage() {
 	}
   }, [map, user, map_id, navigate]);
 
+  const handleReward = useCallback(
+	async (reward?: RewardResult) => {
+	  if (!reward || (reward.xp_gained === 0 && reward.achievements_unlocked.length === 0)) return;
+
+	  if (reward.xp_gained > 0) {
+		showToast(t('toast_xp_gained', { xp: reward.xp_gained }), 'success');
+	  }
+	  reward.achievements_unlocked.forEach((achievement) => {
+		showToast(
+		  t('toast_achievement_unlocked', { name: t(`achievement.${ACHIEVEMENT_LABEL[achievement.code]}`) }),
+		  'success',
+		);
+	  });
+
+	  try {
+		updateUser(await api.auth.getMe());
+	  } catch {
+		// The next page load will refresh the profile if this background refresh fails.
+	  }
+	},
+	[showToast, t, updateUser],
+  );
+
   const handleExit = useCallback(
 	async (time_ms: number) => {
 	  if (!map_id) return;
 	  try {
-		await api.scores.submit(map_id, time_ms);
+		const result = await api.scores.submit(map_id, time_ms);
 		showToast(t('game_page.toast_finished', { time: (time_ms / 1000).toFixed(2) }), 'success');
+		await handleReward(result.reward);
 	  } catch {
 		showToast(t('game_page.toast_score_error'), 'error');
 	  }
 	  // Creator completing their own map: mark it done and return to editor to publish
 	  if (map && user && map.creator_id === user.id) {
 		try {
-		  await api.maps.markComplete(map_id);
+		  const completed = await api.maps.markComplete(map_id);
+		  await handleReward(completed.reward);
 		} catch {
 		  // Silently ignore — map may already be marked complete
 		}
@@ -86,7 +117,7 @@ export function GamePage() {
 		navigate('/train');
 	  }
 	},
-	[map_id, map, user, navigate, showToast],
+	[map_id, map, user, navigate, showToast, t, handleReward],
   );
 
   if (loading) {
