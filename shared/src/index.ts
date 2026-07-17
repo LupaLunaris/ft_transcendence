@@ -13,6 +13,7 @@
 export * from './types/tiles.types';
 export * from './types/user.types';
 export * from './types/gamification.types';
+export * from './types/leaderboard.types';
 export * from './types/map.types';
 export * from './types/auth.types';
 export * from './types/game.types';

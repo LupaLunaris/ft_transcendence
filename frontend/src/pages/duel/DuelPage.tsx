@@ -16,7 +16,9 @@ import type { Difficulty, DuelStartPayload } from '@ft/shared';
 import { useAuth } from '@/context/auth.context';
 import { usePublishedMaps } from '@/hooks/useMap';
 import { useDuelLobby } from '@/hooks/useDuelLobby';
+import { useGlobalLeaderboard } from '@/hooks/useLeaderboard';
 import { Layout } from '@/components/layout/Layout';
+import { Leaderboard } from '@/components/leaderboard/Leaderboard';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { useTranslation } from 'react-i18next';
@@ -54,6 +56,7 @@ export function DuelPage() {
   const [error,      setError]      = useState<string | null>(null);
 
   const { maps, total, loading, error: mapsError } = usePublishedMaps(page, difficulty);
+  const { entries: leaderboardEntries, loading: leaderboardLoading } = useGlobalLeaderboard();
 
   const handleDuelStart = useCallback((payload: DuelStartPayload) => {
     navigate('/duel/game', { state: payload });
@@ -83,7 +86,8 @@ export function DuelPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-6">
+      <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-6 items-start">
+      <div className="flex-1 min-w-0 flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold font-fantasy text-white tracking-wide">
             ⚔️ {t('duel_page.duel')}
@@ -225,6 +229,15 @@ export function DuelPage() {
             </Button>
           </div>
         )}
+      </div>
+
+      <Leaderboard
+        title={t('leaderboard.global_title')}
+        entries={leaderboardEntries}
+        loading={leaderboardLoading}
+        highlightUserId={user?.id}
+        className="w-full lg:w-64 shrink-0"
+      />
       </div>
     </Layout>
   );

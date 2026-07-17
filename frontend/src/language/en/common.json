@@ -233,8 +233,15 @@
     "achievement.first_escape": "First Escape",
     "achievement.first_creator": "First Creator",
     "achievement.explorer": "Explorer",
+    "achievement.duel_champion": "Duel Champion",
     "toast_xp_gained": "+{{xp}} XP",
     "toast_achievement_unlocked": "Achievement unlocked: {{name}}",
+
+    "leaderboard.map_title": "🏆 Map leaderboard",
+    "leaderboard.global_title": "🏆 Overall leaderboard",
+    "leaderboard.points_value": "{{points}} pts",
+    "leaderboard.time_value": "{{time}}s",
+    "leaderboard.empty": "No rankings yet.",
 
     "footer.rights": "All rights reserved.",
     "footer.terms": "Terms of Service",

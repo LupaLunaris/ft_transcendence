@@ -233,8 +233,15 @@
     "achievement.first_escape": "Eerste ontsnapping",
     "achievement.first_creator": "Eerste maker",
     "achievement.explorer": "Ontdekkingsreiziger",
+    "achievement.duel_champion": "Duelkampioen",
     "toast_xp_gained": "+{{xp}} XP",
     "toast_achievement_unlocked": "Achievement ontgrendeld: {{name}}",
+
+    "leaderboard.map_title": "🏆 Klassement van de map",
+    "leaderboard.global_title": "🏆 Algemeen klassement",
+    "leaderboard.points_value": "{{points}} pt",
+    "leaderboard.time_value": "{{time}}s",
+    "leaderboard.empty": "Nog geen klassement.",
 
     "footer.rights": "Alle rechten voorbehouden.",
     "footer.terms": "Gebruiksvoorwaarden",

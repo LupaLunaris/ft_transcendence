@@ -4,11 +4,13 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import type { AchievementCode, Difficulty, RewardResult } from '@ft/shared';
 import { useAuth } from '@/context/auth.context';
 import { useMap } from '@/hooks/useMap';
+import { useMapLeaderboard } from '@/hooks/useLeaderboard';
 import { AVATAR_TO_SPRITE, DEFAULT_PLAYER_SPRITE } from '@/game/assets';
 import { useToast } from '@/components/ui/useToast';
 import { Spinner } from '@/components/ui/Spinner';
 import { GameCanvas } from '@/game/GameCanvas';
 import { GameOverModal } from '@/components/game/GameOverModal';
+import { Leaderboard } from '@/components/leaderboard/Leaderboard';
 import { api } from '@/services/api.service';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +33,7 @@ const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
   FIRST_ESCAPE: 'first_escape',
   FIRST_CREATOR: 'first_creator',
   EXPLORER: 'explorer',
+  DUEL_CHAMPION: 'duel_champion',
 };
 
 function getEnemyDifficulty(value: unknown): Difficulty {
@@ -46,6 +49,7 @@ export function GamePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { map, loading, error } = useMap(map_id);
+  const { entries: leaderboardEntries, loading: leaderboardLoading } = useMapLeaderboard(map_id);
   const [dead, setDead] = useState(false);
   const [gameKey, setGameKey] = useState(0);
   const { t } = useTranslation();
@@ -154,30 +158,40 @@ export function GamePage() {
 
   return (
 	<>
-	  <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-4 p-4">
-		<h2 className="text-xl font-semibold text-silver-100 font-fantasy tracking-wide">
-		  {map.name}
-		</h2>
-		<GameCanvas
-			key={`${map.id}-${gameKey}-${enemySpeed}`}
-			grid={map.grid}
-			settings={settings}
-			player_id={user!.id}
-			player_sprite={AVATAR_TO_SPRITE[user!.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE}
-			onExit={handleExit}
-			onDeath={handleDeath}
-			/>
-				<Button
-		  type="button"
-		  variant="secondary"
-		  size="sm"
-		  onClick={handleExitMap}
-		>
-		  {t('game_page.exit')}
-		</Button>
-		<p className="text-white/40 text-sm">
-		  {t('game_page.instructions')}
-		</p>
+	  <div className="min-h-screen bg-surface flex flex-row items-start justify-center gap-4 p-4">
+		<div className="flex flex-col items-center gap-4">
+		  <h2 className="text-xl font-semibold text-silver-100 font-fantasy tracking-wide">
+			{map.name}
+		  </h2>
+		  <GameCanvas
+			  key={`${map.id}-${gameKey}-${enemySpeed}`}
+			  grid={map.grid}
+			  settings={settings}
+			  player_id={user!.id}
+			  player_sprite={AVATAR_TO_SPRITE[user!.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE}
+			  onExit={handleExit}
+			  onDeath={handleDeath}
+			  />
+				  <Button
+			type="button"
+			variant="secondary"
+			size="sm"
+			onClick={handleExitMap}
+		  >
+			{t('game_page.exit')}
+		  </Button>
+		  <p className="text-white/40 text-sm">
+			{t('game_page.instructions')}
+		  </p>
+		</div>
+
+		<Leaderboard
+		  title={t('leaderboard.map_title')}
+		  entries={leaderboardEntries}
+		  loading={leaderboardLoading}
+		  highlightUserId={user?.id}
+		  className="w-64 mt-12 hidden md:flex"
+		/>
 	  </div>
 
 	  <GameOverModal
