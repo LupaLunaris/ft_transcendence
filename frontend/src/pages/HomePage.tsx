@@ -61,6 +61,7 @@ export function HomePage() {
 					<img
 						src="/assets/icons/diamond.svg"
 						alt=""
+						aria-hidden="true"
 						className="w-3.5 h-3.5 opacity-90"
 					/>
 					{t('home_page.diamond_count', { count: user.diamonds})}
@@ -69,6 +70,7 @@ export function HomePage() {
 					<img
 						src="/assets/icons/tower.svg"
 						alt=""
+						aria-hidden="true"
 						className="w-3.5 h-3.5 opacity-90"
 					/>
 					{t('congratulatory_modal.level')} {user.tower_progress}
@@ -77,6 +79,7 @@ export function HomePage() {
 					<img
 						src="/assets/icons/map.svg"
 						alt=""
+						aria-hidden="true"
 						className="w-3.5 h-3.5 opacity-90"
 					/>
 					{t('home_page.map_count', { count: user.created_maps_count })}
@@ -90,9 +93,9 @@ export function HomePage() {
 			  <Link to="/editor">
 				<button className="gold-edge-hover w-full bg-surface-raised hover:bg-surface-hover border border-surface-border rounded-xl p-6 text-left group">
 				  <ActionIcon src="/assets/icons/map.svg" alt="" />
-				  <h3 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
+				  <h2 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
 					{t('home_page.create_map')}
-				  </h3>
+				  </h2>
 				  <p className="text-xs text-silver-400 group-hover:text-silver-200 mt-1 transition-colors">
 					{t('home_page.map_instructions')}
 				  </p>
@@ -102,9 +105,9 @@ export function HomePage() {
 			  <Link to="/train">
 				<button className="gold-edge-hover w-full bg-surface-raised hover:bg-surface-hover border border-surface-border rounded-xl p-6 text-left group">
 				  <ActionIcon src="/assets/icons/training.svg" alt="" />
-				  <h3 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
+				  <h2 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
 					{t('navbar.train')}
-				  </h3>
+				  </h2>
 				  <p className="text-xs text-silver-400 group-hover:text-silver-200 mt-1 transition-colors">
 					{t('home_page.train_d')}
 				  </p>
@@ -114,9 +117,9 @@ export function HomePage() {
 			  <Link to="/tower">
 				<button className="gold-edge-hover w-full bg-surface-raised hover:bg-surface-hover border border-surface-border rounded-xl p-6 text-left group">
 				  <ActionIcon src="/assets/icons/tower.svg" alt="" />
-				  <h3 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
+				  <h2 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
 					{t('home_page.climb_tower')}
-				  </h3>
+				  </h2>
 				  <p className="text-xs text-silver-400 group-hover:text-silver-200 mt-1 transition-colors">
 					{t('home_page.climb_tower_d')}
 				  </p>
@@ -126,9 +129,9 @@ export function HomePage() {
 			  <Link to="/duel">
 				<button className="gold-edge-hover w-full bg-surface-raised hover:bg-surface-hover border border-surface-border rounded-xl p-6 text-left group">
 				  <ActionIcon src="/assets/icons/duel.svg" alt="" />
-				  <h3 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
+				  <h2 className="font-semibold text-silver-100 group-hover:text-gold-300 transition-colors">
 					{t('duel_page.duel')}
-				  </h3>
+				  </h2>
 				  <p className="text-xs text-silver-400 group-hover:text-silver-200 mt-1 transition-colors">
 					{t('home_page.duel_d')}
 				  </p>

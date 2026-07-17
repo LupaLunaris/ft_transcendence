@@ -437,7 +437,7 @@ export function EditorPage() {
 				<Spinner size="sm" className="text-deep-400" />
 				</div>
 			) : myMaps.length === 0 ? (
-				<p className="text-white/30 text-xs">
+				<p className="text-white/60 text-xs">
 				{t('editor_page.no_saved_maps')}
 				</p>
 			) : (

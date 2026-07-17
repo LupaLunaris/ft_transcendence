@@ -92,7 +92,7 @@ export function DuelPage() {
           <h1 className="text-2xl font-semibold font-fantasy text-white tracking-wide">
             ⚔️ {t('duel_page.duel')}
           </h1>
-          <div className="flex items-center gap-2 text-sm text-white/40">
+          <div className="flex items-center gap-2 text-sm text-white/50">
             <span className={`w-2 h-2 rounded-full ${connected ? 'bg-green-400' : 'bg-white/20'}`} />
             {connected ? t('common.online') : t('common.login')}
           </div>

@@ -180,7 +180,7 @@ export function GamePage() {
 		  >
 			{t('game_page.exit')}
 		  </Button>
-		  <p className="text-white/40 text-sm">
+		  <p className="text-white/60 text-sm">
 			{t('game_page.instructions')}
 		  </p>
 		</div>
