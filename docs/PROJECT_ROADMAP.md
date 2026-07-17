@@ -102,11 +102,11 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 
 | Requirement | Responsable | Support | Vérification | Deadline | État | Commentaires |
 |-------------|-------------|---------|--------------|----------|:---:|--------------|
-| Historique Git propre | Jennifer | Jerem | Martin | 30/07 | ⬜ | Pas de commits inutiles. |
-| Commits clairs et explicites | Toute l'équipe | — | Jennifer | 30/07 | ⬜ | |
-| Répartition du travail visible dans Git | Jennifer | Jerem | Toute l'équipe | 30/07 | ⬜ | Vérifier les contributions de chacun. |
-| Toutes les grosses modifications passent par PR | Jennifer | Toute l'équipe | Toute l'équipe | 30/07 | ⬜ | |
-| Relecture des PR importantes | Jennifer | Toute l'équipe | Toute l'équipe | 30/07 | ⬜ | |
+| Historique Git propre | Jennifer | Jerem | Martin | 30/07 | 🟡 | Contributions présentes, mais identités Git à uniformiser et secrets à contrôler. |
+| Commits clairs et explicites | Toute l'équipe | — | Jennifer | 30/07 | 🟡 | Correct globalement. Uniformiser les futurs messages |
+| Répartition du travail visible dans Git | Jennifer | Jerem | Toute l'équipe | 30/07 | ✅ | Documenter les contributions de chacun. |
+| Toutes les grosses modifications passent par PR | Jennifer | Toute l'équipe | Toute l'équipe | 30/07 | ✅ | |
+| Relecture des PR importantes | Jennifer | Toute l'équipe | Toute l'équipe | 30/07 | ✅ | |
 
 ### README
 
