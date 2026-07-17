@@ -1,7 +1,15 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { TILE, GRID_SIZE, type Grid, type TileValue, type MapData } from '@ft/shared';
+import {
+  TILE,
+  GRID_SIZE,
+  type AchievementCode,
+  type Grid,
+  type RewardResult,
+  type TileValue,
+  type MapData,
+} from '@ft/shared';
 import { api, type AdminMap } from '@/services/api.service';
 import { useAuth } from '@/context/auth.context';
 import { useToast } from '@/components/ui/useToast';
@@ -19,6 +27,12 @@ const ERROR_MAP: Record<string, string> = {
   'Invalid grid: must be 25x25 with WALL borders, valid tile values, exactly 1 SPAWN and 1 EXIT': 'errors.invalid_grid',
   'No clear path from SPAWN to EXIT': 'errors.no_path',
   'Name is required': 'errors.name_required',
+};
+
+const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
+  FIRST_ESCAPE: 'first_escape',
+  FIRST_CREATOR: 'first_creator',
+  EXPLORER: 'explorer',
 };
 
 function getErrorKey(err: unknown, fallback: string): string {
@@ -41,7 +55,7 @@ export function EditorPage() {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { t } = useTranslation();
 
   const [grid, setGrid] = useState<Grid>(makeEmptyGrid);
@@ -225,9 +239,17 @@ export function EditorPage() {
 	setPublishing(true);
 	setShowPublishModal(false);
 	try {
-	  await api.maps.publish(mapId);
+	  const published = await api.maps.publish(mapId);
 	  setIsPublished(true);
 	  showToast(t('editor_page.toast_publish_ok'), 'success');
+	  if (published.reward && (published.reward.xp_gained > 0 || published.reward.achievements_unlocked.length > 0)) {
+		showRewardToast(published.reward);
+		try {
+		  updateUser(await api.auth.getMe());
+		} catch {
+		  // The next profile load will refresh XP if this background refresh fails.
+		}
+	  }
 	  navigate('/train');
 	} catch (err) {
 	  const msg = err && typeof err === 'object' && 'error' in err
@@ -237,6 +259,18 @@ export function EditorPage() {
 	} finally {
 	  setPublishing(false);
 	}
+  };
+
+  const showRewardToast = (reward: RewardResult) => {
+	if (reward.xp_gained > 0) {
+	  showToast(t('toast_xp_gained', { xp: reward.xp_gained }), 'success');
+	}
+	reward.achievements_unlocked.forEach((achievement) => {
+	  showToast(
+		t('toast_achievement_unlocked', { name: t(`achievement.${ACHIEVEMENT_LABEL[achievement.code]}`) }),
+		'success',
+	  );
+	});
   };
 
   const handlePublishClick = () => {

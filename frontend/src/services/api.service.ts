@@ -25,6 +25,7 @@ import type {
   Grid,
   Difficulty,
   UpdateProfileRequest,
+  RewardResult,
 } from '@ft/shared';
 
 interface TowerLevel {
@@ -58,6 +59,7 @@ interface ScoreResult {
   user_id: string;
   completion_time_ms: number;
   created_at: string;
+  reward?: RewardResult;
 }
 
 interface FriendPublic {

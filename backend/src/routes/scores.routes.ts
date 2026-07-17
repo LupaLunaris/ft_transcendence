@@ -16,6 +16,7 @@ import { authMiddleware } from '../middleware/auth.middleware';
 import { validateBody } from '../middleware/validate.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
 import { scoreSchema } from '../schemas/map.schemas';
+import { rewardPublicMapCompletion } from '../services/gamification.service';
 
 const router = Router();
 
@@ -32,12 +33,20 @@ router.post('/', authMiddleware, validateBody(scoreSchema), async (req: Request,
     return;
   }
 
-  const score = await prisma.score.create({
-    data: {
-      map_id,
-      user_id: req.user!.id,
-      completion_time_ms,
-    },
+  const { score, reward } = await prisma.$transaction(async (tx) => {
+    const score = await tx.score.create({
+      data: {
+        map_id,
+        user_id: req.user!.id,
+        completion_time_ms,
+      },
+    });
+
+    const reward = map.published
+      ? await rewardPublicMapCompletion(tx, req.user!.id, map_id)
+      : undefined;
+
+    return { score, reward };
   });
 
   sendSuccess(res, {
@@ -46,6 +55,7 @@ router.post('/', authMiddleware, validateBody(scoreSchema), async (req: Request,
     user_id: score.user_id,
     completion_time_ms: score.completion_time_ms,
     created_at: score.created_at.toISOString(),
+    reward,
   }, 201);
 });
 

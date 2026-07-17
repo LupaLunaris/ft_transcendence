@@ -38,6 +38,10 @@ const mockPrisma = {
 };
 
 jest.mock('../lib/prisma', () => ({ __esModule: true, default: mockPrisma }));
+jest.mock('../services/gamification.service', () => ({
+  rewardFirstMapPublication: jest.fn().mockResolvedValue(undefined),
+  rewardTestMapCompletion: jest.fn().mockResolvedValue(undefined),
+}));
 
 // ─── App setup ───────────────────────────────────────────────────────────────
 
@@ -252,6 +256,10 @@ describe('POST /api/v1/maps/:id/publish', () => {
       creator_completed: true,
     });
     mockPrisma.map.update.mockResolvedValue({ ...baseMap, published: true });
+    mockPrisma.$transaction.mockImplementation(async (arg) => {
+      if (typeof arg === 'function') return arg(mockPrisma);
+      return Promise.resolve(arg);
+    });
 
     const res = await request(app)
       .post('/api/v1/maps/map-uuid-1/publish')

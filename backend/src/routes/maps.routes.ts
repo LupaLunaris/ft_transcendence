@@ -20,6 +20,10 @@ import { createMapSchema, updateMapSchema } from '../schemas/map.schemas';
 import { NextFunction } from 'express';
 import { AppError, ForbiddenError, NotFoundError } from '../errors';
 import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth.middleware';
+import {
+  rewardFirstMapPublication,
+  rewardTestMapCompletion,
+} from '../services/gamification.service';
 
 const asyncHandler = (fn: (req: Request, res: Response) => Promise<void>) =>
   (req: Request, res: Response, next: NextFunction) =>
@@ -186,14 +190,24 @@ router.delete('/:id', authMiddleware, asyncHandler(async (req: Request, res: Res
 
 // POST /api/v1/maps/:id/complete
 router.post('/:id/complete', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
-  await requireMapOwner(req.params.id, req.user!.id);
+  const map = await requireMapOwner(req.params.id, req.user!.id);
 
-  const updated = await prisma.map.update({
-    where: { id: req.params.id },
-    data: { creator_completed: true },
+  const { updated, reward } = await prisma.$transaction(async (tx) => {
+    const updated = map.creator_completed
+      ? map
+      : await tx.map.update({
+        where: { id: req.params.id },
+        data: { creator_completed: true },
+      });
+
+    const reward = map.creator_completed
+      ? undefined
+      : await rewardTestMapCompletion(tx, req.user!.id, req.params.id);
+
+    return { updated, reward };
   });
 
-  sendSuccess(res, toMapData(updated));
+  sendSuccess(res, { ...toMapData(updated), reward });
 }));
 
 // POST /api/v1/maps/:id/publish
@@ -205,12 +219,20 @@ router.post('/:id/publish', authMiddleware, asyncHandler(async (req: Request, re
     return;
   }
 
-  const updated = await prisma.map.update({
-    where: { id: req.params.id },
-    data: { published: true },
+  const { updated, reward } = await prisma.$transaction(async (tx) => {
+    const updated = await tx.map.update({
+      where: { id: req.params.id },
+      data: { published: true },
+    });
+
+    const reward = map.published
+      ? undefined
+      : await rewardFirstMapPublication(tx, req.user!.id);
+
+    return { updated, reward };
   });
 
-  sendSuccess(res, toMapData(updated));
+  sendSuccess(res, { ...toMapData(updated), reward });
 }));
 
 // POST /api/v1/maps/:id/unpublish

@@ -1,5 +1,5 @@
 import { Grid } from "@ft/shared/dist/types/tiles.types";
-import type { Difficulty } from "@ft/shared";
+import type { Difficulty, RewardResult } from "@ft/shared";
 
 export type EnemySpeed = "slow" | "normal" | "fast";
 
@@ -18,6 +18,7 @@ export interface MapData {
   difficulty: Difficulty;
   play_count: number;
   created_at: string;
+  reward?: RewardResult;
 }
 export interface MapSettings {
   size: number;

@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 import { Grid } from './tiles.types';
+import type { RewardResult } from './gamification.types';
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -24,6 +25,7 @@ export interface MapData {
   difficulty: Difficulty;
   play_count: number;
   created_at: string;
+  reward?: RewardResult;
 }
 
 export interface MapSummary {
