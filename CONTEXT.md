@@ -322,6 +322,25 @@ Docs de référence : `backend_doc/duel-nplayer-lobby-and-race-lifecycle.md`,
 
 ---
 
+## Hub joueur en barre latérale (2026-07-17)
+- `frontend/src/components/layout/PlayerHub.tsx`, monté une seule fois
+  dans `Layout.tsx` (aside gauche, sticky, masqué sous `lg`) — visible
+  sur toutes les pages utilisant `Layout` sauf `/editor` et `/editor/:id`
+  (et absent si pas connecté). Carte carrée compacte : diamants,
+  progression tour, maps créées, niveau XP, badges achievements (icône
+  médaille commune, grisée si non débloqué, tooltip = nom complet).
+- `frontend/src/constants/achievements.ts` (nouveau) : `ACHIEVEMENT_LABEL`
+  et `ALL_ACHIEVEMENT_CODES` extraits de `ProfilePage.tsx` pour être
+  partagés avec `PlayerHub`.
+- `HomePage.tsx` : ancienne carte joueur inline (diamants/tour/maps)
+  supprimée — redondante avec le hub désormais toujours visible.
+- **Fix** : `Map.play_count` n'était jamais incrémenté (`POST /scores`
+  ne touchait que `Score`/gamification) → toujours affiché à 0 dans
+  `TrainingPage`. Ajout de `tx.map.update({ data: { play_count: {
+  increment: 1 } } })` dans la transaction de `POST /scores`. Cf.
+  `history_debug/2026-07-17_play-count-jamais-incremente.md`.
+- Doc : `frontend_doc/player-hub-sidebar.md`
+
 ## Fonctionnalités complètes (mise à jour 2026-07-17, branche `dev`)
 - Auth (register/login/me/profile/avatar)
 - Éditeur de maps (create/edit/delete/publish/unpublish/complete)

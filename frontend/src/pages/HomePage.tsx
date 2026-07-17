@@ -4,7 +4,6 @@ import { useAuth } from '@/context/auth.context';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
-import { Avatar } from '@/components/profile/Avatar';
 
 function ActionIcon({ src, alt }: { src: string; alt: string }) {
   return (
@@ -33,58 +32,6 @@ export function HomePage() {
 
 		{user ? (
 		  <>
-			{/* Player card */}
-			<div className="gold-edge bg-surface-raised border border-surface-border rounded-xl p-6 flex items-center gap-5">
-			  <div className="
-				w-14 h-14
-				rounded-full
-				bg-gradient-to-br
-				from-diamond-500/20
-				to-surface-muted
-				border border-gold-500/40
-				shadow-gold-soft
-				flex items-center justify-center
-				text-2xl font-bold font-fantasy
-				text-gold-200
-				shrink-0
-				">
-				<Avatar
-				avatarUrl={user.avatar ?? undefined}
-				username={user.username}
-				className="w-full h-full"
-				/>
-			  </div>
-			  <div className="flex-1">
-				<p className="text-xl font-semibold text-silver-100">{user.username}</p>
-				<div className="flex gap-4 mt-1 text-sm text-silver-400">
-				  <span className="flex items-center gap-1">
-					<img
-						src="/assets/icons/diamond.svg"
-						alt=""
-						className="w-3.5 h-3.5 opacity-90"
-					/>
-					{t('home_page.diamond_count', { count: user.diamonds})}
-					</span>
-				  <span className="flex items-center gap-1">
-					<img
-						src="/assets/icons/tower.svg"
-						alt=""
-						className="w-3.5 h-3.5 opacity-90"
-					/>
-					{t('congratulatory_modal.level')} {user.tower_progress}
-					</span>
-				  <span className="flex items-center gap-1">
-					<img
-						src="/assets/icons/map.svg"
-						alt=""
-						className="w-3.5 h-3.5 opacity-90"
-					/>
-					{t('home_page.map_count', { count: user.created_maps_count })}
-					</span>
-				</div>
-			  </div>
-			</div>
-
 			{/* Action buttons */}
 			<div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
 			  <Link to="/editor">
