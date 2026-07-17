@@ -166,7 +166,7 @@ router.put('/:id', authMiddleware, validateBody(updateMapSchema), asyncHandler(a
     where: { id: req.params.id },
     data: {
       ...(name !== undefined && { name }),
-      ...(grid !== undefined && { grid_json: JSON.stringify(grid) }),
+      ...(grid !== undefined && { grid_json: JSON.stringify(grid), creator_completed: false }),
     },
   });
 

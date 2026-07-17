@@ -212,10 +212,12 @@ export function EditorPage() {
 	setSaving(true);
 	try {
 	  if (mapId) {
-		await api.maps.update(mapId, { name: mapName, grid });
+		const updated = await api.maps.update(mapId, { name: mapName, grid });
+		setCreatorCompleted(updated.creator_completed);
 	  } else {
 		const created = await api.maps.create({ name: mapName, grid });
 		setMapId(created.id);
+		setCreatorCompleted(created.creator_completed);
 		navigate(`/editor/${created.id}`, { replace: true });
 	  }
 	  showToast(t('editor_page.toast_save_ok'), 'success');
