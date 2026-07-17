@@ -112,30 +112,30 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 
 | Requirement | Responsable | Support | Vérification | Deadline | État | Commentaires |
 |-------------|-------------|---------|--------------|----------|:---:|--------------|
-| README entièrement en anglais | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
+| README entièrement en anglais | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
 | Description du projet | Martin | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
 | Instructions d'installation | Jerem | Jennifer | Martin | 07/08 | ⬜ | |
-| Ressources utilisées | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Utilisation de l'IA documentée | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Présentation de l'équipe | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Répartition des rôles | Jennifer | Jerem | Toute l'équipe | 07/08 | ⬜ | |
-| Responsabilités de chaque rôle | Jennifer | Jerem | Toute l'équipe | 07/08 | ⬜ | |
+| Ressources utilisées | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Utilisation de l'IA documentée | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Présentation de l'équipe | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Répartition des rôles | Jennifer | Jerem | Toute l'équipe | 07/08 | 🟡 | |
+| Responsabilités de chaque rôle | Jennifer | Jerem | Toute l'équipe | 07/08 | 🟡 | |
 | Organisation du projet | Jerem | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
 | Outils de gestion utilisés | Jerem | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
 | Moyens de communication utilisés | Jerem | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
-| Stack technique complète | Jennifer | Jerem | Toute l'équipe | 07/08 | ⬜ | |
-| Justification des choix techniques | Jennifer | Jerem | Toute l'équipe | 07/08 | ⬜ | |
+| Stack technique complète | Jennifer | Jerem | Toute l'équipe | 07/08 | 🟡 | |
+| Justification des choix techniques | Jennifer | Jerem | Toute l'équipe | 07/08 | 🟡 | |
 | Schéma de la base de données | Jerem | Jennifer | Martin | 07/08 | ⬜ | |
 | Liste complète des fonctionnalités | Martin | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
-| Fonctionnalités attribuées à chaque membre | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Liste des modules réalisés | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Calcul des points des modules | Jennifer | Jerem | Toute l'équipe | 07/08 | ⬜ | |
-| Justification des modules choisis | Jennifer | Martin | Toute l'équipe | 07/08 | ⬜ | |
-| Description de l'implémentation des modules | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Répartition des modules par membre | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Contributions individuelles détaillées | Toute l'équipe | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
-| Difficultés rencontrées et solutions | Toute l'équipe | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
-| Limitations connues du projet | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
+| Fonctionnalités attribuées à chaque membre | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Liste des modules réalisés | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Calcul des points des modules | Jennifer | Jerem | Toute l'équipe | 07/08 | 🟡 | |
+| Justification des modules choisis | Jennifer | Martin | Toute l'équipe | 07/08 | 🟡 | |
+| Description de l'implémentation des modules | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Répartition des modules par membre | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Contributions individuelles détaillées | Toute l'équipe | Jennifer | Toute l'équipe | 07/08 | 🟡 | |
+| Difficultés rencontrées et solutions | Toute l'équipe | Jennifer | Toute l'équipe | 07/08 | 🟡 | |
+| Limitations connues du projet | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
 
 ---
 
