@@ -161,10 +161,10 @@ This section will be completed by Martin.
 
 | Member | Main features worked on |
 |---|---|
-| Martin | Phaser scenes, solo game flow, tower gameplay, race gameplay, map gameplay behavior |
-| Jerem | Auth routes, map routes, tower routes, admin routes, Prisma models, Docker and backend setup |
-| Jennifer | App routing, protected routes, auth context, API service, shared types, duel integration, documentation coordination |
-| Elise | UI components, layout, home/auth/profile pages, notifications UI, language selector, responsive UI work |
+| Martin | Gameplay core, tower, game scenes, multiplayer flow, editor core, avatar sprite work |
+| Jerem | Backend API, auth, maps, users, friends, Docker, security, WAF and Vault |
+| Jennifer | Frontend architecture, user management frontend, game customization flow, gamification, docs and integration |
+| Elise | UI components, i18n, legal pages, profile UI, notifications, map panel and UI fixes |
 
 ## 42 Module Scope
 
@@ -198,41 +198,48 @@ This section will be completed by Martin.
 ### Backend framework
 
 The backend is an Express server with REST routes under `/api/v1`, middleware for auth and validation, and a Socket.IO server for realtime features.
+Most backend ownership sits with Jerem. Jennifer only supports the integration side.
 
 ### Authentication
 
 Users can register, log in, fetch their own profile, update profile data, and upload an avatar. Passwords are hashed and access is protected with JWT.
+The backend auth flow is mainly Jerem. The frontend auth flow and validation are shared with Jennifer and Elise.
 
 ### Remote player
 
 The duel mode uses Socket.IO for lobby registration, match start, and synchronized gameplay updates during the game.
+Martin is the main owner here. Jerem supports the backend side and Jennifer supports the frontend integration.
 
 ### Frontend framework
 
 The frontend is a React app with protected routes, reusable hooks, a shared API service, and integration with Phaser for the game views.
+This is mainly Jennifer's area, with UI work and translations coming from Elise.
 
 ### Database
 
 The project uses PostgreSQL with Prisma. The schema includes users, maps, scores, admin tower levels, achievements, XP events, and friendships.
+The audit shows this is shared between Jerem, Jennifer, and Martin, not owned by one person only.
 
 ### Game customisation
 
 Players can create maps, edit grids, choose a difficulty, test their own map, and publish it only after completing it.
+The base gameplay comes from Martin, while Jennifer finalizes the customization flow and Elise helps with the UI around it.
 
 ### Browser client
 
 The whole project runs in the browser with React and Phaser, which keeps the game accessible without a native client.
+Jennifer owns the integration side of the browser client.
 
 ## Modules By Member
 
 | Module | Main owner | Support |
 |---|---|---|
-| Backend framework | Jerem | Jennifer |
+| Backend framework | Jerem | Jennifer, Martin |
 | Authentication | Jerem | Jennifer, Elise |
-| Remote player | Martin | Jerem, Jennifer |
-| Frontend framework | Jennifer | Elise |
-| Database | Jerem | Jennifer |
-| Game customisation | Martin | Jennifer, Elise |
+| Remote player | Martin | Jerem, Jennifer, Elise |
+| Frontend framework | Jennifer | Elise, Martin |
+| Database | Jerem, Jennifer, Martin | - |
+| Game customisation | Martin, Jennifer | Elise, Jerem |
 | Browser client | Jennifer | Martin, Elise |
 
 ## Resources Used
@@ -266,5 +273,4 @@ This section will be completed by the whole team.
 - The current multiplayer work is focused on duel mode, not on a larger shared world.
 - Tower mode is currently based on 8 admin levels.
 - Language support exists for French, English, and Dutch only.
-- The security layer is fine for a student project, but it is still basic and would need more hardening for production.
-- Published maps cannot be edited directly. They must first be unpublished, then changed.
+- The security layer is fine for a student project.
