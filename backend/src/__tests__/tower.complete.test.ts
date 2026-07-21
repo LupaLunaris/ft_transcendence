@@ -70,7 +70,7 @@ function makeUser(tower_progress: number, diamonds = 0) {
   };
 }
 
-function token(progress = 0): string {
+function token(_progress = 0): string {
   return jwt.sign({ id: 'user-uuid-1', email: 'alice@example.com', is_admin: false }, SECRET);
 }
 

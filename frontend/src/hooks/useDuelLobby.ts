@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* useDuelLobby.ts                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jpaulis <jpaulis@student.42belgium.be        +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/27 00:00:00 by jpaulis           #+#    #+#               */
-/* Updated: 2026/05/27 00:00:00 by jpaulis         ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';

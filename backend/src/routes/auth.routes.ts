@@ -182,7 +182,7 @@ router.post( '/avatar', authMiddleware, avatarUpload.single('avatar'), asyncHand
   }),
 );
 
-router.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+router.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof AppError) {
     sendError(res, err.message, err.statusCode);
     return;

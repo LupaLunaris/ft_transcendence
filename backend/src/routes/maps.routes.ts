@@ -252,7 +252,7 @@ router.post('/:id/unpublish', authMiddleware, asyncHandler(async (req: Request, 
   sendSuccess(res, toMapData(updated));
 }));
 
-router.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+router.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof AppError) {
     sendError(res, err.message, err.statusCode);
     return;

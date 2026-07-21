@@ -171,8 +171,8 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 | ORM (Prisma) | Minor | 1 | Jennifer + Martin | Jennifer + Martin | Jerem | 20/07 | ✅ | A verifer |
 | Custom-made Design System | Minor | 1 | Élise | Jennifer | Martin | 25/07 | 🟡 | Palette, composants réutilisables... |
 | Multiple Languages | Minor | 1 | Élise | Jerem | Jennifer | 25/07 | ✅ | Français, Anglais, Néerlandais. |
-| Game Customization Options | Minor | 1 | Jennifer | Martin | Élise | 25/07 | ✅ | Personnalisation des parties/maps. |
-| Gamification System | Minor | 1 | Jennifer | Martin | Jerem | 30/07 | 🟡 | Leaderboards, XP, badges... |
+| Game Customization Options | Minor | 1 | Jennifer + Martin | Jennifer + Martin | Élise | 25/07 | ✅ | Personnalisation des parties/maps. |
+| Gamification System | Minor | 1 | Jennifer + Martin | Jennifer + Martin | Jerem | 30/07 | ✅ | Leaderboards, XP, badges... |
 | Complete Notification System | Minor | 1 | Élise | Jennifer | Jerem | 30/07 | ✅ | Notifications de création, modification et suppression. |
 | Support Additional Browsers | Minor | 1 | Élise | Jennifer | Martin | 30/07 | ✅ | Firefox + Edge (ou Safari). |
 

@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* DuelPage.tsx                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: evan-dro <evan-dro@student.42belgium.be      +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/27 00:00:00 by evan-dro        #+#    #+#               */
-/* Updated: 2026/05/27 00:00:00 by evan-dro       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

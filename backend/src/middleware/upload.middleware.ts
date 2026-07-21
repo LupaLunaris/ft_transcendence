@@ -14,7 +14,6 @@ import multer, { StorageEngine } from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { Request } from 'express';
-import { sendError } from '../utils/response.utils';
 
 const AVATAR_DIR = path.join(process.cwd(), 'uploads', 'avatars');
 
@@ -49,4 +48,3 @@ export const avatarUpload = multer({
 	fileFilter,
 	limits: { fileSize: 2 * 1024 * 1024 },
 });
-

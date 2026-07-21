@@ -11,14 +11,14 @@ export const TILE_SIZE = 36;
 
 // ─── Fallback couleurs (utilisées quand la texture PNG est absente) ───────────
 
-const TILE_COLORS: Record<number, number> = {
-  [TILE.EMPTY]:   0x2a2a3e,
-  [TILE.WALL]:    0x5c3d8f,
-  [TILE.EXIT]:    0x00e5a0,
-  [TILE.SPAWN]:   0x2a2a3e, // même couleur que le sol — invisible en jeu
-  [TILE.ENEMY_H]: 0x2a2a3e, // case ennemi dessinée comme sol (ennemi par-dessus)
-  [TILE.ENEMY_V]: 0x2a2a3e,
-};
+// const TILE_COLORS: Record<number, number> = {
+//   [TILE.EMPTY]:   0x2a2a3e,
+//   [TILE.WALL]:    0x5c3d8f,
+//   [TILE.EXIT]:    0x00e5a0,
+//   [TILE.SPAWN]:   0x2a2a3e, // même couleur que le sol — invisible en jeu
+//   [TILE.ENEMY_H]: 0x2a2a3e, // case ennemi dessinée comme sol (ennemi par-dessus)
+//   [TILE.ENEMY_V]: 0x2a2a3e,
+// };
 
 // ─── Mapping tuile → clé texture Phaser ──────────────────────────────────────
 // Les cases ENEMY sont rendues comme le sol : l'ennemi (sprite) est superposé.

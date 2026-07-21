@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* assets.ts                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: malafont <malafont@student.42belgium.be       +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/21 00:00:00 by malafont        #+#    #+#               */
-/* Updated: 2026/05/23 00:00:00 by malafont       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 // Paths are relative to Vite's public/ root — served as-is, no import needed.
 // Keys are Phaser's internal texture cache identifiers.
