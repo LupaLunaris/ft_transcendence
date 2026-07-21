@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   bootstrap.ts                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: Jdebrull <jdebrull@student.s19.be>         +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/01 10:09:03 by Jdebrull          #+#    #+#             */
-/*   Updated: 2026/07/03 13:00:20 by Jdebrull         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 /* Authenticates to Vault using AppRole, fetches secrets, and populates process.env BEFORE server.ts (and therefore Prisma) is ever imported. 
 Called exclusively from index.ts as the very first async operation. */

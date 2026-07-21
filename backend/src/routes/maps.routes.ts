@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* maps.routes.ts                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jdebrull <jdebrull@student.42be              +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jdebrull        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jdebrull       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Router, Request, Response } from 'express';
 import { Map as PrismaMap } from '@prisma/client';

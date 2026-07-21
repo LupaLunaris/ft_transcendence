@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   friends.routes.ts                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: Jpaulis <Jpaulis@student.s19.be>           +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/12 11:31:40 by Jdebrull          #+#    #+#             */
-/*   Updated: 2026/06/17 09:07:35 by Jpaulis          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { FriendPublic } from '@ft/shared';
