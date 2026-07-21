@@ -12,7 +12,7 @@ COPY backend/package.json ./backend/
 # frontend manifest needed for npm install (workspaces resolution)
 COPY frontend/package.json ./frontend/
 
-RUN npm install
+RUN npm ci --include=optional
 
 # Build @ft/shared before backend can import it
 COPY shared/ ./shared/
