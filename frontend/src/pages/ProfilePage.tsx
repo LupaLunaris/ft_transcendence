@@ -6,14 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { FriendsList } from '@/components/friends/FriendsList';
 import { ProfileEditor } from '@/components/profile/ProfileEditor';
 import { Avatar } from '@/components/profile/Avatar';
-import type { AchievementCode } from '@ft/shared';
-
-const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
-  FIRST_ESCAPE: 'first_escape',
-  FIRST_CREATOR: 'first_creator',
-  EXPLORER: 'explorer',
-  DUEL_CHAMPION: 'duel_champion',
-};
+import { ACHIEVEMENT_LABEL } from '@/constants/achievements';
 
 export function ProfilePage() {
   const { t } = useTranslation();

@@ -43,6 +43,14 @@ router.post('/', authMiddleware, validateBody(scoreSchema), async (req: Request,
       where: { user_id_map_id: { user_id: req.user!.id, map_id } },
     });
 
+    // Compte chaque partie terminée sur la map, indépendamment du record
+    // personnel (upsertBestScore ne touche pas la ligne si le temps n'est
+    // pas meilleur).
+    await tx.map.update({
+      where: { id: map_id },
+      data: { play_count: { increment: 1 } },
+    });
+
     const reward = map.published
       ? await rewardPublicMapCompletion(tx, req.user!.id, map_id)
       : undefined;
