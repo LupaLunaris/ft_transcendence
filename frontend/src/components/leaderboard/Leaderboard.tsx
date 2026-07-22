@@ -22,7 +22,7 @@ export function Leaderboard({ title, entries, loading, highlightUserId, classNam
 
   return (
     <div className={`bg-surface-raised border border-surface-border rounded-xl p-4 flex flex-col gap-3 ${className ?? ''}`}>
-      <h3 className="font-fantasy text-lg text-gold-300">{title}</h3>
+      <h2 className="font-fantasy text-lg text-gold-300">{title}</h2>
 
       {loading && (
         <div className="flex justify-center py-4">
