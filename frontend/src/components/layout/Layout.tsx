@@ -13,7 +13,7 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const { user } = useAuth();
   const { pathname } = useLocation();
-  const showHub = user && !pathname.startsWith('/editor');
+  const showHub = user && !pathname.startsWith('/editor') && !pathname.startsWith('/profile');
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
