@@ -133,7 +133,7 @@ return (
         {t('tower_game_page.exit_level')}
       </Button>
 
-      <p className="text-silver-400 text-sm">
+      <p className="text-silver-500 text-sm">
         {t('game_page.instructions')}
       </p>
     </div>

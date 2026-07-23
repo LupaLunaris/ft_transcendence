@@ -6,9 +6,9 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-surface-border bg-surface/90 backdrop-blur">
+    <footer className="border-t border-surface-border bg-surface/90">
       <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p className="text-xs text-silver-500">
+        <p className="text-xs text-silver-400">
           © {year} Guilds of the Deep. {t('footer.rights')}
         </p>
 

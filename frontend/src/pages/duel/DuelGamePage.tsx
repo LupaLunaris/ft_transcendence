@@ -307,7 +307,7 @@ export function DuelGamePage() {
         )}
       </div>
 
-      <p className="text-white/40 text-sm">
+      <p className="text-white/60 text-sm">
         {t('duel_game_page.instructions')}
       </p>
     </div>

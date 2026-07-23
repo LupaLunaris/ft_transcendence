@@ -46,7 +46,7 @@ export function TileSelector({ selected, onChange }: TileSelectorProps) {
               />
               <span className="flex-1">
                 <span className="text-sm font-medium block">{label}</span>
-                <span className="text-xs text-white/40">{description}</span>
+                <span className="text-xs text-white/50">{description}</span>
               </span>
               {isActive && (
                 <span className="text-deep-300 text-xs">✓</span>
