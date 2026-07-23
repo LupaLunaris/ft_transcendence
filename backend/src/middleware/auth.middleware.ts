@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* auth.middleware.ts                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jdebrull <jdebrull@student.42be              +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jdebrull        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jdebrull       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
@@ -45,7 +34,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   }
 }
 
-export function optionalAuthMiddleware(req: Request, res: Response, next: NextFunction): void {
+export function optionalAuthMiddleware(req: Request, _res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) {
     next();

@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* auth.routes.ts                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jdebrull <jdebrull@student.42be              +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jdebrull        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jdebrull       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
@@ -182,7 +171,7 @@ router.post( '/avatar', authMiddleware, avatarUpload.single('avatar'), asyncHand
   }),
 );
 
-router.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+router.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof AppError) {
     sendError(res, err.message, err.statusCode);
     return;

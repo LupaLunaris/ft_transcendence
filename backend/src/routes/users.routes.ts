@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   users.routes.ts                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: Jdebrull <jdebrull@student.s19.be>         +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/12 11:31:42 by Jdebrull          #+#    #+#             */
-/*   Updated: 2026/06/12 11:31:42 by Jdebrull         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { UserProfile } from '@ft/shared';

@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* useMap.ts                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jpaulis <jpaulis@student.42belgium.be        +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jpaulis         #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jpaulis        ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import type { MapData, MapSummary, PaginatedResponse, Difficulty } from '@ft/shared';
 import { api } from '@/services/api.service';

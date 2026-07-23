@@ -3,8 +3,6 @@ import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import type { Grid } from '@ft/shared';
 import { GameScene } from './scenes/GameScene';
-import { TILE_SIZE } from './scenes/BaseScene';
-import { GRID_SIZE } from '@ft/shared';
 
 interface GameCanvasProps {
   grid: Grid;

@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* RacePage.tsx                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: malafont <malafont@student.42belgium.be       +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by malafont        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by malafont       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Layout } from '@/components/layout/Layout';
 import { useTranslation } from 'react-i18next';
