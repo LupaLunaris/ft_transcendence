@@ -41,6 +41,28 @@ openssl x509 -req \
   -extfile vault-ext.cnf
 
 rm vault.csr vault-ext.cnf
+
+# 5. nginx Https certs
+openssl genrsa -out nginx-key.pem 4096
+openssl req -new \
+  -key nginx-key.pem \
+  -out nginx.csr \
+  -subj "/C=BE/O=ft_transcendence/CN=localhost"
+
+cat > nginx-ext.cnf << EOF
+subjectAltName = DNS:localhost, IP:127.0.0.1
+extendedKeyUsage = serverAuth
+EOF
+
+openssl x509 -req \
+  -in nginx.csr \
+  -CA ca-cert.pem -CAkey ca-key.pem CAcreateserial \
+  -out nginx-cert.pem \
+  -days 825 -sha256 \
+  -extfile nginx-ext.cnf
+
+
+rm vault.csr vault-ext.cnf
 rm -f ca-cert.srl
 
 # Permissions: key must be readable by the vault container's unprivileged user

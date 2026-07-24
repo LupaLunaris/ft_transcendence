@@ -73,8 +73,6 @@ services:
       - ./nginx/modsec/modsecurity.conf:/etc/nginx/modsec/modsecurity.conf:ro
     networks:
       - ft_network
-    ports:
-    - "8080:8080"
 
   backend:
     build:
@@ -118,13 +116,25 @@ services:
       BACKEND_INTERNAL_URL: http://waf:8080
       NODE_ENV: development
       VITE_HMR_HOST: localhost
-      VITE_HMR_PORT: 5173
-      VITE_HMR_PROTOCOL: ws
-    ports:
-      - "5173:5173"
+      VITE_HMR_PORT: 443
+      VITE_HMR_PROTOCOL: wss
     networks:
       - ft_network
     volumes:
       - ./frontend/src:/app/frontend/src
       - /app/node_modules
       - /app/frontend/node_modules
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    depends_on:
+      -fronted
+      -waf
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./ngingx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./vault/certs:/etc/
