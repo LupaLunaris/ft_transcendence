@@ -130,7 +130,7 @@ services:
     container_name: nginx
     restart: unless-stopped
     depends_on:
-      -fronted
+      -frontend
       -waf
     ports:
       - "80:80"
