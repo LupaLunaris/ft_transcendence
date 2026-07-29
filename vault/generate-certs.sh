@@ -40,7 +40,7 @@ openssl x509 -req \
   -days 825 -sha256 \
   -extfile vault-ext.cnf
 
-rm vault.csr vault-ext.cnf
+rm -f vault.csr vault-ext.cnf
 
 # 5. nginx Https certs
 openssl genrsa -out nginx-key.pem 4096
@@ -56,17 +56,16 @@ EOF
 
 openssl x509 -req \
   -in nginx.csr \
-  -CA ca-cert.pem -CAkey ca-key.pem CAcreateserial \
+  -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial \
   -out nginx-cert.pem \
   -days 825 -sha256 \
   -extfile nginx-ext.cnf
 
-
-rm vault.csr vault-ext.cnf
+rm -f vault.csr vault-ext.cnf nginx.csr nginx-ext.cnf
 rm -f ca-cert.srl
 
 # Permissions: key must be readable by the vault container's unprivileged user
-chmod 644 ca-cert.pem vault-cert.pem vault-key.pem
+chmod 644 ca-cert.pem vault-cert.pem vault-key.pem nginx-cert.pem nginx-key.pem
 chmod 600 ca-key.pem
 
 echo "Vault certs generated in $CERT_DIR."
