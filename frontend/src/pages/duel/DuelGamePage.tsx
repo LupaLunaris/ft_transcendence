@@ -22,6 +22,7 @@ import { useToast } from '@/components/ui/useToast';
 import type { AchievementCode } from '@ft/shared';
 import { api } from '@/services/api.service';
 import { useTranslation } from 'react-i18next';
+import { TouchPad } from '@/components/ui/TouchPad';
 
 const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
   FIRST_ESCAPE: 'first_escape',
@@ -244,6 +245,10 @@ export function DuelGamePage() {
     };
   }, [state, user]);  // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleDirection = (direction: Direction, pressed: boolean) => {
+  gameRef.current?.events.emit('touch_input', { direction, pressed });
+  };
+
   if (!state) return null;
 
   return (
@@ -267,6 +272,8 @@ export function DuelGamePage() {
           className="rounded-lg overflow-hidden shadow-lg"
           style={{ width: CANVAS_W, height: CANVAS_H }}
         />
+
+        <TouchPad onDirection={handleDirection} />
 
         {/* Attente que tous les joueurs soient connectés */}
         {waiting && !result && (

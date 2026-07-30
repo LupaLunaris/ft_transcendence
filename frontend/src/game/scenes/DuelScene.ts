@@ -264,6 +264,7 @@ export class DuelScene extends BaseScene {
     // ignorés — cf. DuelGamePage.tsx `me.alive === false`.
     this.game.events.on('i_died', this.handleIDied, this);
 
+    this.registerTouchInput();
     // Signale à React que les listeners ci-dessus sont prêts : tout
     // game_state émis PENDANT le chargement des assets (preload) était
     // silencieusement perdu (aucun listener encore inscrit) — React rejoue
@@ -278,10 +279,10 @@ export class DuelScene extends BaseScene {
   update(): void {
     if (this.finished || this.isMoving) return;
 
-    const left  = this.cursors.left.isDown  || this.wasd.left.isDown;
-    const right = this.cursors.right.isDown || this.wasd.right.isDown;
-    const up    = this.cursors.up.isDown    || this.wasd.up.isDown;
-    const down  = this.cursors.down.isDown  || this.wasd.down.isDown;
+    const left  = this.cursors.left.isDown  || this.wasd.left.isDown || this.touchState.left;
+    const right = this.cursors.right.isDown || this.wasd.right.isDown || this.touchState.right;
+    const up    = this.cursors.up.isDown    || this.wasd.up.isDown || this.touchState.up;
+    const down  = this.cursors.down.isDown  || this.wasd.down.isDown || this.touchState.down;
 
     if      (left)  this.tryMove(-1,  0, 'left');
     else if (right) this.tryMove( 1,  0, 'right');
@@ -481,5 +482,6 @@ export class DuelScene extends BaseScene {
     this.game.events.off('remote_states',  this.handleRemoteStates,  this);
     this.game.events.off('remote_enemies', this.handleRemoteEnemies, this);
     this.game.events.off('i_died',         this.handleIDied,         this);
+    this.unregisterTouchInput();
   }
 }

@@ -1,8 +1,9 @@
 
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
-import type { Grid } from '@ft/shared';
+import type { Grid, Direction } from '@ft/shared';
 import { GameScene } from './scenes/GameScene';
+import { TouchPad } from '@/components/ui/TouchPad';
 
 interface GameCanvasProps {
   grid: Grid;
@@ -25,6 +26,7 @@ const CANVAS_HEIGHT = 600;
 	onDeath
 	}: GameCanvasProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
+	const gameRef = useRef<Phaser.Game | null>(null);
 
 	const onExitRef = useRef(onExit);
 	useEffect(() => { onExitRef.current = onExit; }, [onExit]);
@@ -49,6 +51,7 @@ const CANVAS_HEIGHT = 600;
 		};
 
 		const game = new Phaser.Game(config);
+		gameRef.current = game;
 
 		game.events.on('player_reached_exit', (time_ms: number) => {
 		onExitRef.current(time_ms);
@@ -69,13 +72,21 @@ const CANVAS_HEIGHT = 600;
 
 		return () => {
 		game.destroy(true);
+		gameRef.current = null;
 		};
 	}, []);
 
+	  const handleDirection = (direction: Direction, pressed: boolean) => {
+      gameRef.current?.events.emit('touch_input', { direction, pressed });
+  	};
+
 	return (
+	  <>
 		<div
 		ref={containerRef}
 		style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}
 		/>
+		<TouchPad onDirection={handleDirection} />
+	  </>
 	);
 	}
