@@ -6,7 +6,7 @@
 /*   By: Jdebrull <jdebrull@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/12 11:31:42 by Jdebrull          #+#    #+#             */
-/*   Updated: 2026/06/12 11:31:42 by Jdebrull         ###   ########.fr       */
+/*   Updated: 2026/07/30 12:33:36 by Jdebrull         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@ import { UserProfile } from '@ft/shared';
 import prisma from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
-import { onlineUsers } from '../state/online.state';
+import { getStatus } from '../state/online.state';
 
 const router = Router();
 
@@ -77,7 +77,7 @@ router.get('/:user_id', authMiddleware, asyncHandler(async (req: Request, res: R
         created_maps_count: user.created_maps_count,
         is_admin: user.is_admin,
         created_at: user.created_at.toISOString(),
-        online_status: onlineUsers.has(user.id) ? 'online' : 'offline', 
+        online_status: getStatus(user.id), 
         friends_count: user._count.friendships_sent + user._count.friendships_received,
     };
     
