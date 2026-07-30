@@ -158,7 +158,7 @@ export function GamePage() {
 
   return (
 	<>
-	  <div className="min-h-screen bg-surface flex flex-row items-start justify-center gap-4 p-4">
+	  <div className="min-h-screen bg-surface flex flex-row items-start justify-start md:justify-center gap-4 p-4 overflow-x-auto">
 		<div className="flex flex-col items-center gap-4">
 		  <h2 className="text-xl font-semibold text-silver-100 font-fantasy tracking-wide">
 			{map.name}

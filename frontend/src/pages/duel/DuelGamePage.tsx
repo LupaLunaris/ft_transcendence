@@ -247,7 +247,7 @@ export function DuelGamePage() {
   if (!state) return null;
 
   return (
-    <div className="min-h-screen bg-surface flex flex-row items-start justify-center gap-4 p-4">
+    <div className="min-h-screen bg-surface flex flex-row items-start justify-start md:justify-center gap-4 p-4 overflow-x-auto">
     <div className="flex flex-col items-center gap-4 flex-1">
     {/* En-tête avec pseudos adversaires */}
       <div className="flex items-center gap-4 text-sm text-white/60 flex-wrap justify-center">
