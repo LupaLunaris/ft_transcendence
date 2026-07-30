@@ -6,7 +6,7 @@
 /*   By: Jdebrull <jdebrull@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/12 11:31:42 by Jdebrull          #+#    #+#             */
-/*   Updated: 2026/07/30 12:33:36 by Jdebrull         ###   ########.fr       */
+/*   Updated: 2026/07/30 18:07:08 by Jdebrull         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ import prisma from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
 import { getStatus } from '../state/online.state';
+import { toUserPublic } from '../utils/user.serializer';
+import { avatarUpload } from '../middleware/upload.middleware';
 
 const router = Router();
 
@@ -82,6 +84,22 @@ router.get('/:user_id', authMiddleware, asyncHandler(async (req: Request, res: R
     };
     
     sendSuccess(res, profile);
+}));
+
+router.post('/avatar', authMiddleware, avatarUpload.single('avatar'), asyncHandler(async (req: Request, res: Response) => {
+    if (!req.file) {
+        sendError(res, 'No file uploaded', 400);
+        return ;
+    }
+    
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    
+    const user = await prisma.user.update({
+        where: { id: req.user!.id },
+        data: { avatar: avatarUrl },
+    });
+
+    sendSuccess(res, toUserPublic(user));
 }));
 
 export default router;

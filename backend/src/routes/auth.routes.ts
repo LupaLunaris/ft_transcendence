@@ -21,7 +21,7 @@ import { validateBody } from '../middleware/validate.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
 import { NextFunction } from 'express';
 import { AppError } from '../errors';
-import { avatarUpload } from '../middleware/upload.middleware';
+import { toUserPublic } from '../utils/user.serializer';
 import {
   registerSchema,
   loginSchema,
@@ -37,19 +37,6 @@ if (!JWT_SECRET)
   throw new Error('JWT_SECRET is not set');
 
 const router = Router();
-
-function toUserPublic(user: User): UserPublic {
-  return {
-    id: user.id,
-    username: user.username,
-    avatar: user.avatar,
-    diamonds: user.diamonds,
-    tower_progress: user.tower_progress,
-    created_maps_count: user.created_maps_count,
-    is_admin: user.is_admin,
-    created_at: user.created_at.toISOString(),
-  };
-}
 
 function signToken(user: User): string {
   return jwt.sign(
@@ -147,22 +134,6 @@ router.put('/profile', authMiddleware, validateBody(updateProfileSchema), asyncH
 
   sendSuccess(res, toUserPublic(user));
 }));
-
-router.post( '/avatar', authMiddleware, avatarUpload.single('avatar'), asyncHandler(async (req: Request, res: Response) => {
-    if (!req.file) {
-      sendError(res, 'No file uploaded', 400);
-      return;
-    }
-
-    const avatarUrl = `/uploads/avatars/${req.file.filename}`
-
-    const user = await prisma.user.update({
-      where: { id: req.user!.id },
-      data: { avatar: avatarUrl },
-    });
-    sendSuccess(res, toUserPublic(user));
-  }),
-);
 
 router.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof AppError) {

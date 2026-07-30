@@ -33,17 +33,18 @@ export function ProfileEditor() {
 		formData.append("avatar", file);
 		formData.append("username", username);
 
-		const res = await fetch("/api/users/avatar", {
+		const res = await fetch("/api/v1/users/avatar", {
 			method: "POST",
 			headers: {
-			Authorization: `Bearer ${localStorage.getItem("token")}`,
+			Authorization: `Bearer ${localStorage.getItem("ft_token")}`,
 			},
 			body: formData,
 		});
 
 		if (!res.ok) throw new Error("Upload failed");
 
-		updatedUser = await res.json();
+		const json = await res.json();
+		updatedUser = json.data;
 		}
 
 		// 🔥 CAS 2 — avatars prédéfinis
