@@ -4,6 +4,7 @@ import Phaser from 'phaser';
 import type { Grid, Direction } from '@ft/shared';
 import { GameScene } from './scenes/GameScene';
 import { TouchPad } from '@/components/ui/TouchPad';
+import { createPortal } from 'react-dom'
 
 interface GameCanvasProps {
   grid: Grid;
@@ -86,7 +87,6 @@ const CANVAS_HEIGHT = 600;
 		ref={containerRef}
 		style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}
 		/>
-		<TouchPad onDirection={handleDirection} />
-	  </>
+      	{createPortal(<TouchPad onDirection={handleDirection} />, document.body)}	  </>
 	);
 	}

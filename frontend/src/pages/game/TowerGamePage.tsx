@@ -11,6 +11,7 @@ import { CongratulatoryModal } from '@/components/tower/CongratulatoryModal';
 import { GameOverModal } from '@/components/game/GameOverModal';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
+import { ScaledGameFrame } from '@/components/game/ScaledGameFrame';
 
 export function TowerGamePage() {
   const { order_index: orderIndexParam } = useParams<{ order_index: string }>();
@@ -105,8 +106,7 @@ if (error || !level) {
 
 return (
   <>
-    <div className="min-h-screen bg-surface flex flex-row items-start justify-start gap-4 p-4 overflow-x-auto">
-      <div className="flex flex-col items-center gap-4">
+    <div className="min-h-screen bg-surface flex flex-col items-center gap-4 p-4">
       <h2 className="guild-title font-fantasy text-xl font-semibold tracking-wide flex items-center gap-2">
         <img src="/assets/icons/tower.svg" alt="" className="h-6 w-6 object-contain opacity-80" />
         {t('tower_levels.level_' + orderIndex)}
@@ -116,28 +116,24 @@ return (
         {t('tower_game_page.level', { orderIndex })}
       </p>
 
-      <GameCanvas
-        key={gameKey}
-        grid={level.grid_json}
-        player_id={user!.id}
-        player_sprite={AVATAR_TO_SPRITE[user!.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE}
-        onExit={handleExit}
-        onDeath={handleDeath}
-      />
-
-      <Button
-        type="button"
-        variant="secondary"
-        size="sm"
-        onClick={handleExitMap}
-      >
+      <Button type="button" variant="secondary" size="sm" onClick={handleExitMap}>
         {t('tower_game_page.exit_level')}
       </Button>
 
       <p className="text-silver-500 text-sm">
         {t('game_page.instructions')}
       </p>
-    </div>
+
+      <ScaledGameFrame>
+        <GameCanvas
+          key={gameKey}
+          grid={level.grid_json}
+          player_id={user!.id}
+          player_sprite={AVATAR_TO_SPRITE[user!.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE}
+          onExit={handleExit}
+          onDeath={handleDeath}
+        />
+      </ScaledGameFrame>
     </div>
 
     <GameOverModal

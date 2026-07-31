@@ -23,6 +23,8 @@ import type { AchievementCode } from '@ft/shared';
 import { api } from '@/services/api.service';
 import { useTranslation } from 'react-i18next';
 import { TouchPad } from '@/components/ui/TouchPad';
+import { ScaledGameFrame } from '@/components/game/ScaledGameFrame';
+import { createPortal } from 'react-dom';
 
 const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
   FIRST_ESCAPE: 'first_escape',
@@ -251,29 +253,34 @@ export function DuelGamePage() {
 
   if (!state) return null;
 
-  return (
-    <div className="min-h-screen bg-surface flex flex-row items-start justify-start md:justify-center gap-4 p-4 overflow-x-auto">
-    <div className="flex flex-col items-center gap-4 flex-1">
+return (
+  <div className="min-h-screen bg-surface flex flex-col items-center gap-4 p-4">
     {/* En-tête avec pseudos adversaires */}
-      <div className="flex items-center gap-4 text-sm text-white/60 flex-wrap justify-center">
-        <span className="text-white font-medium">{user?.username}</span>
-        <span className="text-white/30">vs</span>
-        {state.opponents.map((o, i) => (
-          <span key={o.id} className="text-deep-300 font-medium">
-            {o.username}{i < state.opponents.length - 1 ? ',' : ''}
-          </span>
-        ))}
-      </div>
+    <div className="flex items-center gap-4 text-sm text-white/60 flex-wrap justify-center">
+      <span className="text-white font-medium">{user?.username}</span>
+      <span className="text-white/30">vs</span>
+      {state.opponents.map((o, i) => (
+        <span key={o.id} className="text-deep-300 font-medium">
+          {o.username}{i < state.opponents.length - 1 ? ',' : ''}
+        </span>
+      ))}
+    </div>
 
-      {/* Zone de jeu */}
-      <div className="relative">
-        <div
-          ref={containerRef}
-          className="rounded-lg overflow-hidden shadow-lg"
-          style={{ width: CANVAS_W, height: CANVAS_H }}
-        />
+    <p className="text-white/60 text-sm">
+      {t('duel_game_page.instructions')}
+    </p>
 
-        <TouchPad onDirection={handleDirection} />
+    <div className="w-full flex flex-row items-start justify-center gap-4">
+      <div className="relative w-full max-w-[800px]">
+        <ScaledGameFrame>
+          <div
+            ref={containerRef}
+            className="rounded-lg overflow-hidden shadow-lg"
+            style={{ width: CANVAS_W, height: CANVAS_H }}
+          />
+        </ScaledGameFrame>
+
+        {createPortal(<TouchPad onDirection={handleDirection} />, document.body)}
 
         {/* Attente que tous les joueurs soient connectés */}
         {waiting && !result && (
@@ -314,11 +321,6 @@ export function DuelGamePage() {
         )}
       </div>
 
-      <p className="text-white/60 text-sm">
-        {t('duel_game_page.instructions')}
-      </p>
-    </div>
-
       <Leaderboard
         title={t('leaderboard.map_title')}
         entries={leaderboardEntries}
@@ -326,6 +328,7 @@ export function DuelGamePage() {
         highlightUserId={user?.id}
         className="w-64 mt-12 hidden md:flex"
       />
+      </div>
     </div>
   );
 }
