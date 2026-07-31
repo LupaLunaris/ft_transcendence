@@ -46,7 +46,7 @@ const MAX_LOBBY_PLAYERS = 4;
 
 export function DuelPage() {
   const navigate    = useNavigate();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const { t } = useTranslation();
 
   const [difficulty, setDifficulty] = useState<Difficulty | undefined>();
@@ -60,7 +60,6 @@ export function DuelPage() {
   }, [navigate]);
 
   const { lobbyEntries, myRegistrations, joinLobby, connected } = useDuelLobby({
-    token,
     userId: user?.id ?? null,
     onDuelStart: handleDuelStart,
     onError: (msg) => setError(msg),

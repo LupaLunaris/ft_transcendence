@@ -13,7 +13,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Phaser from 'phaser';
-import { io, Socket } from 'socket.io-client';
 import type {
   DuelStartPayload,
   RaceResult,
@@ -23,6 +22,7 @@ import type {
   ServerToClientEvents,
 } from '@ft/shared';
 import { useAuth } from '@/context/auth.context';
+import { useSocket } from '@/context/socket.context';
 import { DuelScene } from '@/game/scenes/DuelScene';
 import { AVATAR_TO_SPRITE, DEFAULT_PLAYER_SPRITE } from '@/game/assets';
 import { Button } from '@/components/ui/Button';
@@ -90,14 +90,16 @@ function ResultOverlay({
 export function DuelGamePage() {
   const location  = useLocation();
   const navigate  = useNavigate();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
+  const { socket } = useSocket();
   const { t } = useTranslation();
 
   const state = location.state as DuelStartPayload | null;
 
   const containerRef  = useRef<HTMLDivElement>(null);
   const gameRef       = useRef<Phaser.Game | null>(null);
-  const socketRef     = useRef<DuelSocket | null>(null);
+  const socketRef = useRef<typeof socket>(null);
+  useEffect(() => { socketRef.current = socket; }, [socket]);
   // Dernier game_state reçu, indépendamment de l'état de chargement de la
   // scène Phaser — permet de rattraper la scène dès qu'elle signale 'scene_ready'
   // (cf. effect Phaser ci-dessous : sans ce cache, un game_state émis avant que
@@ -122,49 +124,56 @@ export function DuelGamePage() {
   // auth.context.tsx), la closure de 'game_state' capture user=null pour
   // toute la durée de la connexion socket (l'effect ne se relance jamais).
   useEffect(() => {
-    if (!state || !token || !user) return;
+    if (!state || !user || !socket) return;
 
-    const socket: DuelSocket = io({ auth: { token }, transports: ['websocket', 'polling'] });
-    socketRef.current = socket;
-
-    socket.on('game_state', (gameState) => {
+    function handleGameState(gameState: GameState) {
       if (!gameState.started) return;
       setWaiting(false);
       lastGameStateRef.current = gameState;
 
-      const me = gameState.players.find(p => p.id === user.id);
+      const me = gameState.players.find(p => p.id === user!.id);
       if (me?.finished) setMyFinished(true);
-      // Le mouvement local est prédictif (tween immédiat côté client) : sans ce
-      // signal explicite, un joueur tué par un ennemi ne le sait jamais — son
-      // scene Phaser continue de bouger localement alors que le serveur ignore
-      // déjà tous ses `player_input` (cf. backend_doc/duel-server-authoritative-enemies.md).
       if (me && !me.alive) {
         setMyAlive(false);
         gameRef.current?.events.emit('i_died');
       }
 
-      const remotes = gameState.players.filter(p => p.id !== user.id);
+      const remotes = gameState.players.filter(p => p.id !== user!.id);
       gameRef.current?.events.emit('remote_states', remotes);
       gameRef.current?.events.emit('remote_enemies', gameState.enemies);
-    });
+    }
 
-    socket.on('race_finished', (res) => {
+    function handleRaceFinished(res: RaceResult) {
       setResult(res);
-    });
+    }
 
-    socket.on('error_event', ({ message }) => {
+    function handleErrorEvent({ message }: { message: string }) {
       console.error('[duel game]', message);
-    });
+    }
 
-    socket.on('connect', () => {
+    function handleConnect() {
+      socket!.emit('join_race', { race_id: state!.race_id });
+    }
+
+    socket.on('game_state', handleGameState);
+    socket.on('race_finished', handleRaceFinished);
+    socket.on('error_event', handleErrorEvent);
+    socket.on('connect', handleConnect);
+
+    // Le socket partagé est peut-être déjà connecté avant ce montage
+    // (ex: navigation depuis le lobby) — sans ceci, 'connect' ne se
+    // redéclenche jamais et join_race n'est jamais émis.
+    if (socket.connected) {
       socket.emit('join_race', { race_id: state.race_id });
-    });
+    }
 
     return () => {
-      socket.disconnect();
-      socketRef.current = null;
+      socket.off('game_state', handleGameState);
+      socket.off('race_finished', handleRaceFinished);
+      socket.off('error_event', handleErrorEvent);
+      socket.off('connect', handleConnect);
     };
-  }, [token, state?.race_id, user?.id]);   // eslint-disable-line react-hooks/exhaustive-deps
+  }, [socket, state?.race_id, user?.id]);   // eslint-disable-line react-hooks/exhaustive-deps  // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Phaser : initialisation ───────────────────────────────────────────────
   useEffect(() => {
