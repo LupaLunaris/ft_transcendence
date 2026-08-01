@@ -48,6 +48,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/uploads": {
+        target: process.env.BACKEND_INTERNAL_URL ?? "http://localhost:3001",
+        changeOrigin: true,
+        secure: false,
+      },
       "/socket.io": {
         target: process.env.BACKEND_INTERNAL_URL ?? "http://localhost:3001",
         changeOrigin: true,
