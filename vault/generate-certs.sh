@@ -3,8 +3,8 @@ set -e
 
 CERT_DIR="$(dirname "$0")/certs"
 
-if [ -f "$CERT_DIR/vault-cert.pem" ]; then
-    echo "Vault certs already exist in $CERT_DIR, skipping generation."
+if [ -f "$CERT_DIR/vault-cert.pem" ] && [ -f "$CERT_DIR/nginx-cert.pem" ]; then
+    echo "Certs already exist in $CERT_DIR, skipping generation."
     exit 0
 fi
 
