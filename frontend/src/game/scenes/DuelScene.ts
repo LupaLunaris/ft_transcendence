@@ -330,10 +330,10 @@ export class DuelScene extends BaseScene {
         this.isMoving = false;
 
         const stillPressed =
-          (dir === 'left'  && (this.cursors.left.isDown  || this.wasd.left.isDown))  ||
-          (dir === 'right' && (this.cursors.right.isDown || this.wasd.right.isDown)) ||
-          (dir === 'up'    && (this.cursors.up.isDown    || this.wasd.up.isDown))    ||
-          (dir === 'down'  && (this.cursors.down.isDown  || this.wasd.down.isDown));
+          (dir === 'left'  && (this.cursors.left.isDown  || this.wasd.left.isDown|| this.touchState.left))  ||
+          (dir === 'right' && (this.cursors.right.isDown || this.wasd.right.isDown || this.touchState.right)) ||
+          (dir === 'up'    && (this.cursors.up.isDown    || this.wasd.up.isDown || this.touchState.up))    ||
+          (dir === 'down'  && (this.cursors.down.isDown  || this.wasd.down.isDown || this.touchState.down));
         if (stillPressed) this.moveDuration = Math.max(60, this.moveDuration - 15);
 
         if (this.grid[ny][nx] === TILE.EXIT && !this.finished) {
