@@ -2,8 +2,16 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 600;
+const LEADERBOARD_BREAKPOINT = 768;
+const LEADERBOARD_RESERVED_WIDTH = 256 + 16;
 
-export function ScaledGameFrame({ children }: { children: ReactNode }) {
+interface ScaledGameFrameProps {
+  children: ReactNode;
+  /** Rendu par-dessus le jeu (spinners, overlays d'état...), non affecté par le scale */
+  overlay?: ReactNode;
+}
+
+export function ScaledGameFrame({ children, overlay }: ScaledGameFrameProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -12,14 +20,16 @@ export function ScaledGameFrame({ children }: { children: ReactNode }) {
     if (!el || !el.parentElement) return;
 
     const updateScale = () => {
-      // clientWidth du PARENT (pas window.innerWidth) : reflète l'espace
-      // réellement disponible après déduction de toute scrollbar déjà
-      // présente, sans le décalage que window.innerWidth peut avoir.
-      const width = el.parentElement!.clientWidth;
+      const parentWidth = el.parentElement!.clientWidth;
+      const leaderboardVisible = window.innerWidth >= LEADERBOARD_BREAKPOINT;
+      const availableWidth = leaderboardVisible
+        ? parentWidth - LEADERBOARD_RESERVED_WIDTH
+        : parentWidth;
+
       const top = el.getBoundingClientRect().top;
       const availableHeight = window.innerHeight - top - 16;
 
-      const nextScale = Math.min(1, width / GAME_WIDTH, availableHeight / GAME_HEIGHT);
+      const nextScale = Math.min(1, availableWidth / GAME_WIDTH, availableHeight / GAME_HEIGHT);
       setScale(Math.max(0.35, nextScale));
     };
 
@@ -38,7 +48,7 @@ export function ScaledGameFrame({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div ref={wrapperRef} className="w-full max-w-[800px] mx-auto">
+    <div ref={wrapperRef} className="relative shrink-0 mx-auto" style={{ width: GAME_WIDTH * scale }}>
       <div className="overflow-hidden" style={{ height: GAME_HEIGHT * scale }}>
         <div
           style={{
@@ -51,6 +61,7 @@ export function ScaledGameFrame({ children }: { children: ReactNode }) {
           {children}
         </div>
       </div>
+      {overlay}
     </div>
   );
 }

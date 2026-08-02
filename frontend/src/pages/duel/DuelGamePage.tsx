@@ -271,64 +271,66 @@ return (
     </p>
 
     <div className="w-full flex flex-row items-start justify-center gap-4">
-      <div className="relative w-full max-w-[800px]">
-        <ScaledGameFrame>
-          <div
-            ref={containerRef}
-            className="rounded-lg overflow-hidden shadow-lg"
-            style={{ width: CANVAS_W, height: CANVAS_H }}
-          />
-        </ScaledGameFrame>
+      <ScaledGameFrame
+        overlay={
+          <>
+            {/* Attente que tous les joueurs soient connectés */}
+            {waiting && !result && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3">
+                <Spinner size="lg" className="text-deep-400" />
+                <p className="text-white/70 text-sm">
+                  {t('duel_game_page.wait_other_player')}
+                </p>
+              </div>
+            )}
 
-        {createPortal(<TouchPad onDirection={handleDirection} />, document.body)}
+            {/* Le joueur local a fini, la course continue pour les autres */}
+            {!waiting && myFinished && !result && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3 pointer-events-none">
+                <Spinner size="lg" className="text-deep-400" />
+                <p className="text-white/70 text-sm">
+                  {t('duel_game_page.waiting_others')}
+                </p>
+              </div>
+            )}
 
-        {/* Attente que tous les joueurs soient connectés */}
-        {waiting && !result && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3">
-            <Spinner size="lg" className="text-deep-400" />
-            <p className="text-white/70 text-sm">
-              {t('duel_game_page.wait_other_player')}
-            </p>
-          </div>
-        )}
+            {/* Le joueur local est mort (ennemi/forfait), la course continue pour les autres */}
+            {!waiting && !myAlive && !myFinished && !result && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3 pointer-events-none">
+                <p className="text-3xl">💀</p>
+                <p className="text-white/70 text-sm">
+                  {t('duel_game_page.dead_waiting')}
+                </p>
+              </div>
+            )}
 
-        {/* Le joueur local a fini, la course continue pour les autres */}
-        {!waiting && myFinished && !result && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3 pointer-events-none">
-            <Spinner size="lg" className="text-deep-400" />
-            <p className="text-white/70 text-sm">
-              {t('duel_game_page.waiting_others')}
-            </p>
-          </div>
-        )}
-
-        {/* Le joueur local est mort (ennemi/forfait), la course continue pour les autres */}
-        {!waiting && !myAlive && !myFinished && !result && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3 pointer-events-none">
-            <p className="text-3xl">💀</p>
-            <p className="text-white/70 text-sm">
-              {t('duel_game_page.dead_waiting')}
-            </p>
-          </div>
-        )}
-
-        {result && (
-          <ResultOverlay
-            result={result}
-            myId={user?.id ?? ''}
-            onLeave={() => navigate('/duel')}
-          />
-        )}
-      </div>
+            {result && (
+              <ResultOverlay
+                result={result}
+                myId={user?.id ?? ''}
+                onLeave={() => navigate('/duel')}
+              />
+            )}
+          </>
+        }
+      >
+        <div
+          ref={containerRef}
+          className="rounded-lg overflow-hidden shadow-lg"
+          style={{ width: CANVAS_W, height: CANVAS_H }}
+        />
+      </ScaledGameFrame>
 
       <Leaderboard
         title={t('leaderboard.map_title')}
         entries={leaderboardEntries}
         loading={leaderboardLoading}
         highlightUserId={user?.id}
-        className="w-64 mt-12 hidden md:flex"
+        className="w-64 shrink-0 mt-12 hidden md:flex"
       />
-      </div>
     </div>
-  );
+
+    {createPortal(<TouchPad onDirection={handleDirection} />, document.body)}
+  </div>
+);
 }

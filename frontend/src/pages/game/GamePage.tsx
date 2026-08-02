@@ -195,7 +195,7 @@ export function GamePage() {
             entries={leaderboardEntries}
             loading={leaderboardLoading}
             highlightUserId={user?.id}
-            className="w-64 mt-12 hidden md:flex"
+            className="w-64 shrink-0 mt-12 hidden md:flex"
           />
         </div>
       </div>
