@@ -201,7 +201,8 @@ vault-unseal: vault-wait
 	@docker exec vault vault operator unseal "$$(sed -E 's/\x1B\[[0-9;]*[mK]//g' vault/secrets/init-output.txt | grep 'Unseal Key 3:' | awk '{print $$NF}' | tr -d '\r')"
 	@docker exec vault vault status
 
-docker-up: check-platform-deps certs ## Build and start all services in detached mode	@if [ ! -f .env ]; then \
+docker-up: check-platform-deps certs ## Build and start all services in detached mode	
+	@if [ ! -f .env ]; then \
 		printf "$(RED)Error: .env not found. Copy .env.example and fill in values.$(RESET)\n"; \
 		exit 1; \
 	fi
@@ -215,8 +216,9 @@ docker-up: check-platform-deps certs ## Build and start all services in detached
 	fi
 	$(COMPOSE) up --build -d
 	@printf "$(GREEN)Services running:$(RESET)\n"
-	@printf "  Frontend: http://localhost:5173\n"
-	@printf "  WAF:      http://localhost:8080\n"
+	@printf "  App:      https://localhost\n"
+	@printf "  API:      https://localhost/api/health\n"
+	@printf "  HTTP:     http://localhost (redirects to HTTPS)\n"
 
 docker-down: ## Stop and remove containers (keeps volumes)
 	$(COMPOSE) down
@@ -235,7 +237,12 @@ docker-restart: certs ## Tear down, rebuild, and restart all services
 	$(COMPOSE) down
 	$(COMPOSE) up --build -d postgres
 	$(COMPOSE) up --build -d --no-deps vault
-	@$(MAKE) vault-unseal
+	@$(MAKE) vault-wait
+	@if docker exec vault vault status 2>/dev/null | grep -q 'Initialized.*true'; then \
+		$(MAKE) vault-unseal; \
+	else \
+		$(MAKE) vault-init; \
+	fi
 	$(COMPOSE) up --build -d
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -261,9 +268,13 @@ clean: ## Remove build artifacts
 	rm -rf shared/dist backend/dist frontend/dist
 	rm -rf frontend/.vite backend/.cache
 
-fclean: clean ## Remove build artifacts and all node_modules
+fclean: clean ## Remove build artifacts + all node_modules + Docker volumes + Vault state
 	rm -rf node_modules
 	rm -rf backend/node_modules frontend/node_modules shared/node_modules
+	rm -rf vault/certs
+	rm -f vault/secrets/init-output.txt
+	$(COMPOSE) down -v --remove-orphans
+	@printf "$(GREEN)Full clean complete. Run 'make docker-up' to start fresh.$(RESET)\n"
 
 npm-reset: ## Regenerate dependencies and package-lock.json
 	rm -rf node_modules
