@@ -14,6 +14,7 @@ import type {
   ServerToClientEvents,
 } from '@ft/shared';
 import { TILE, GRID_SIZE, extractEnemiesFromGrid, stepEnemy, type EnemyRuntimeState } from '@ft/shared';
+import { setOnline, setInGame, setOffline } from '../state/online.state';
 import { onlineUsers } from '../state/online.state';
 import { upsertBestScore } from '../services/scoring.service';
 import { rewardDuelVictory } from '../services/gamification.service';
@@ -185,6 +186,8 @@ function cleanupRace(race_id: string): void {
 async function finishRace(io: Server<ClientToServerEvents, ServerToClientEvents>, race: ActiveRace): Promise<void> {
   if (race.finished) return;
   race.finished = true;
+  for (const p of race.players.values())
+    setOnline(p.user.id);
   const ranking = buildRanking(race);
   const result: RaceResult = {
     race_id:    race.race_id,
@@ -329,7 +332,7 @@ export function registerDuelHandlers(
 
   io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     const user = socket.data.user as SocketUser;
-    onlineUsers.add(user.id);
+    setOnline(user.id);
     console.log(`[duel] ${user.username} connected (${socket.id})`);
 
     // Envoie l'état courant du lobby au nouveau connecté
@@ -407,12 +410,17 @@ export function registerDuelHandlers(
           player.disconnect_timer = undefined;
         }
       }
+      
+      if (player && !race.finished) {
+        setInGame(user.id);
+      }
 
       const room = io.sockets.adapter.rooms.get(`race:${race_id}`);
       if (room && room.size === race.players.size && !race.started) {
         race.started = true;
         const now = Date.now();
-        for (const p of race.players.values()) p.start_time = now;
+        for (const p of race.players.values()) 
+          p.start_time = now;
 
         race.enemy_tick_timer = setInterval(() => {
           race.enemies = race.enemies.map(e => stepEnemy(e, race.grid));
@@ -477,7 +485,7 @@ export function registerDuelHandlers(
 
     // ── disconnect ───────────────────────────────────────────────────────────
     socket.on('disconnect', () => {
-      onlineUsers.delete(user.id);
+      setOffline(user.id);
       console.log(`[duel] ${user.username} disconnected`);
       // Désinscription immédiate des lobbies en attente — pas de délai de
       // grâce hors course active.

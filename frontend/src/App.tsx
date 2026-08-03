@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { ToastProvider } from '@/components/ui/useToast';
 import { ToastContainer } from '@/components/ui/Toast';
 import { AuthProvider, useAuth } from '@/context/auth.context';
+import { SocketProvider } from '@/context/socket.context';
 import { Spinner } from '@/components/ui/Spinner';
 
 // Pages
@@ -70,10 +71,12 @@ export default function App() {
   return (
     <ToastProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </AuthProvider>
+        <SocketProvider>
+          <BrowserRouter>
+            <AppRoutes />
+            </BrowserRouter> 
+          </SocketProvider>
+        </AuthProvider>
       <ToastContainer />
     </ToastProvider>
   );

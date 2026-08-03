@@ -4,7 +4,7 @@ import { FriendPublic } from '@ft/shared';
 import prisma from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
-import { onlineUsers } from '../state/online.state';
+import { getStatus } from '../state/online.state';
 
 
 const router = Router();
@@ -12,10 +12,6 @@ const router = Router();
 const asyncHandler = (fn: (req: Request, res: Response) => Promise<void>) =>
 	(req: Request, res: Response, next: NextFunction) =>
 		fn(req, res).catch(next);
-
-function resolveStatus(userId: string): 'online' | 'offline' | 'in_game' {
-	return (onlineUsers.has(userId) ? 'online' : 'offline'); 
-}
 
 router.get('/', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
 	const myId = req.user!.id;
@@ -37,7 +33,7 @@ router.get('/', authMiddleware, asyncHandler(async (req: Request, res: Response)
 			id: friend.id,
 			username: friend.username,
 			avatar: friend.avatar,
-			online_status: resolveStatus(friend.id),
+			online_status: getStatus(friend.id),
 			friendship_id: f.id,
 			created_at: f.created_at.toISOString(),
 		};
@@ -83,7 +79,7 @@ router.post('/:user_id', authMiddleware, asyncHandler(async (req: Request, res: 
 		id: target.id,
 		username: target.username,
 		avatar: target.avatar,
-		online_status: resolveStatus(target.id),
+		online_status: getStatus(target.id),
 		friendship_id: friendship.id,
 		created_at: friendship.created_at.toISOString(),
 	};

@@ -4,6 +4,9 @@ import { UserProfile } from '@ft/shared';
 import prisma from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
+import { getStatus } from '../state/online.state';
+import { toUserPublic } from '../utils/user.serializer';
+import { avatarUpload } from '../middleware/upload.middleware';
 import { onlineUsers } from '../state/online.state';
 import { getLevelFromXp } from '../services/gamification.service';
 
@@ -74,11 +77,28 @@ router.get('/:user_id', authMiddleware, asyncHandler(async (req: Request, res: R
         created_maps_count: user.created_maps_count,
         is_admin: user.is_admin,
         created_at: user.created_at.toISOString(),
-        online_status: onlineUsers.has(user.id) ? 'online' : 'offline', 
+        online_status: getStatus(user.id), 
         friends_count: user._count.friendships_sent + user._count.friendships_received,
     };
     
     sendSuccess(res, profile);
 }));
 
+router.post('/avatar', authMiddleware, avatarUpload.single('avatar'), asyncHandler(async (req: Request, res: Response) => {
+    if (!req.file) {
+        sendError(res, 'No file uploaded', 400);
+        return ;
+    }
+    
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    
+    const user = await prisma.user.update({
+        where: { id: req.user!.id },
+        data: { avatar: avatarUrl },
+    });
+
+    sendSuccess(res, toUserPublic(user));
+}));
+
+export default router;
 export default router;
