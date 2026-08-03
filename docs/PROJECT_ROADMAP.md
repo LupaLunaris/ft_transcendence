@@ -78,14 +78,14 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 |-------------|-------------|---------|--------------|----------|:---:|--------------|
 | Frontend React fonctionnel | Jennifer | Élise | Martin | 20/07 | ✅ | Architecture claire, routing, composants. |
 | Frontend responsive | Élise | Jennifer | Martin | 25/07 | 🟡 | Desktop, tablette et mobile. |
-| Frontend accessible | Élise | Jennifer | Martin | 25/07 | 🟡 | Navigation clavier, labels, contraste... |
+| Frontend accessible | Élise | Jennifer | Martin | 25/07 | ✅ | Navigation clavier, labels, contraste... |
 | Backend Express fonctionnel | Jerem | Jennifer | Martin | 20/07 | ✅ | |
 | Base de données avec schéma cohérent | Martin + Jennifer | Jerem | Élise | 20/07 | ✅ | |
 | ORM (Prisma) correctement configuré | Jennifer + Martin | Jerem | Élise | 20/07 | ✅ | |
 | Authentification sécurisée (JWT + bcrypt) | Jerem | Élise | Jennifer | 20/07 | ✅ | |
 | Validation des formulaires (Frontend) | Jennifer | Élise | Martin | 20/07 | ✅ | |
 | Validation des formulaires (Backend) | Martin | Jerem | Élise | 20/07 | ✅ | |
-| HTTPS fonctionnel | Jerem | Jennifer | Martin | 20/07 | 🟡 | |
+| HTTPS fonctionnel | Jerem | Jennifer | Martin | 20/07 | ✅ | |
 | Docker : lancement avec une seule commande | Jerem | Martin | Jennifer | 20/07 | ✅ | |
 | Compatible Google Chrome | Élise | Jennifer | Martin | 25/07 | ✅ | |
 | Console navigateur sans erreur | Jennifer | Martin | Élise | 30/07 | 🟡 | |
@@ -93,7 +93,7 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 | Gestion correcte des actions simultanées | Martin | Jerem | Jennifer | 25/07 | ✅ | |
 | Synchronisation temps réel correcte | Martin | Jerem | Jennifer | 25/07 | ✅ | |
 | Aucune corruption de données | Jerem | Jennifer | Élise | 25/07 | ✅ | |
-| Fichier `.env` ignoré par Git | Jerem | Jennifer | Martin | 20/07 | 🟡 | |
+| Fichier `.env` ignoré par Git | Jerem | Jennifer | Martin | 20/07 | ✅ | |
 | Fichier `.env.example` complet | Jerem | Jennifer | Martin | 20/07 | 🟡 | |
 | Privacy Policy accessible et complète | Élise | Martin | Jennifer | 20/07 | ✅ | IA |
 | Terms of Service accessibles et complètes | Élise | Martin | Jennifer | 20/07 | ✅ | IA |
@@ -169,7 +169,7 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 | Module | Type | Points | Responsable | Support | Vérification | Deadline | État | Commentaires |
 |--------|------|-------:|-------------|---------|--------------|----------|:---:|--------------|
 | ORM (Prisma) | Minor | 1 | Jennifer + Martin | Jennifer + Martin | Jerem | 20/07 | ✅ | A verifer |
-| Custom-made Design System | Minor | 1 | Élise | Jennifer | Martin | 25/07 | 🟡 | Palette, composants réutilisables... |
+| Custom-made Design System | Minor | 1 | Élise | Jennifer | Martin | 25/07 | ✅ | Palette, composants réutilisables... |
 | Multiple Languages | Minor | 1 | Élise | Jerem | Jennifer | 25/07 | ✅ | Français, Anglais, Néerlandais. |
 | Game Customization Options | Minor | 1 | Jennifer + Martin | Jennifer + Martin | Élise | 25/07 | ✅ | Personnalisation des parties/maps. |
 | Gamification System | Minor | 1 | Jennifer + Martin | Jennifer + Martin | Jerem | 30/07 | ✅ | Leaderboards, XP, badges... |
