@@ -6,6 +6,7 @@ volumes:
   postgres_data:
   vault_data:
   vault_logs:
+  backend_uploads:
 
 services:
   postgres:
@@ -63,6 +64,7 @@ services:
       - PARANOIA=1
       - ANOMALY_INBOUND=5
       - ANOMALY_OUTBOUND=4
+      - ALLOWED_METHODS=GET HEAD POST PUT DELETE OPTIONS
       - PORT=8080
       - SSL_PORT=8443
       - MODSEC_AUDIT_LOG=/tmp/modsec_audit.log
@@ -103,6 +105,7 @@ services:
       - ./vault/certs:/vault/certs:ro
       - /app/node_modules
       - /app/backend/node_modules
+      - backend_uploads:/app/backend/uploads
 
   frontend:
     build:
