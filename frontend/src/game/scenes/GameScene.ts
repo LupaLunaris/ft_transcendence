@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* GameScene.ts                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: malafont <malafont@student.42belgium.be       +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by malafont        #+#    #+#               */
-/* Updated: 2026/05/22 12:00:00 by malafont       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import Phaser from 'phaser';
 import { TILE, GRID_SIZE, type Grid, type Direction } from '@ft/shared';
@@ -80,6 +69,9 @@ const ENEMY_ANIM_FRAMES: Record<Direction, number[]> = {
 // ─── GameScene ────────────────────────────────────────────────────────────────
 
 export class GameScene extends BaseScene {
+	private settings!: {
+		enemySpeed: "slow" | "normal" | "fast";
+		};
 	private grid: Grid = [];
 	private gridX = 0;
 	private gridY = 0;
@@ -136,7 +128,12 @@ export class GameScene extends BaseScene {
 
 	// ── create ───────────────────────────────────────────────────────────────────
 
-	create(data: GameScene): void {
+	create(data: any): void {
+		console.log("DATA RECEIVED:", data);
+		console.log("DATA:", data);
+		this.settings = data.settings ?? {
+		enemySpeed: "normal",
+		};
 		this.grid = data.grid;
 		this.finished = false;
 		this.isMoving = false;
@@ -191,6 +188,7 @@ export class GameScene extends BaseScene {
 				}
 			})
 
+		console.log("SETTINGS:", this.settings);
 		// Idle face caméra au spawn (Row 2 = 'down' = face).
 		this.player.anims.play('idle_down');
 		this.spawnEnemies(data.grid);
@@ -276,12 +274,14 @@ export class GameScene extends BaseScene {
 					this.moveDuration = Math.max(60, this.moveDuration - 15);
 				}
 
-				const hitEnemy = this.enemies.some(
-					e => e.gridX === this.gridX && e.gridY === this.gridY,
+				const hitEnemyNow = this.enemies.some(
+				e => e.gridX === nx && e.gridY === ny
 				);
-				if (hitEnemy && !this.finished) {
-					this.finished = true;
-					this.game.events.emit('player_caught');
+
+				if (hitEnemyNow && !this.finished) {
+				this.finished = true;
+				this.game.events.emit('player_caught');
+				return;
 				}
 
 				if (this.grid[ny][nx] === TILE.EXIT) {
@@ -349,11 +349,19 @@ export class GameScene extends BaseScene {
 			}
 		}
 
+		const speedMap = {
+		slow: 800,
+		normal: 400,
+		fast: 150,
+		};
+
+		const delay = speedMap[this.settings.enemySpeed] ?? 400;
+
+		this.time.removeAllEvents();
 		this.time.addEvent({
-			delay: 400,
-			loop: true,
-			callback: this.moveEnemies,
-			callbackScope: this,
+		delay,
+		loop: true,
+		callback: () => this.moveEnemies(delay),
 		});
 	}
 
@@ -361,7 +369,7 @@ export class GameScene extends BaseScene {
 	// Appelée toutes les 400ms. Déplace chaque ennemi, joue l'animation de marche
 	// correspondant à sa direction, puis vérifie la collision avec le joueur.
 
-	private moveEnemies(): void {
+	private moveEnemies(duration: number): void {
 		for (const enemy of this.enemies) {
 			const next = enemy.computeNextPosition(this.grid);
 			enemy.gridX = next.x;
@@ -372,7 +380,7 @@ export class GameScene extends BaseScene {
 				targets: enemy.rect,
 				x: next.x * TILE_SIZE + TILE_SIZE / 2,
 				y: next.y * TILE_SIZE + TILE_SIZE / 2,
-				duration: 350,
+				duration: duration,
 				ease: 'Linear',
 			});
 			if (enemy.rect instanceof Phaser.GameObjects.Sprite) {

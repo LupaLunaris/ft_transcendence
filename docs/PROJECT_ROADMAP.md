@@ -32,8 +32,8 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 | 01/08 → 07/08 | Refactoring, nettoyage du code et de la documentation |
 | 03/08 → 10/08 | Campagne complète de tests |
 | 03/08 → 14/08 | Apprentissage du code |
-| 07/08 → 14/08 | Simulations de correction |
-| À partir du 15/08 | Demandes de correction |
+| 08/08 → 14/08 | Simulations de correction |
+| À partir du 15/08 max 18/08 | Demandes de correction |
 
 ---
 
@@ -78,23 +78,23 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 |-------------|-------------|---------|--------------|----------|:---:|--------------|
 | Frontend React fonctionnel | Jennifer | Élise | Martin | 20/07 | ✅ | Architecture claire, routing, composants. |
 | Frontend responsive | Élise | Jennifer | Martin | 25/07 | 🟡 | Desktop, tablette et mobile. |
-| Frontend accessible | Élise | Jennifer | Martin | 25/07 | ⬜ | Navigation clavier, labels, contraste... |
+| Frontend accessible | Élise | Jennifer | Martin | 25/07 | ✅ | Navigation clavier, labels, contraste... |
 | Backend Express fonctionnel | Jerem | Jennifer | Martin | 20/07 | ✅ | |
-| Base de données avec schéma cohérent | Martin + Jennifer | Jerem | Élise | 20/07 | 🟡 | À revoir pendant leaderboard |
-| ORM (Prisma) correctement configuré | Jennifer + Martin | Jerem | Élise | 20/07 | 🟡 | |
+| Base de données avec schéma cohérent | Martin + Jennifer | Jerem | Élise | 20/07 | ✅ | |
+| ORM (Prisma) correctement configuré | Jennifer + Martin | Jerem | Élise | 20/07 | ✅ | |
 | Authentification sécurisée (JWT + bcrypt) | Jerem | Élise | Jennifer | 20/07 | ✅ | |
 | Validation des formulaires (Frontend) | Jennifer | Élise | Martin | 20/07 | ✅ | |
-| Validation des formulaires (Backend) | Martin | Jerem | Élise | 20/07 | 🟡 | |
+| Validation des formulaires (Backend) | Martin | Jerem | Élise | 20/07 | ✅ | |
 | HTTPS fonctionnel | Jerem | Jennifer | Martin | 20/07 | ✅ | |
-| Docker : lancement avec une seule commande | Jerem | Martin | Jennifer | 20/07 | 🟡 | |
-| Compatible Google Chrome | Élise | Jennifer | Martin | 25/07 | 🟡 | |
-| Console navigateur sans erreur | Jennifer | Martin | Élise | 30/07 | ⬜ | |
-| Plusieurs utilisateurs connectés simultanément | Martin | Jerem | Jennifer | 25/07 | 🟡 | |
-| Gestion correcte des actions simultanées | Martin | Jerem | Jennifer | 25/07 | 🟡 | |
-| Synchronisation temps réel correcte | Martin | Jerem | Jennifer | 25/07 | 🟡 | |
-| Aucune corruption de données | Jerem | Jennifer | Élise | 25/07 | 🟡 | Fini, à vérifier |
+| Docker : lancement avec une seule commande | Jerem | Martin | Jennifer | 20/07 | ✅ | |
+| Compatible Google Chrome | Élise | Jennifer | Martin | 25/07 | ✅ | |
+| Console navigateur sans erreur | Jennifer | Martin | Élise | 30/07 | 🟡 | |
+| Plusieurs utilisateurs connectés simultanément | Martin | Jerem | Jennifer | 25/07 | ✅ | Encore un petit détail à régler |
+| Gestion correcte des actions simultanées | Martin | Jerem | Jennifer | 25/07 | ✅ | |
+| Synchronisation temps réel correcte | Martin | Jerem | Jennifer | 25/07 | ✅ | |
+| Aucune corruption de données | Jerem | Jennifer | Élise | 25/07 | ✅ | |
 | Fichier `.env` ignoré par Git | Jerem | Jennifer | Martin | 20/07 | ✅ | |
-| Fichier `.env.example` complet | Jerem | Jennifer | Martin | 20/07 | ✅ | |
+| Fichier `.env.example` complet | Jerem | Jennifer | Martin | 20/07 | 🟡 | |
 | Privacy Policy accessible et complète | Élise | Martin | Jennifer | 20/07 | ✅ | IA |
 | Terms of Service accessibles et complètes | Élise | Martin | Jennifer | 20/07 | ✅ | IA |
 
@@ -102,40 +102,40 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 
 | Requirement | Responsable | Support | Vérification | Deadline | État | Commentaires |
 |-------------|-------------|---------|--------------|----------|:---:|--------------|
-| Historique Git propre | Jennifer | Jerem | Martin | 30/07 | ⬜ | Pas de commits inutiles. |
-| Commits clairs et explicites | Toute l'équipe | — | Jennifer | 30/07 | ⬜ | |
-| Répartition du travail visible dans Git | Jennifer | Jerem | Toute l'équipe | 30/07 | ⬜ | Vérifier les contributions de chacun. |
-| Toutes les grosses modifications passent par PR | Jennifer | Toute l'équipe | Toute l'équipe | 30/07 | ⬜ | |
-| Relecture des PR importantes | Jennifer | Toute l'équipe | Toute l'équipe | 30/07 | ⬜ | |
+| Historique Git propre | Jennifer | Jerem | Martin | 30/07 | 🟡 | Contributions présentes, mais identités Git à uniformiser et secrets à contrôler. |
+| Commits clairs et explicites | Toute l'équipe | — | Jennifer | 30/07 | 🟡 | Correct globalement. Uniformiser les futurs messages |
+| Répartition du travail visible dans Git | Jennifer | Jerem | Toute l'équipe | 30/07 | ✅ | Documenter les contributions de chacun. |
+| Toutes les grosses modifications passent par PR | Jennifer | Toute l'équipe | Toute l'équipe | 30/07 | ✅ | |
+| Relecture des PR importantes | Jennifer | Toute l'équipe | Toute l'équipe | 30/07 | ✅ | |
 
 ### README
 
 | Requirement | Responsable | Support | Vérification | Deadline | État | Commentaires |
 |-------------|-------------|---------|--------------|----------|:---:|--------------|
-| README entièrement en anglais | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
+| README entièrement en anglais | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
 | Description du projet | Martin | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
 | Instructions d'installation | Jerem | Jennifer | Martin | 07/08 | ⬜ | |
-| Ressources utilisées | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Utilisation de l'IA documentée | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Présentation de l'équipe | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Répartition des rôles | Jennifer | Jerem | Toute l'équipe | 07/08 | ⬜ | |
-| Responsabilités de chaque rôle | Jennifer | Jerem | Toute l'équipe | 07/08 | ⬜ | |
+| Ressources utilisées | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Utilisation de l'IA documentée | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Présentation de l'équipe | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Répartition des rôles | Jennifer | Jerem | Toute l'équipe | 07/08 | 🟡 | |
+| Responsabilités de chaque rôle | Jennifer | Jerem | Toute l'équipe | 07/08 | 🟡 | |
 | Organisation du projet | Jerem | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
 | Outils de gestion utilisés | Jerem | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
 | Moyens de communication utilisés | Jerem | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
-| Stack technique complète | Jennifer | Jerem | Toute l'équipe | 07/08 | ⬜ | |
-| Justification des choix techniques | Jennifer | Jerem | Toute l'équipe | 07/08 | ⬜ | |
+| Stack technique complète | Jennifer | Jerem | Toute l'équipe | 07/08 | 🟡 | |
+| Justification des choix techniques | Jennifer | Jerem | Toute l'équipe | 07/08 | 🟡 | |
 | Schéma de la base de données | Jerem | Jennifer | Martin | 07/08 | ⬜ | |
 | Liste complète des fonctionnalités | Martin | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
-| Fonctionnalités attribuées à chaque membre | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Liste des modules réalisés | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Calcul des points des modules | Jennifer | Jerem | Toute l'équipe | 07/08 | ⬜ | |
-| Justification des modules choisis | Jennifer | Martin | Toute l'équipe | 07/08 | ⬜ | |
-| Description de l'implémentation des modules | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Répartition des modules par membre | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
-| Contributions individuelles détaillées | Toute l'équipe | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
-| Difficultés rencontrées et solutions | Toute l'équipe | Jennifer | Toute l'équipe | 07/08 | ⬜ | |
-| Limitations connues du projet | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | ⬜ | |
+| Fonctionnalités attribuées à chaque membre | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Liste des modules réalisés | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Calcul des points des modules | Jennifer | Jerem | Toute l'équipe | 07/08 | 🟡 | |
+| Justification des modules choisis | Jennifer | Martin | Toute l'équipe | 07/08 | 🟡 | |
+| Description de l'implémentation des modules | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Répartition des modules par membre | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
+| Contributions individuelles détaillées | Toute l'équipe | Jennifer | Toute l'équipe | 07/08 | 🟡 | |
+| Difficultés rencontrées et solutions | Toute l'équipe | Jennifer | Toute l'équipe | 07/08 | 🟡 | |
+| Limitations connues du projet | Jennifer | Toute l'équipe | Toute l'équipe | 07/08 | 🟡 | |
 
 ---
 
@@ -155,12 +155,12 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 | Module | Type | Points | Responsable | Support | Vérification | Deadline | État | Commentaires |
 |--------|------|-------:|-------------|---------|--------------|----------|:---:|--------------|
 | Framework Frontend + Backend | Major | 2 | Jennifer + Jerem | Jennifer + Jerem | Martin | 20/07 | ✅ | React + Express. |
-| Real-time Features (WebSockets) | Major | 2 | Martin | Jerem | Jennifer | 25/07 | 🟡 | Synchronisation temps réel. |
+| Real-time Features (WebSockets) | Major | 2 | Martin | Jerem | Jennifer | 25/07 | ✅ | Synchronisation temps réel. |
 | Standard User Management | Major | 2 | Jennifer + Jerem | Jennifer + Jerem | Élise | 25/07 | 🟡 | Upload avatar et mettre un par défaut, statut en ligne doit être visible pour les amis, vérifier suppression amis |
 | Complete Web-based Game | Major | 2 | Martin | Jennifer | Jerem | 25/07 | ✅ | Gameplay complet. |
-| Remote Players | Major | 2 | Martin | Jerem | Élise | 25/07 | 🟡 | Deux joueurs sur deux machines. |
-| Multiplayer Game (3+ joueurs) | Major | 2 | Martin | Jerem | Jennifer | 30/07 | 🟡 | Plus de deux joueurs simultanément. |
-| Cybersecurity (WAF + ModSecurity + HashiCorp Vault) | Major | 2 | Jerem | Jennifer | Élise | 30/07 | 🟡 | WAF + gestion sécurisée des secrets. |
+| Remote Players | Major | 2 | Martin | Jerem | Élise | 25/07 | ✅ | Deux joueurs sur deux machines. |
+| Multiplayer Game (3+ joueurs) | Major | 2 | Martin | Jerem | Jennifer | 30/07 | ✅ | Plus de deux joueurs simultanément. |
+| Cybersecurity (WAF + ModSecurity + HashiCorp Vault) | Major | 2 | Jerem | Jennifer | Élise | 30/07 | ✅ | WAF + gestion sécurisée des secrets. |
 
 ---
 
@@ -168,13 +168,13 @@ L'objectif est de terminer un projet stable, propre et que toute l'équipe est c
 
 | Module | Type | Points | Responsable | Support | Vérification | Deadline | État | Commentaires |
 |--------|------|-------:|-------------|---------|--------------|----------|:---:|--------------|
-| ORM (Prisma) | Minor | 1 | Jennifer + Martin | Jennifer + Martin | Jerem | 20/07 | 🟡 | |
-| Custom-made Design System | Minor | 1 | Élise | Jennifer | Martin | 25/07 | 🟡 | Palette, composants réutilisables... |
+| ORM (Prisma) | Minor | 1 | Jennifer + Martin | Jennifer + Martin | Jerem | 20/07 | ✅ | A verifer |
+| Custom-made Design System | Minor | 1 | Élise | Jennifer | Martin | 25/07 | ✅ | Palette, composants réutilisables... |
 | Multiple Languages | Minor | 1 | Élise | Jerem | Jennifer | 25/07 | ✅ | Français, Anglais, Néerlandais. |
-| Game Customization Options | Minor | 1 | Jennifer | Jennifer | Élise | 25/07 | 🟡 | Personnalisation des parties/maps. |
-| Gamification System | Minor | 1 | Jennifer | Martin | Jerem | 30/07 | 🟡 | Leaderboards, XP, badges... |
+| Game Customization Options | Minor | 1 | Jennifer + Martin | Jennifer + Martin | Élise | 25/07 | ✅ | Personnalisation des parties/maps. |
+| Gamification System | Minor | 1 | Jennifer + Martin | Jennifer + Martin | Jerem | 30/07 | ✅ | Leaderboards, XP, badges... |
 | Complete Notification System | Minor | 1 | Élise | Jennifer | Jerem | 30/07 | ✅ | Notifications de création, modification et suppression. |
-| Support Additional Browsers | Minor | 1 | Élise | Jennifer | Martin | 30/07 | 🟡 | Firefox + Edge (ou Safari). |
+| Support Additional Browsers | Minor | 1 | Élise | Jennifer | Martin | 30/07 | ✅ | Firefox + Edge (ou Safari). |
 
 ---
 

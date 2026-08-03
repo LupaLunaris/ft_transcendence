@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   users.routes.ts                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: Jdebrull <jdebrull@student.s19.be>         +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/12 11:31:42 by Jdebrull          #+#    #+#             */
-/*   Updated: 2026/07/30 18:07:08 by Jdebrull         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { UserProfile } from '@ft/shared';
@@ -18,6 +7,8 @@ import { sendSuccess, sendError } from '../utils/response.utils';
 import { getStatus } from '../state/online.state';
 import { toUserPublic } from '../utils/user.serializer';
 import { avatarUpload } from '../middleware/upload.middleware';
+import { onlineUsers } from '../state/online.state';
+import { getLevelFromXp } from '../services/gamification.service';
 
 const router = Router();
 
@@ -57,6 +48,7 @@ router.get('/:user_id', authMiddleware, asyncHandler(async (req: Request, res: R
     const user = await prisma.user.findUnique({
         where: { id: user_id },
         include: {
+            achievements: true,
             _count: {
                 select: {
                     friendships_sent: true,
@@ -74,6 +66,12 @@ router.get('/:user_id', authMiddleware, asyncHandler(async (req: Request, res: R
         id: user.id,
         username: user.username,
         avatar: user.avatar,
+        xp: user.xp,
+        level: getLevelFromXp(user.xp),
+        achievements: user.achievements.map((achievement) => ({
+            code: achievement.code as UserProfile['achievements'][number]['code'],
+            unlocked_at: achievement.unlocked_at.toISOString(),
+        })),
         diamonds: user.diamonds,
         tower_progress: user.tower_progress,
         created_maps_count: user.created_maps_count,
@@ -102,4 +100,5 @@ router.post('/avatar', authMiddleware, avatarUpload.single('avatar'), asyncHandl
     sendSuccess(res, toUserPublic(user));
 }));
 
+export default router;
 export default router;

@@ -1,21 +1,11 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* auth.routes.ts                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jdebrull <jdebrull@student.42be              +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jdebrull        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jdebrull       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { UserPublic, AuthResponse } from '@ft/shared';
-import { User } from '@prisma/client';
+import { User, UserAchievement } from '@prisma/client';
 import prisma from '../lib/prisma';
+import { getLevelFromXp } from '../services/gamification.service';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { validateBody } from '../middleware/validate.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
@@ -37,6 +27,29 @@ if (!JWT_SECRET)
   throw new Error('JWT_SECRET is not set');
 
 const router = Router();
+
+type UserWithAchievements = User & { achievements?: UserAchievement[] };
+
+function toUserPublic(user: UserWithAchievements): UserPublic {
+  const xp = user.xp ?? 0;
+
+  return {
+    id: user.id,
+    username: user.username,
+    avatar: user.avatar,
+    xp,
+    level: getLevelFromXp(xp),
+    achievements: (user.achievements ?? []).map((achievement) => ({
+      code: achievement.code as UserPublic['achievements'][number]['code'],
+      unlocked_at: achievement.unlocked_at.toISOString(),
+    })),
+    diamonds: user.diamonds,
+    tower_progress: user.tower_progress,
+    created_maps_count: user.created_maps_count,
+    is_admin: user.is_admin,
+    created_at: user.created_at.toISOString(),
+  };
+}
 
 function signToken(user: User): string {
   return jwt.sign(
@@ -66,6 +79,7 @@ router.post('/register', validateBody(registerSchema), asyncHandler(async (req: 
 
   const user = await prisma.user.create({
     data: { email, username, password_hash, is_admin },
+    include: { achievements: true },
   });
 
   const response: AuthResponse = { user: toUserPublic(user), token: signToken(user) };
@@ -86,6 +100,7 @@ router.post('/login', validateBody(loginSchema), asyncHandler(async (req: Reques
         { username: identifier },
       ],
     },
+    include: { achievements: true },
   });
 
   // Generic message prevents email/username enumeration
@@ -100,7 +115,10 @@ router.post('/login', validateBody(loginSchema), asyncHandler(async (req: Reques
 
 // GET /api/v1/auth/me
 router.get('/me', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
-  const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+  const user = await prisma.user.findUnique({
+    where: { id: req.user!.id },
+    include: { achievements: true },
+  });
 
   if (!user) {
     sendError(res, 'User not found', 404);
@@ -130,12 +148,31 @@ router.put('/profile', authMiddleware, validateBody(updateProfileSchema), asyncH
       ...(username !== undefined && { username }),
       ...(avatar !== undefined && { avatar }),
     },
+    include: { achievements: true },
   });
 
   sendSuccess(res, toUserPublic(user));
 }));
 
 router.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+router.post( '/avatar', authMiddleware, avatarUpload.single('avatar'), asyncHandler(async (req: Request, res: Response) => {
+    if (!req.file) {
+      sendError(res, 'No file uploaded', 400);
+      return;
+    }
+
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`
+
+    const user = await prisma.user.update({
+      where: { id: req.user!.id },
+      data: { avatar: avatarUrl },
+      include: { achievements: true },
+    });
+    sendSuccess(res, toUserPublic(user));
+  }),
+);
+
+router.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof AppError) {
     sendError(res, err.message, err.statusCode);
     return;

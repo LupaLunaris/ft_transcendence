@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* TowerGamePage.tsx                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: malafont <malafont@student.42belgium.be       +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/17 00:00:00 by malafont        #+#    #+#               */
-/* Updated: 2026/05/17 00:00:00 by malafont       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { useCallback, useState, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -144,7 +133,7 @@ return (
         {t('tower_game_page.exit_level')}
       </Button>
 
-      <p className="text-silver-400 text-sm">
+      <p className="text-silver-500 text-sm">
         {t('game_page.instructions')}
       </p>
     </div>

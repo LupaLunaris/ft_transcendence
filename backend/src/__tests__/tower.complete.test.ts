@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* tower.complete.test.ts                               :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jdebrull <jdebrull@student.42be              +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/17 00:00:00 by jdebrull        #+#    #+#               */
-/* Updated: 2026/05/17 00:00:00 by jdebrull       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import request from 'supertest';
 import express from 'express';
@@ -70,7 +59,7 @@ function makeUser(tower_progress: number, diamonds = 0) {
   };
 }
 
-function token(progress = 0): string {
+function token(_progress = 0): string {
   return jwt.sign({ id: 'user-uuid-1', email: 'alice@example.com', is_admin: false }, SECRET);
 }
 

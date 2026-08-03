@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '@/services/api.service';
 import { useAuth } from '@/context/auth.context';
+import { Input } from '@/components/ui/Input';
 import { useTranslation } from 'react-i18next';
 
 const AVATARS = [
@@ -74,11 +75,8 @@ export function ProfileEditor() {
 	  </h2>
 
 	  <div className="mb-6">
-		<label className="block text-silver-400 mb-2">
-		  {t('profile_editor_username')}
-		</label>
-
-		<input
+		<Input
+  		  label={t('profile_editor_username')}
 		  value={username}
 		  onChange={(e) => setUsername(e.target.value)}
 		  className="w-full rounded-lg border border-surface-border bg-neutral-900 px-4 py-2 text-gold-100"
@@ -134,11 +132,9 @@ export function ProfileEditor() {
 		  ))}
 		</div>
 		<div className="mt-4">
-		<label className="block text-silver-400 mb-2">
-			{t('profile_editor_upload_avatar')}
-		</label>
 
-		<input
+		<Input
+			label={t('profile_editor_upload_avatar')}
 			type="file"
 			accept="image/*"
 			onChange={(e) => {

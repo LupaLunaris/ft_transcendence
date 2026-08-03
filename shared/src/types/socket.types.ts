@@ -1,17 +1,7 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* socket.types.ts                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jpaulis <jpaulis@student.42be                 +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jpaulis           #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jpaulis         ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Direction, GameState, PlayerState, RaceResult } from './game.types';
 import { Grid } from './tiles.types';
+import { RewardResult } from './gamification.types';
 
 export interface LobbyEntry {
   map_id: string;
@@ -53,4 +43,6 @@ export interface ServerToClientEvents {
   error_event: (data: { message: string; code: number }) => void;
   lobby_state: (data: { entries: LobbyEntry[] }) => void;
   duel_start: (payload: DuelStartPayload) => void;
+  // Émis uniquement au vainqueur d'une course (rank 1, cf. duelHandler.ts#finishRace)
+  reward_earned: (reward: RewardResult) => void;
 }

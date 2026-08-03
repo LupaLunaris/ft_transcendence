@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* maps.routes.test.ts                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jdebrull <jdebrull@student.42be              +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jdebrull        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jdebrull       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import request from 'supertest';
 import express from 'express';
@@ -38,6 +27,10 @@ const mockPrisma = {
 };
 
 jest.mock('../lib/prisma', () => ({ __esModule: true, default: mockPrisma }));
+jest.mock('../services/gamification.service', () => ({
+  rewardFirstMapPublication: jest.fn().mockResolvedValue(undefined),
+  rewardTestMapCompletion: jest.fn().mockResolvedValue(undefined),
+}));
 
 // ─── App setup ───────────────────────────────────────────────────────────────
 
@@ -177,6 +170,71 @@ describe('POST /api/v1/maps', () => {
   });
 });
 
+// ─── PUT /api/v1/maps/:id ────────────────────────────────────────────────────
+
+describe('PUT /api/v1/maps/:id', () => {
+  it('resets creator_completed when the grid is updated', async () => {
+    mockPrisma.map.findUnique.mockResolvedValue({
+      ...baseMap,
+      published: false,
+      creator_completed: true,
+    });
+    mockPrisma.map.update.mockResolvedValue({
+      ...baseMap,
+      published: false,
+      creator_completed: false,
+    });
+
+    const res = await request(app)
+      .put('/api/v1/maps/map-uuid-1')
+      .set('Authorization', authHeader)
+      .send({ grid: makeValidGrid() });
+
+    expect(res.status).toBe(200);
+    expect(mockPrisma.map.update).toHaveBeenCalledWith({
+      where: { id: 'map-uuid-1' },
+      data: expect.objectContaining({ creator_completed: false }),
+    });
+    expect(res.body.data.creator_completed).toBe(false);
+  });
+
+  it('does not touch creator_completed when only the name is updated', async () => {
+    mockPrisma.map.findUnique.mockResolvedValue({
+      ...baseMap,
+      published: false,
+      creator_completed: true,
+    });
+    mockPrisma.map.update.mockResolvedValue({
+      ...baseMap,
+      published: false,
+      name: 'Renamed',
+    });
+
+    const res = await request(app)
+      .put('/api/v1/maps/map-uuid-1')
+      .set('Authorization', authHeader)
+      .send({ name: 'Renamed' });
+
+    expect(res.status).toBe(200);
+    const updateData = mockPrisma.map.update.mock.calls[0][0].data;
+    expect(updateData).not.toHaveProperty('creator_completed');
+  });
+
+  it('returns 400 when the map is currently published', async () => {
+    mockPrisma.map.findUnique.mockResolvedValue({
+      ...baseMap,
+      published: true,
+    });
+
+    const res = await request(app)
+      .put('/api/v1/maps/map-uuid-1')
+      .set('Authorization', authHeader)
+      .send({ grid: makeValidGrid() });
+
+    expect(res.status).toBe(400);
+  });
+});
+
 // ─── POST /api/v1/maps/:id/publish ───────────────────────────────────────────
 
 describe('POST /api/v1/maps/:id/publish', () => {
@@ -187,6 +245,10 @@ describe('POST /api/v1/maps/:id/publish', () => {
       creator_completed: true,
     });
     mockPrisma.map.update.mockResolvedValue({ ...baseMap, published: true });
+    mockPrisma.$transaction.mockImplementation(async (arg) => {
+      if (typeof arg === 'function') return arg(mockPrisma);
+      return Promise.resolve(arg);
+    });
 
     const res = await request(app)
       .post('/api/v1/maps/map-uuid-1/publish')

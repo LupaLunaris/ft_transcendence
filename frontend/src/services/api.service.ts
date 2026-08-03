@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* api.service.ts                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jpaulis <jpaulis@student.42belgium.be        +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jpaulis         #+#    #+#               */
-/* Updated: 2026/05/17 00:00:00 by jpaulis        ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import type {
   UserPublic,
@@ -25,6 +14,8 @@ import type {
   Grid,
   Difficulty,
   UpdateProfileRequest,
+  RewardResult,
+  LeaderboardEntry,
 } from '@ft/shared';
 
 interface TowerLevel {
@@ -58,6 +49,7 @@ interface ScoreResult {
   user_id: string;
   completion_time_ms: number;
   created_at: string;
+  reward?: RewardResult;
 }
 
 interface FriendPublic {
@@ -215,6 +207,12 @@ class ApiService {
 
     getLeaderboard: (map_id: string): Promise<ScoreEntry[]> =>
       this.request<ScoreEntry[]>('GET', `/scores/leaderboard/${map_id}`),
+
+    getMapPointsLeaderboard: (map_id: string): Promise<LeaderboardEntry[]> =>
+      this.request<LeaderboardEntry[]>('GET', `/scores/leaderboard/${map_id}/points`),
+
+    getGlobalLeaderboard: (): Promise<LeaderboardEntry[]> =>
+      this.request<LeaderboardEntry[]>('GET', '/scores/leaderboard/global'),
   };
 }
 

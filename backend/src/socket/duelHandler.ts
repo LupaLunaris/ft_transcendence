@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   duelHandler.ts                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: Jdebrull <jdebrull@student.s19.be>         +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/12 11:31:30 by Jdebrull          #+#    #+#             */
-/*   Updated: 2026/07/30 12:30:53 by Jdebrull         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
@@ -26,6 +15,9 @@ import type {
 } from '@ft/shared';
 import { TILE, GRID_SIZE, extractEnemiesFromGrid, stepEnemy, type EnemyRuntimeState } from '@ft/shared';
 import { setOnline, setInGame, setOffline } from '../state/online.state';
+import { onlineUsers } from '../state/online.state';
+import { upsertBestScore } from '../services/scoring.service';
+import { rewardDuelVictory } from '../services/gamification.service';
 
 // ─── Constantes ──────────────────────────────────────────────────────────────
 
@@ -191,19 +183,46 @@ function cleanupRace(race_id: string): void {
   activeRaces.delete(race_id);
 }
 
-function finishRace(io: Server<ClientToServerEvents, ServerToClientEvents>, race: ActiveRace): void {
+async function finishRace(io: Server<ClientToServerEvents, ServerToClientEvents>, race: ActiveRace): Promise<void> {
   if (race.finished) return;
   race.finished = true;
   for (const p of race.players.values())
     setOnline(p.user.id);
+  const ranking = buildRanking(race);
   const result: RaceResult = {
     race_id:    race.race_id,
     map_id:     race.map_id,
-    ranking:    buildRanking(race),
+    ranking,
     created_at: new Date().toISOString(),
   };
   io.to(`race:${race.race_id}`).emit('race_finished', result);
   cleanupRace(race.race_id);
+
+  // Chaque joueur qui a atteint l'EXIT compte comme un essai sur cette map,
+  // au même titre qu'une partie solo (record personnel + points de
+  // classement de vitesse, cf. backend_doc/duel-server-authoritative-enemies.md).
+  // Le vainqueur (rank 1, doit avoir fini) reçoit en plus la récompense de
+  // victoire en duel.
+  try {
+    await prisma.$transaction(async (tx) => {
+      for (const entry of ranking) {
+        if (entry.finished && entry.duration_ms !== null) {
+          await upsertBestScore(tx, entry.user_id, race.map_id, entry.duration_ms);
+        }
+      }
+
+      const winner = ranking.find(e => e.rank === 1 && e.finished);
+      if (!winner) return;
+
+      const reward = await rewardDuelVictory(tx, winner.user_id, race.race_id);
+      if (reward.xp_gained > 0 || reward.achievements_unlocked.length > 0) {
+        const winnerPlayer = race.players.get(winner.user_id);
+        if (winnerPlayer) io.to(winnerPlayer.socket_id).emit('reward_earned', reward);
+      }
+    });
+  } catch (err) {
+    console.error('[duel] failed to persist race scoring', err);
+  }
 }
 
 // Marque un joueur forfait (mort/déconnexion résolue) et termine la course
@@ -221,7 +240,7 @@ function resolvePlayerLoss(
   player.death_time = Date.now();
   io.to(`race:${race.race_id}`).emit('game_state', buildGameState(race));
 
-  if (isRaceOver(race)) finishRace(io, race);
+  if (isRaceOver(race)) void finishRace(io, race);
 }
 
 // ─── Enregistrement des handlers ─────────────────────────────────────────────
@@ -457,7 +476,7 @@ export function registerDuelHandlers(
         player.finish_time = Date.now();
 
         io.to(`race:${race_id}`).emit('game_state', buildGameState(race));
-        if (isRaceOver(race)) finishRace(io, race);
+        if (isRaceOver(race)) void finishRace(io, race);
         return;
       }
 

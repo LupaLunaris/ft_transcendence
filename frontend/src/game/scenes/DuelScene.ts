@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* DuelScene.ts                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: malafont <malafont@student.42belgium.be       +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/27 00:00:00 by malafont        #+#    #+#               */
-/* Updated: 2026/07/07 00:00:00 by malafont       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
-
 import Phaser from 'phaser';
 import {
   TILE, GRID_SIZE, extractEnemiesFromGrid,
@@ -27,14 +15,17 @@ import { type EnemyGameObject } from '../entities/Enemy';
 // ─── Constantes ───────────────────────────────────────────────────────────────
 
 const FRAME_RATE = 8;
-const FRAME_W    = 200;
-const FRAME_H    = 320;
+const FRAME_W = 200;
+const FRAME_H = 320;
+const SCALE_PLAYER = 0.2;
+const SPRITE_DEPTH_BASE = 10;
+const LABEL_DEPTH_OFFSET = 0.5;
 
 const ANIM_FRAMES: Record<Direction, { walk: number[]; idle: number }> = {
-  down:  { walk: [0, 2],    idle: 1  },
-  left:  { walk: [6, 7, 8], idle: 7  },
-  right: { walk: [3, 5],    idle: 4  },
-  up:    { walk: [9, 10],   idle: 10 },
+  down:  { walk: [0, 1, 2, 1], idle: 0 },
+  left:  { walk: [6, 7, 8, 7], idle: 7 },
+  right: { walk: [3, 4, 5, 4], idle: 4 },
+  up:    { walk: [9, 10, 9, 11], idle: 9 },
 };
 
 const ENEMY_FRAME_W = 240;
@@ -76,6 +67,10 @@ interface RemoteGhost {
 
 function opponentTextureKey(id: string): string {
   return `sprite_opponent_${id}`;
+}
+
+function depthForGridY(gridY: number): number {
+  return SPRITE_DEPTH_BASE + gridY;
 }
 
 // ─── DuelScene ────────────────────────────────────────────────────────────────
@@ -197,9 +192,10 @@ export class DuelScene extends BaseScene {
 
     // ── Sprite joueur local ──────────────────────────────────────────────────
     this.localPlayer = this.add.sprite(spawnPx, spawnPy, KEY_SPRITE_PLAYER);
-    this.localPlayer.setScale(0.20);
-    this.localPlayer.setOrigin(0.5, 0.75);
-    this.localPlayer.setDepth(2);
+    this.localPlayer.setScale(SCALE_PLAYER);
+    this.localPlayer.setCrop(5, 5, FRAME_W - 15, FRAME_H - 10);
+    this.localPlayer.setOrigin(0.5, 0.70);
+    this.localPlayer.setDepth(depthForGridY(this.gridY));
     this.localPlayer.anims.play('idle_down');
 
     // ── Fantômes adverses (1 à 3), chacun avec sa propre texture + anims ────
@@ -207,9 +203,10 @@ export class DuelScene extends BaseScene {
       const key = opponentTextureKey(opponent.id);
 
       const sprite = this.add.sprite(spawnPx, spawnPy, key);
-      sprite.setScale(0.20);
-      sprite.setOrigin(0.5, 0.75);
-      sprite.setDepth(1);
+      sprite.setScale(SCALE_PLAYER);
+      sprite.setCrop(5, 5, FRAME_W - 15, FRAME_H - 10);
+      sprite.setOrigin(0.5, 0.70);
+      sprite.setDepth(depthForGridY(this.gridY));
       sprite.setAlpha(0.55);
       sprite.setTint(0x66aaff);
 
@@ -217,7 +214,9 @@ export class DuelScene extends BaseScene {
         fontSize:   '10px',
         color:      '#99ccff',
         fontFamily: 'monospace',
-      }).setOrigin(0.5, 1).setDepth(3).setAlpha(0.85);
+      }).setOrigin(0.5, 1)
+        .setDepth(depthForGridY(this.gridY) + LABEL_DEPTH_OFFSET)
+        .setAlpha(0.85);
 
       (Object.entries(ANIM_FRAMES) as [Direction, { walk: number[]; idle: number }][])
         .forEach(([dir, { walk, idle }]) => {
@@ -324,6 +323,7 @@ export class DuelScene extends BaseScene {
     this.isMoving = true;
     this.gridX    = nx;
     this.gridY    = ny;
+    this.localPlayer.setDepth(depthForGridY(ny));
 
     this.localPlayer.anims.play(`walk_${dir}`, true);
 
@@ -383,6 +383,8 @@ export class DuelScene extends BaseScene {
 
       ghost.gridX = nx;
       ghost.gridY = ny;
+      ghost.sprite.setDepth(depthForGridY(ny));
+      ghost.label.setDepth(depthForGridY(ny) + LABEL_DEPTH_OFFSET);
 
       const targetX = nx * TILE_SIZE + TILE_SIZE / 2;
       const targetY = ny * TILE_SIZE + TILE_SIZE / 2;
@@ -432,7 +434,7 @@ export class DuelScene extends BaseScene {
           .setScale(0.2)
           .setCrop(15, 15, ENEMY_FRAME_W - 30, ENEMY_FRAME_H - 30)
           .setOrigin(0.5, 0.75)
-          .setDepth(2);
+          .setDepth(depthForGridY(enemy.y));
 
         (Object.entries(ENEMY_ANIM_FRAMES) as [Direction, number[]][]).forEach(([dir, frames]) => {
           const animKey = `${key}_walk_${dir}`;
@@ -449,7 +451,8 @@ export class DuelScene extends BaseScene {
         sprite.anims.play(`${key}_walk_down`);
         obj = sprite;
       } else {
-        obj = this.add.rectangle(px, py, TILE_SIZE, TILE_SIZE, fallbackColor).setDepth(2);
+        obj = this.add.rectangle(px, py, TILE_SIZE, TILE_SIZE, fallbackColor)
+          .setDepth(depthForGridY(enemy.y));
       }
 
       this.enemySprites.set(enemy.id, obj);
@@ -467,6 +470,11 @@ export class DuelScene extends BaseScene {
 
       const targetX = enemy.position.x * TILE_SIZE + TILE_SIZE / 2;
       const targetY = enemy.position.y * TILE_SIZE + TILE_SIZE / 2;
+
+      // Plus la ligne Y est basse à l'écran, plus le sprite passe devant.
+      // Un ennemi au-dessus du joueur a donc une profondeur inférieure,
+      // tandis qu'un ennemi en dessous passe devant le joueur.
+      obj.setDepth(depthForGridY(enemy.position.y));
 
       if (obj instanceof Phaser.GameObjects.Sprite) {
         const key = enemy.kind === 'horizontal' ? KEY_SPRITE_ENEMY_H : KEY_SPRITE_ENEMY_V;

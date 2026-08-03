@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* TowerPage.tsx                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: malafont <malafont@student.42belgium.be       +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by malafont        #+#    #+#               */
-/* Updated: 2026/05/17 00:00:00 by malafont       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth.context';
@@ -21,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 export function TowerPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { data: levels, loading, error } = useApi<TowerLevel[]>(() => api.tower.getList());
+  const { loading, error } = useApi<TowerLevel[]>(() => api.tower.getList());
   const { t } = useTranslation();
 
   const progress = user?.tower_progress ?? 0;
@@ -67,7 +56,6 @@ return (
       {!loading && !error && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {Array.from({ length: 8 }, (_, i) => i + 1).map((n) => {
-            const level = levels?.find((l) => l.order_index === n);
             const completed = n <= progress;
             const unlocked = n <= progress + 1;
             const locked = !unlocked;

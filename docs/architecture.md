@@ -25,7 +25,9 @@ Local development and Docker evaluation use the same application architecture:
 ├── backend/                    Express API, Socket.IO, Prisma
 ├── frontend/                   React, Vite, Phaser game client
 ├── shared/                     Shared TypeScript types/contracts
-├── docs/                       Canonical docs, team docs, subject PDFs
+├── docs/                       Canonical docs, archive, subject PDFs
+│   ├── archive/                Historical notes worth keeping
+│   └── to_delete/              Redundant docs kept in the repository
 ├── backend_doc/                Backend implementation notes
 ├── frontend_doc/               Frontend implementation notes
 ├── background_doc/             Background technical notes

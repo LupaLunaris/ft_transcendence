@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* TileSelector.tsx                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: evan-dro <evan-dro@student.42belgium.be      +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by evan-dro        #+#    #+#               */
-/* Updated: 2026/05/21 00:00:00 by evan-dro       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import { TILE, type TileValue } from '@ft/shared';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +46,7 @@ export function TileSelector({ selected, onChange }: TileSelectorProps) {
               />
               <span className="flex-1">
                 <span className="text-sm font-medium block">{label}</span>
-                <span className="text-xs text-white/40">{description}</span>
+                <span className="text-xs text-white/50">{description}</span>
               </span>
               {isActive && (
                 <span className="text-deep-300 text-xs">✓</span>

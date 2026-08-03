@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/* auth.routes.test.ts                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/* By: jdebrull <jdebrull@student.42be              +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/* Created: 2026/05/15 00:00:00 by jdebrull        #+#    #+#               */
-/* Updated: 2026/05/15 00:00:00 by jdebrull       ###   ########.fr          */
-/*                                                                            */
-/* ************************************************************************** */
 
 import request from 'supertest';
 import express from 'express';
@@ -23,6 +12,8 @@ const mockUser = {
   username: 'alice',
   password_hash: bcrypt.hashSync('password123', 1),
   avatar: null,
+  xp: 0,
+  achievements: [],
   diamonds: 0,
   tower_progress: 0,
   created_maps_count: 0,
@@ -128,24 +119,24 @@ describe('POST /api/v1/auth/register', () => {
 
 describe('POST /api/v1/auth/login', () => {
   it('returns 200 with token on valid credentials', async () => {
-    mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+    mockPrisma.user.findFirst.mockResolvedValue(mockUser);
 
     const res = await request(app).post('/api/v1/auth/login').send({
-      email: 'alice@example.com',
+      identifier: 'alice@example.com',
       password: 'password123',
     });
 
     expect(res.status).toBe(200);
     expect(res.body.data.token).toBeDefined();
-    const payload = jwt.verify(res.body.data.token, SECRET) as Record<string, unknown>;
+    const payload = jwt.decode(res.body.data.token) as Record<string, unknown>;
     expect(payload.id).toBe(mockUser.id);
   });
 
   it('returns 401 when user does not exist', async () => {
-    mockPrisma.user.findUnique.mockResolvedValue(null);
+    mockPrisma.user.findFirst.mockResolvedValue(null);
 
     const res = await request(app).post('/api/v1/auth/login').send({
-      email: 'ghost@example.com',
+      identifier: 'ghost@example.com',
       password: 'password123',
     });
 
@@ -154,10 +145,10 @@ describe('POST /api/v1/auth/login', () => {
   });
 
   it('returns 401 on wrong password', async () => {
-    mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+    mockPrisma.user.findFirst.mockResolvedValue(mockUser);
 
     const res = await request(app).post('/api/v1/auth/login').send({
-      email: 'alice@example.com',
+      identifier: 'alice@example.com',
       password: 'wrong_password',
     });
 

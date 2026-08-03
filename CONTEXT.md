@@ -18,10 +18,12 @@ malafont, jdebrull, jpaulis, evan-dro (@student.42belgium.be)
 
 ```prisma
 model User {
-  id, email, username, password_hash, avatar?, diamonds Int=0,
+  id, email, username, password_hash, avatar?, xp Int=0, diamonds Int=0,
   tower_progress Int=0, created_maps_count Int=0, is_admin Boolean=false,
   created_at, updated_at
-  maps Map[], scores Score[]
+  maps Map[], scores Score[], achievements UserAchievement[], xp_events XpEvent[]
+  friendships_sent Friendship[] @relation("FriendshipRequester")
+  friendships_received Friendship[] @relation("FriendshipAddressee")
 }
 model Map {
   id, name, grid_json String (TEXT), published, creator_completed,
@@ -31,27 +33,99 @@ model Map {
 }
 model AdminMap { id, order_index Int @unique, name, grid_json String, created_at }
 model Score {
-  id, completion_time_ms Int, user_id FK→User, map_id FK→Map, created_at
+  // Une seule ligne par (user, map) depuis le 17/07 : le record personnel
+  // du joueur, plus un historique d'essais — cf. section scoring ci-dessous.
+  id, completion_time_ms Int, user_id FK→User, map_id FK→Map, created_at, updated_at
+  @@unique([user_id, map_id])
   @@index([map_id, completion_time_ms])
+}
+model UserAchievement {
+  id, user_id FK→User (cascade), code String, unlocked_at
+  @@unique([user_id, code])  @@index([user_id])
+}
+model XpEvent {
+  id, user_id FK→User (cascade), action String, key String, xp Int, created_at
+  @@unique([action, key])   // idempotence : un même (action, key) ne peut payer qu'une fois
+  @@index([user_id])
+}
+model MapRankingPoints {
+  // Points actuels d'un joueur sur une map (pas un historique) — recalculé
+  // à chaque nouveau record personnel sur cette map, cf. section scoring.
+  id, map_id FK→Map (cascade), user_id FK→User (cascade), points Int, updated_at
+  @@unique([map_id, user_id])  @@index([user_id])  @@index([map_id])
+}
+model Friendship {
+  id, created_at, requester_id FK→User, addressee_id FK→User
+  @@unique([requester_id, addressee_id])  @@index([requester_id])  @@index([addressee_id])
 }
 ```
 
+### Gamification MVP (migration `20260717000000_add_gamification`, commit 5d5e5aa, PR #71 mergée 2026-07-17)
+- `backend/src/services/gamification.service.ts` — XP et achievements
+  - `XP_PER_LEVEL = 100` ; `getLevelFromXp(xp) = floor(xp / 100) + 1`
+  - `AchievementCode = 'FIRST_ESCAPE' | 'FIRST_CREATOR' | 'EXPLORER'` (shared)
+  - **Idempotence via contrainte unique** `XpEvent(action, key)` : `awardXpOnce()` tente d'abord `xpEvent.create`, si `P2002` (unique constraint) → renvoie l'état courant sans re-créditer. Donc rejouer un complete/publish/score ne double jamais l'XP.
+  - `rewardPublicMapCompletion(tx, userId, mapId)` — `action='PUBLIC_MAP_COMPLETION'` key=`${userId}:${mapId}`, +20xp, débloque `FIRST_ESCAPE` ; si l'utilisateur a un score sur ≥5 maps publiées différentes (`score.groupBy(['map_id'])`) → débloque aussi `EXPLORER`
+  - `rewardTestMapCompletion(tx, userId, mapId)` — `action='TEST_MAP_COMPLETION'` key=`${userId}:${mapId}`, +10xp, appelé quand le créateur termine sa propre map (`POST /maps/:id/complete`)
+  - `rewardFirstMapPublication(tx, userId)` — `action='FIRST_MAP_PUBLICATION'` key=`userId` (donc une seule fois par user, pas par map), +15xp, débloque `FIRST_CREATOR`
+  - Toutes les fonctions tournent dans la même transaction Prisma que l'action métier (`prisma.$transaction`) déclenchant la récompense — cf. `maps.routes.ts` (`/complete`, `/publish`) et `scores.routes.ts`
+  - Les routes ne récompensent que la **première** occurrence : `/complete` vérifie `map.creator_completed` avant, `/publish` vérifie `map.published` avant, `/scores` ne récompense que si `map.published` — combiné à l'unicité `(action,key)`, double protection contre le double-crédit
+- `RewardResult { xp_gained, xp_total, level, achievements_unlocked: UserAchievement[] }` (shared, `gamification.types.ts`) renvoyé en `reward?` par `POST /maps/:id/complete`, `POST /maps/:id/publish`, `POST /scores`
+- `UserPublic` (shared) étendu : `xp: number`, `level: number`, `achievements: UserAchievement[]` — calculés à chaque réponse auth (`toUserPublic()` dans `auth.routes.ts` inclut `achievements: true`)
+- `GET /users/:user_id` (profil public) renvoie aussi `xp`/`level`/`achievements`
+- Frontend : `ProfilePage.tsx` affiche XP/LVL (2 tuiles ajoutées, grid passée à `sm:grid-cols-2 lg:grid-cols-5`) + une section badges (`ACHIEVEMENT_LABEL` map code→clé i18n `achievement.<key>`)
+- `EditorPage.tsx` (publish) et `GamePage.tsx` (`handleExit`/complete) : après action réussie, si `reward.xp_gained > 0` ou `achievements_unlocked.length > 0` → toast XP + toast par achievement débloqué, puis `updateUser(await api.auth.getMe())` pour rafraîchir le contexte auth (best-effort, catch silencieux — le prochain chargement de profil rattrapera sinon)
+- i18n : nouvelles clés `profile_page_xp`, `profile_page_level`, `profile_page_achievements`, `profile_page_no_achievements`, `toast_xp_gained`, `toast_achievement_unlocked`, `achievement.first_escape`, `achievement.first_creator`, `achievement.explorer` dans `en/fr/nl common.json`
+
+### Scoring, points de classement et leaderboards (migration `20260717010000_add_scoring_points`, 2026-07-17)
+Doc complète : `backend_doc/scoring-points-and-leaderboards.md`. Résumé :
+- `Score` : `POST /scores` (solo) et `duelHandler.ts#finishRace` (duel, chaque joueur ayant atteint l'EXIT) appellent tous deux `backend/src/services/scoring.service.ts#upsertBestScore(tx, userId, mapId, ms)` — n'écrit que si c'est un nouveau record personnel ; sinon no-op.
+- `MapRankingPoints` : `scoring.service.ts#recalculateMapPoints(tx, mapId)` relit le top 5 `Score` de la map et met à jour les points (5/4/3/2/1) à **chaque** nouveau record — pas de calcul à la volée en lecture, les leaderboards lisent directement cette table.
+- Duel : `finishRace` (désormais `async`, appels `void finishRace(...)`) persiste les temps des finisseurs puis, si un joueur a `rank===1 && finished`, appelle `gamification.service.ts#rewardDuelVictory(tx, userId, raceId)` — `action='DUEL_VICTORY'` key=`${userId}:${raceId}` (répétable à chaque victoire, contrairement aux récompenses de map), +25xp, débloque `DUEL_CHAMPION`. Émis uniquement au vainqueur via le nouvel event socket `reward_earned` (pas dans `race_finished`, qui est identique pour toute la room).
+- `AchievementCode` (shared) += `'DUEL_CHAMPION'`
+- Nouvelles routes leaderboard : voir section Routes ci-dessous. `LeaderboardEntry` (shared, `leaderboard.types.ts`) : `{ rank, user_id, username, avatar, points, completion_time_ms? }` — `completion_time_ms` seulement sur le leaderboard d'une map précise (absent sur le global)
+- Frontend : `frontend/src/components/leaderboard/Leaderboard.tsx` (composant unique réutilisé) + `frontend/src/hooks/useLeaderboard.ts` (`useMapLeaderboard`/`useGlobalLeaderboard`) — affiché à droite du canvas sur `GamePage`/`DuelGamePage` (classement de la map jouée) et à droite du contenu sur `TrainingPage`/`DuelPage` (classement global, toutes maps)
+  - Affichage par ligne : si `entry.completion_time_ms !== undefined` → temps formaté (`leaderboard.time_value`), sinon → points (`leaderboard.points_value`). Donc **temps** sur le leaderboard d'une map (via `/leaderboard/:map_id/points`, qui malgré son nom lit désormais `Score` directement — top 5 par `completion_time_ms` asc, points recalculés positionnellement via `POINTS_BY_RANK`, exporté depuis `scoring.service.ts`), **points** sur le leaderboard global
+  - `GET /scores/leaderboard/global` : plus de `take` — retourne **tous** les joueurs ayant au moins 1 point (pas seulement le top 5) — modifié le 2026-07-17 sur demande explicite
+- **Bug corrigé le jour même** : `gamification.service.ts` catchait un P2002 (XP/achievement déjà accordé) puis continuait à interroger le même `tx` — dans Postgres, une transaction poursuivie après une requête en erreur est *aborted* (25P02) pour toute requête suivante, donc le rollback entier avalait aussi l'upsert du score fait juste avant dans la même transaction (replay d'une map déjà complétée → "score non enregistré"). Fix : `findUnique` de garde avant `create` au lieu de catch-and-continue. Cf. `history_debug/2026-07-17_score-not-saved-poisoned-transaction.md`. **Ne jamais catcher une erreur Prisma dans une transaction interactive pour continuer à interroger le même `tx`.**
+- i18n : `leaderboard.map_title`, `leaderboard.global_title`, `leaderboard.points_value`, `leaderboard.time_value`, `leaderboard.empty`, `achievement.duel_champion`
+
 ## Routes API actives (/api/v1/)
-- `POST /auth/register` `POST /auth/login` `GET /auth/me` `PUT /auth/profile`
+- `POST /auth/register` `POST /auth/login` `GET /auth/me` `PUT /auth/profile` `POST /auth/avatar`
 - `GET /maps` `POST /maps` `GET /maps/my` `GET /maps/:id` `PUT /maps/:id` `DELETE /maps/:id`
 - `POST /maps/:id/complete` `POST /maps/:id/publish` `POST /maps/:id/unpublish`
 - `GET /tower` `GET /tower/level/:order_index`
-- `POST /scores` `GET /scores/leaderboard/:map_id`
+- `POST /scores` `GET /scores/leaderboard/global` `GET /scores/leaderboard/:map_id` `GET /scores/leaderboard/:map_id/points`
+- `GET /users/:user_id` (profil public + achievements)
 - `GET /admin/tower` `PUT /admin/tower/:order_index` ← admin seulement
 
 **Notes routes :**
 - `DELETE /maps/:id` : cascade sur scores, décrémente `created_maps_count`
-- `POST /scores` : body `{ map_id, completion_time_ms }` (pas `/:map_id` dans l'URL)
+- `POST /scores` : body `{ map_id, completion_time_ms }` (pas `/:map_id` dans l'URL) ; réponse inclut `reward?: RewardResult` si la map est publiée (cf. gamification MVP) — n'écrase `Score` que si c'est un nouveau record personnel (cf. scoring)
+- `POST /maps/:id/complete` et `POST /maps/:id/publish` : réponse `{ ...MapData, reward? }` — `reward` absent si déjà complété/publié (pas de re-crédit)
+- `GET /scores/leaderboard/global` : tous les joueurs, par somme de points de classement (toutes maps), sans limite — **déclarée avant** `/leaderboard/:map_id` dans `scores.routes.ts` (sinon `map_id` capturerait le littéral `global`, cf. `backend_doc/scoring-points-and-leaderboards.md`)
+- `GET /scores/leaderboard/:map_id` : temps bruts (inchangée, mais naturellement dédupliquée par joueur depuis que `Score` est 1 ligne/joueur/map)
+- `GET /scores/leaderboard/:map_id/points` : top 5 de cette map par points de classement
 - `PUT /admin/tower/:order_index` : upsert, order_index 1–8
 
 ## Types partagés clés (shared/src/types/)
 
 ```ts
+// user.types.ts
+interface UserPublic {
+  id, username, avatar: string | null,
+  xp: number, level: number, achievements: UserAchievement[],   // ajouté par la gamification MVP
+  diamonds, tower_progress, created_maps_count, is_admin, created_at
+}
+
+// gamification.types.ts (nouveau)
+type AchievementCode = 'FIRST_ESCAPE' | 'FIRST_CREATOR' | 'EXPLORER' | 'DUEL_CHAMPION'
+interface UserAchievement { code: AchievementCode; unlocked_at: string }
+interface RewardResult { xp_gained, xp_total, level, achievements_unlocked: UserAchievement[] }
+
+// leaderboard.types.ts (nouveau)
+interface LeaderboardEntry { rank: number; user_id, username, avatar: string | null; points: number; completion_time_ms?: number }
+
 // tiles.types.ts
 TILE = { EMPTY:0, WALL:1, EXIT:2, SPAWN:3, ENEMY_H:4, ENEMY_V:5 }
 GRID_SIZE = 25
@@ -94,6 +168,7 @@ interface ServerToClientEvents {
   error_event:   (data: { message: string; code: number }) => void;
   lobby_state:   (data: { entries: LobbyEntry[] }) => void;
   duel_start:    (payload: DuelStartPayload) => void;
+  reward_earned: (reward: RewardResult) => void;   // vainqueur de duel uniquement, cf. scoring
 }
 
 // shared/src/game/enemyLogic.ts (nouveau) — logique de rebond déterministe
@@ -203,6 +278,7 @@ Docs de référence : `backend_doc/duel-nplayer-lobby-and-race-lifecycle.md`,
 - Mode admin (`user.is_admin`) : switch pour éditer les niveaux AdminMap de la tour
 - Delete map : modal de confirmation → `api.maps.delete(id)` → `refetchMyMaps()`
 - Hooks utilisés : `useMyMaps()` pour le panel latéral
+- `creator_completed` reset : `PUT /maps/:id` remet `creator_completed=false` dès que `grid` change (`backend/src/routes/maps.routes.ts`). Empêche de republier une map modifiée sans l'avoir re-testée (flow : unpublish → edit grid → publish échouait sinon, cf. `history_debug/2026-07-16_creator-completed-reset-on-edit.md`). `handleSave` capture la réponse de `api.maps.update`/`create` et appelle `setCreatorCompleted(...)` pour que le bouton Publier reflète l'état sans reload.
 
 ### DuelPage (`frontend/src/pages/duel/DuelPage.tsx`)
 - Liste les maps publiées avec pagination et filtre difficulté
@@ -234,25 +310,53 @@ Docs de référence : `backend_doc/duel-nplayer-lobby-and-race-lifecycle.md`,
 - Docker fonctionne (`make docker-up`)
 - PostgreSQL connecté, migrations appliquées (migration unique 20260527000000_init_postgres)
 - Frontend accessible sur http://localhost:5173
-- Backend accessible sur http://localhost:3001
-- Proxy Vite → backend via `BACKEND_INTERNAL_URL=http://backend:3001` (docker-compose.yml)
+- Backend accessible sur http://localhost:3001 (pas de port publié directement, passe par `waf`)
+- Proxy Vite → `waf:8080` (ModSecurity/OWASP CRS) → `backend:3001` (`BACKEND_INTERNAL_URL=http://waf:8080` dans docker-compose.yml)
+- Vault (AppRole) fournit `DATABASE_URL`/`JWT_SECRET` au backend au démarrage (`backend/src/bootstrap.ts`, appelé depuis `index.ts` avant tout import de `server.ts`)
+
+### WAF (ModSecurity/OWASP CRS) — service `waf`
+- Seul `nginx/modsec/modsecurity.conf` est monté dans le conteneur (`main.conf`, `crs-setup.conf`, `override.conf` du repo sont orphelins, non montés — `crs-setup.conf` contient d'ailleurs un typo `/etx/` qui le rendrait de toute façon cassé)
+- Réglage des règles CRS **uniquement** via variables d'environnement du service `waf` dans `docker-compose.yml`, lues par `/docker-entrypoint.d/95-configure-rules.sh` + `configure-rules.v3.conf` de l'image
+- `ALLOWED_METHODS=GET HEAD POST PUT DELETE OPTIONS` — **obligatoire**, sinon toute requête PUT/DELETE (sauvegarde/suppression de map, etc.) est bloquée 403 par la règle CRS 911100 (défaut : `GET HEAD POST OPTIONS` seulement). Bug rencontré et corrigé le 2026-07-16, cf. `history_debug/2026-07-16_waf-blocks-put-delete-maps.md`
+- Si une nouvelle méthode HTTP est utilisée côté API (ex. PATCH), l'ajouter à `ALLOWED_METHODS`
 
 ---
 
-## Fonctionnalités complètes (2026-06-09)
-- Auth (register/login/me/profile)
+## Hub joueur en barre latérale (2026-07-17)
+- `frontend/src/components/layout/PlayerHub.tsx`, monté une seule fois
+  dans `Layout.tsx` (aside gauche, sticky, masqué sous `lg`) — visible
+  sur toutes les pages utilisant `Layout` sauf `/editor` et `/editor/:id`
+  (et absent si pas connecté). Carte carrée compacte : diamants,
+  progression tour, maps créées, niveau XP, badges achievements (icône
+  médaille commune, grisée si non débloqué, tooltip = nom complet).
+- `frontend/src/constants/achievements.ts` (nouveau) : `ACHIEVEMENT_LABEL`
+  et `ALL_ACHIEVEMENT_CODES` extraits de `ProfilePage.tsx` pour être
+  partagés avec `PlayerHub`.
+- `HomePage.tsx` : ancienne carte joueur inline (diamants/tour/maps)
+  supprimée — redondante avec le hub désormais toujours visible.
+- **Fix** : `Map.play_count` n'était jamais incrémenté (`POST /scores`
+  ne touchait que `Score`/gamification) → toujours affiché à 0 dans
+  `TrainingPage`. Ajout de `tx.map.update({ data: { play_count: {
+  increment: 1 } } })` dans la transaction de `POST /scores`. Cf.
+  `history_debug/2026-07-17_play-count-jamais-incremente.md`.
+- Doc : `frontend_doc/player-hub-sidebar.md`
+
+## Fonctionnalités complètes (mise à jour 2026-07-17, branche `dev`)
+- Auth (register/login/me/profile/avatar)
 - Éditeur de maps (create/edit/delete/publish/unpublish/complete)
 - Mode solo (`/play/:map_id`) — GameScene avec ennemis
 - Mode tour (`/tower` + `/play/tower/:order_index`) — 8 niveaux AdminMap
 - Mode duel (`/duel` + `/duel/game`) — Socket.IO temps réel, **2 à 4 joueurs**, ennemis serveur-autoritaires, reconnexion 10s, classement complet
 - Admin : éditeur de niveaux de la tour dans EditorPage
 - Scores : leaderboard par map, enregistrement après course solo
+- Amis : `FriendsList` + `Friendship` model (requester/addressee, statut implicite par présence de la ligne — voir `frontend/src/components/friends/`, `backend/src/routes/users.routes.ts`)
+- **Gamification MVP** (2026-07-17) : XP + niveaux + 3 achievements (`FIRST_ESCAPE`, `FIRST_CREATOR`, `EXPLORER`), affichés sur `ProfilePage` et via toasts sur `EditorPage`/`GamePage` — détails ci-dessus
+- WAF (ModSecurity) : PUT/DELETE débloqués via `ALLOWED_METHODS` (fix 2026-07-16)
 
-## Ce qui reste (branche actuelle : feature/multi-player-fair-play)
-- Panel maps dans l'éditeur : affiché, delete fonctionnel (commit 924e5f2)
-- Potentiel : persistance des scores en fin de duel (non implémentée côté duelHandler)
+## Ce qui reste
 - RacePage (`/play/:map_id/race`) : encore placeholder
 - `GameScene.ts` (solo) n'utilise pas `shared/game/enemyLogic.ts` — garde sa propre classe `entities/Enemy.ts`, ce qui est correct (pas de sync à assurer en solo) mais crée une duplication d'algorithme assumée (cf. `backend_doc/duel-server-authoritative-enemies.md`)
+- Persistance des scores en fin de duel et récompense de victoire : **implémentées** (2026-07-17), cf. section scoring ci-dessus et `backend_doc/scoring-points-and-leaderboards.md`
 
 ## /duel généralisé à 2-4 joueurs — implémenté (2026-07-07)
 Docs de référence (mises à jour post-implémentation, avec les écarts par rapport à la version planifiée) :

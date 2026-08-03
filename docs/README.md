@@ -12,25 +12,46 @@ This repository contains both canonical documentation and historical/team notes.
 
 If another document contradicts one of these, prefer the canonical document.
 
-## Useful Support Documents
+## Active Files In `docs/`
 
-These documents can still be useful, but they are not startup sources of truth:
+These files stay in the main `docs/` folder because they are still directly useful:
 
 | Path | Notes |
 |---|---|
-| [modules.md](modules.md) | 42 module planning/reference |
-| [team-organization.md](team-organization.md) | Team process notes |
-| [git-commands-guide.md](git-commands-guide.md) | Git workflow help |
-| [git-organization.md](git-organization.md) | Git organization notes |
-| [Role_par_fichier.md](Role_par_fichier.md), [ownership-migration.md](ownership-migration.md), [organisation_role_push.md](organisation_role_push.md), [Martin_role.md](Martin_role.md) | Ownership and role notes; may overlap |
-| [project-cleanup-audit.md](project-cleanup-audit.md) | Historical cleanup audit snapshot |
-| [dev-mode-check.md](dev-mode-check.md) | Historical local startup check |
-| [ticket.txt](ticket.txt) | Historical ticket/planning notes |
-| [42 EvalHub.pdf](42%20EvalHub.pdf), [ft_transcendence.subject.pdf](ft_transcendence.subject.pdf) | Evaluation and subject references |
+| [42 EvalHub.pdf](42%20EvalHub.pdf) | Evaluation reference |
+| [ft_transcendence.subject.pdf](ft_transcendence.subject.pdf) | Official 42 subject |
+| [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) | Internal roadmap kept as-is |
 
-## Historical And Supporting Note Folders
+## Archive
 
-These folders are kept for team memory. They should not be used as current setup or architecture references unless they are explicitly updated and linked from the canonical docs.
+The `archive/` folder keeps older but still interesting material:
+
+| Path | Notes |
+|---|---|
+| `archive/modules.md` | Older module planning/reference |
+| `archive/team-organization.md` | Team process notes |
+| `archive/ownership.md` | Main historical ownership document |
+| `archive/Role_par_fichier.md`, `archive/ownership-migration.md`, `archive/organisation_role_push.md`, `archive/Martin_role.md` | Older role and ownership notes |
+| `archive/project-cleanup-audit.md` | Earlier cleanup audit snapshot |
+| `archive/dev-mode-check.md` | Old local startup check |
+| `archive/git-commands-guide.md` | Git help kept for team memory |
+| `archive/proposition_mvp_kickoff/` | Earlier MVP proposal and screenshots |
+
+## To Delete
+
+The `to_delete/` folder is for documents we do not want to use anymore, but we still keep them in the repository to avoid losing information.
+
+| Path | Notes |
+|---|---|
+| `to_delete/Tickets-Jerem-Elise.md` | Older planning note |
+| `to_delete/Tickets2.md` | Older planning note |
+| `to_delete/ticket.txt` | Older planning note |
+| `to_delete/ticket1.md` | Older planning note |
+| `to_delete/git-organization.md` | Redundant git organization note |
+
+## Other Historical Folders
+
+These folders are outside `docs/`, but they are still kept for team memory.
 
 | Folder | Purpose |
 |---|---|
@@ -40,7 +61,6 @@ These folders are kept for team memory. They should not be used as current setup
 | `../history_debug/` | Debugging history |
 | `../PedagoGamePlay/` | Pedagogical gameplay notes |
 | `../probleme_rencontre/` | Historical problem/correction notes |
-| `proposition_mvp_kickoff/` | Earlier MVP proposal material |
 
 ## Review Rule
 

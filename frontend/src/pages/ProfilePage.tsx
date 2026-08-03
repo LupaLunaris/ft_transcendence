@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { FriendsList } from '@/components/friends/FriendsList';
 import { ProfileEditor } from '@/components/profile/ProfileEditor';
 import { Avatar } from '@/components/profile/Avatar';
+import { ACHIEVEMENT_LABEL } from '@/constants/achievements';
 
 export function ProfilePage() {
   const { t } = useTranslation();
@@ -75,7 +76,31 @@ export function ProfilePage() {
 			</div>
 		</div>
 
-		<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+		<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+			<div className="gold-edge-hover bg-surface-raised border border-surface-border rounded-xl p-5">
+			<div className="mb-3 flex h-10 items-center text-gold-300 text-xl font-bold">
+				XP
+			</div>
+			<p className="text-3xl font-bold text-silver-100">
+				{user.xp}
+			</p>
+			<p className="mt-1 text-sm text-silver-400">
+				{t('profile_page_xp')}
+			</p>
+			</div>
+
+			<div className="gold-edge-hover bg-surface-raised border border-surface-border rounded-xl p-5">
+			<div className="mb-3 flex h-10 items-center text-gold-300 text-xl font-bold">
+				LVL
+			</div>
+			<p className="text-3xl font-bold text-silver-100">
+				{user.level}
+			</p>
+			<p className="mt-1 text-sm text-silver-400">
+				{t('profile_page_level')}
+			</p>
+			</div>
+
 			<div className="gold-edge-hover bg-surface-raised border border-surface-border rounded-xl p-5">
 			<div className="mb-3 flex h-10 items-center">
 				<img
@@ -123,6 +148,28 @@ export function ProfilePage() {
 				{t('profile_page_maps')}
 			</p>
 			</div>
+		</div>
+
+		<div className="gold-edge bg-surface-raised border border-surface-border rounded-xl p-6">
+			<h2 className="font-fantasy text-2xl text-silver-100 mb-4">
+				{t('profile_page_achievements')}
+			</h2>
+			{user.achievements.length === 0 ? (
+				<p className="text-sm text-silver-400">
+					{t('profile_page_no_achievements')}
+				</p>
+			) : (
+				<div className="flex flex-wrap gap-2">
+					{user.achievements.map((achievement) => (
+						<span
+							key={achievement.code}
+							className="rounded-full border border-gold-500/40 bg-gold-500/10 px-3 py-1 text-sm font-semibold text-gold-300"
+						>
+							{t(`achievement.${ACHIEVEMENT_LABEL[achievement.code]}`)}
+						</span>
+					))}
+				</div>
+			)}
 		</div>
 
 		<FriendsList />
