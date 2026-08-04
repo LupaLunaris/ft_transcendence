@@ -11,7 +11,7 @@ import { validateBody } from '../middleware/validate.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
 import { NextFunction } from 'express';
 import { AppError } from '../errors';
-import { toUserPublic } from '../utils/user.serializer';
+import { avatarUpload } from '../middleware/upload.middleware';
 import {
   registerSchema,
   loginSchema,
@@ -154,7 +154,6 @@ router.put('/profile', authMiddleware, validateBody(updateProfileSchema), asyncH
   sendSuccess(res, toUserPublic(user));
 }));
 
-router.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
 router.post( '/avatar', authMiddleware, avatarUpload.single('avatar'), asyncHandler(async (req: Request, res: Response) => {
     if (!req.file) {
       sendError(res, 'No file uploaded', 400);

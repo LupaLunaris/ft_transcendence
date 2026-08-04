@@ -15,7 +15,6 @@ import type {
 } from '@ft/shared';
 import { TILE, GRID_SIZE, extractEnemiesFromGrid, stepEnemy, type EnemyRuntimeState } from '@ft/shared';
 import { setOnline, setInGame, setOffline } from '../state/online.state';
-import { onlineUsers } from '../state/online.state';
 import { upsertBestScore } from '../services/scoring.service';
 import { rewardDuelVictory } from '../services/gamification.service';
 

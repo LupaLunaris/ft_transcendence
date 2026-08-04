@@ -7,7 +7,6 @@ import { sendSuccess, sendError } from '../utils/response.utils';
 import { getStatus } from '../state/online.state';
 import { toUserPublic } from '../utils/user.serializer';
 import { avatarUpload } from '../middleware/upload.middleware';
-import { onlineUsers } from '../state/online.state';
 import { getLevelFromXp } from '../services/gamification.service';
 
 const router = Router();
@@ -100,5 +99,4 @@ router.post('/avatar', authMiddleware, avatarUpload.single('avatar'), asyncHandl
     sendSuccess(res, toUserPublic(user));
 }));
 
-export default router;
 export default router;
