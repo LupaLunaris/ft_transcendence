@@ -91,9 +91,8 @@ function ResultOverlay({
 export function DuelGamePage() {
   const location  = useLocation();
   const navigate  = useNavigate();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { socket } = useSocket();
-  const { user, token, updateUser } = useAuth();
   const { t } = useTranslation();
   const { showToast } = useToast();
 
@@ -170,6 +169,8 @@ export function DuelGamePage() {
 
     socket.on('error_event', ({ message }) => {
       console.error('[duel game]', message);
+    });
+    
     }
 
     function handleConnect() {

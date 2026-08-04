@@ -1,4 +1,3 @@
-
 import { Router, Request, Response, NextFunction } from 'express';
 import { UserProfile } from '@ft/shared';
 import prisma from '../lib/prisma';
@@ -6,9 +5,10 @@ import { authMiddleware } from '../middleware/auth.middleware';
 import { sendSuccess, sendError } from '../utils/response.utils';
 import { getStatus } from '../state/online.state';
 import { toUserPublic } from '../utils/user.serializer';
-import { avatarUpload } from '../middleware/upload.middleware';
-import { onlineUsers } from '../state/online.state';
+import { avatarUpload, validateAndSaveAvatar } from '../middleware/upload.middleware';
 import { getLevelFromXp } from '../services/gamification.service';
+import path from 'path';
+import fs from 'fs';
 
 const router = Router();
 
@@ -84,21 +84,40 @@ router.get('/:user_id', authMiddleware, asyncHandler(async (req: Request, res: R
     sendSuccess(res, profile);
 }));
 
-router.post('/avatar', authMiddleware, avatarUpload.single('avatar'), asyncHandler(async (req: Request, res: Response) => {
-    if (!req.file) {
+router.post('/avatar', authMiddleware, avatarUpload, validateAndSaveAvatar, asyncHandler(async (req: Request, res: Response) => {
+    const filename = (req as any).savedAvatarFilename;
+    if (!filename) {
         sendError(res, 'No file uploaded', 400);
         return ;
     }
     
-    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    const avatarUrl = `/uploads/avatars/${filename}`;
     
+    const previousUser = await prisma.user.findUnique({
+        where: { id: req.user!.id },
+        select: { avatar: true },
+    });
+
     const user = await prisma.user.update({
         where: { id: req.user!.id },
         data: { avatar: avatarUrl },
     });
 
+    if (
+        previousUser?.avatar &&
+        previousUser.avatar !== avatarUrl &&
+        previousUser.avatar.startsWith('/uploads/avatars/')
+    ) {
+        const oldFilename = previousUser.avatar.replace('/uploads/avatars/', '');
+        const oldFilePath = path.join(process.cwd(), 'uploads', 'avatars', oldFilename);
+        fs.unlink(oldFilePath, (err) => {
+            if (err && err.code !== 'ENOENT') {
+                console.error('Failed to delete old avatar:', err);
+            }
+        });
+    }
+
     sendSuccess(res, toUserPublic(user));
 }));
 
-export default router;
 export default router;

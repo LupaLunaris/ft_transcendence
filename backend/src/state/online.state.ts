@@ -2,7 +2,7 @@
 //set of user ids currently connected via socket.io
 export type PresenceStatus = 'online' | 'in_game';
 
-const onlineUsers = new Map<string, PresenceStatus>();
+export const onlineUsers = new Map<string, PresenceStatus>();
 
 export function setOnline(user_id: string): void {
     onlineUsers.set(user_id, 'online');
