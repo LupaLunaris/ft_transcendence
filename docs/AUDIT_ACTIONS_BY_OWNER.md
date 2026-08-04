@@ -1,7 +1,5 @@
 # Audit - Actions à réaliser avant l'évaluation
 
-Ce document regroupe les problèmes détectés lors des audits (Codex + GitHub) et les répartit par responsable.
-
 ---
 
 # 🔴 Jérémie
