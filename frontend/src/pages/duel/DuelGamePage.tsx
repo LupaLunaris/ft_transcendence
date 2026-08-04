@@ -22,6 +22,9 @@ import { useToast } from '@/components/ui/useToast';
 import type { AchievementCode } from '@ft/shared';
 import { api } from '@/services/api.service';
 import { useTranslation } from 'react-i18next';
+import { TouchPad } from '@/components/ui/TouchPad';
+import { ScaledGameFrame } from '@/components/game/ScaledGameFrame';
+import { createPortal } from 'react-dom';
 
 const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
   FIRST_ESCAPE: 'first_escape',
@@ -256,81 +259,90 @@ export function DuelGamePage() {
     };
   }, [state, user]);  // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleDirection = (direction: Direction, pressed: boolean) => {
+  gameRef.current?.events.emit('touch_input', { direction, pressed });
+  };
+
   if (!state) return null;
 
-  return (
-    <div className="min-h-screen bg-surface flex flex-row items-start justify-center gap-4 p-4">
-    <div className="flex flex-col items-center gap-4 flex-1">
+return (
+  <div className="min-h-screen bg-surface flex flex-col items-center gap-4 p-4">
     {/* En-tête avec pseudos adversaires */}
-      <div className="flex items-center gap-4 text-sm text-white/60 flex-wrap justify-center">
-        <span className="text-white font-medium">{user?.username}</span>
-        <span className="text-white/30">vs</span>
-        {state.opponents.map((o, i) => (
-          <span key={o.id} className="text-deep-300 font-medium">
-            {o.username}{i < state.opponents.length - 1 ? ',' : ''}
-          </span>
-        ))}
-      </div>
+    <div className="flex items-center gap-4 text-sm text-white/60 flex-wrap justify-center">
+      <span className="text-white font-medium">{user?.username}</span>
+      <span className="text-white/30">vs</span>
+      {state.opponents.map((o, i) => (
+        <span key={o.id} className="text-deep-300 font-medium">
+          {o.username}{i < state.opponents.length - 1 ? ',' : ''}
+        </span>
+      ))}
+    </div>
 
-      {/* Zone de jeu */}
-      <div className="relative">
+    <p className="text-white/60 text-sm">
+      {t('duel_game_page.instructions')}
+    </p>
+
+    <div className="w-full flex flex-row items-start justify-center gap-4">
+      <ScaledGameFrame
+        overlay={
+          <>
+            {/* Attente que tous les joueurs soient connectés */}
+            {waiting && !result && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3">
+                <Spinner size="lg" className="text-deep-400" />
+                <p className="text-white/70 text-sm">
+                  {t('duel_game_page.wait_other_player')}
+                </p>
+              </div>
+            )}
+
+            {/* Le joueur local a fini, la course continue pour les autres */}
+            {!waiting && myFinished && !result && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3 pointer-events-none">
+                <Spinner size="lg" className="text-deep-400" />
+                <p className="text-white/70 text-sm">
+                  {t('duel_game_page.waiting_others')}
+                </p>
+              </div>
+            )}
+
+            {/* Le joueur local est mort (ennemi/forfait), la course continue pour les autres */}
+            {!waiting && !myAlive && !myFinished && !result && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3 pointer-events-none">
+                <p className="text-3xl">💀</p>
+                <p className="text-white/70 text-sm">
+                  {t('duel_game_page.dead_waiting')}
+                </p>
+              </div>
+            )}
+
+            {result && (
+              <ResultOverlay
+                result={result}
+                myId={user?.id ?? ''}
+                onLeave={() => navigate('/duel')}
+              />
+            )}
+          </>
+        }
+      >
         <div
           ref={containerRef}
           className="rounded-lg overflow-hidden shadow-lg"
           style={{ width: CANVAS_W, height: CANVAS_H }}
         />
-
-        {/* Attente que tous les joueurs soient connectés */}
-        {waiting && !result && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3">
-            <Spinner size="lg" className="text-deep-400" />
-            <p className="text-white/70 text-sm">
-              {t('duel_game_page.wait_other_player')}
-            </p>
-          </div>
-        )}
-
-        {/* Le joueur local a fini, la course continue pour les autres */}
-        {!waiting && myFinished && !result && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3 pointer-events-none">
-            <Spinner size="lg" className="text-deep-400" />
-            <p className="text-white/70 text-sm">
-              {t('duel_game_page.waiting_others')}
-            </p>
-          </div>
-        )}
-
-        {/* Le joueur local est mort (ennemi/forfait), la course continue pour les autres */}
-        {!waiting && !myAlive && !myFinished && !result && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3 pointer-events-none">
-            <p className="text-3xl">💀</p>
-            <p className="text-white/70 text-sm">
-              {t('duel_game_page.dead_waiting')}
-            </p>
-          </div>
-        )}
-
-        {result && (
-          <ResultOverlay
-            result={result}
-            myId={user?.id ?? ''}
-            onLeave={() => navigate('/duel')}
-          />
-        )}
-      </div>
-
-      <p className="text-white/60 text-sm">
-        {t('duel_game_page.instructions')}
-      </p>
-    </div>
+      </ScaledGameFrame>
 
       <Leaderboard
         title={t('leaderboard.map_title')}
         entries={leaderboardEntries}
         loading={leaderboardLoading}
         highlightUserId={user?.id}
-        className="w-64 mt-12 hidden md:flex"
+        className="w-64 shrink-0 mt-12 hidden md:flex"
       />
     </div>
-  );
+
+    {createPortal(<TouchPad onDirection={handleDirection} />, document.body)}
+  </div>
+);
 }

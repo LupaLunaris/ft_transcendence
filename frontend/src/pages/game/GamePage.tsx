@@ -14,6 +14,7 @@ import { Leaderboard } from '@/components/leaderboard/Leaderboard';
 import { api } from '@/services/api.service';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
+import { ScaledGameFrame } from '@/components/game/ScaledGameFrame';
 
 type EnemySpeed = 'slow' | 'normal' | 'fast';
 
@@ -157,49 +158,54 @@ export function GamePage() {
   };
 
   return (
-	<>
-	  <div className="min-h-screen bg-surface flex flex-row items-start justify-center gap-4 p-4">
-		<div className="flex flex-col items-center gap-4">
-		  <h2 className="text-xl font-semibold text-silver-100 font-fantasy tracking-wide">
-			{map.name}
-		  </h2>
-		  <GameCanvas
-			  key={`${map.id}-${gameKey}-${enemySpeed}`}
-			  grid={map.grid}
-			  settings={settings}
-			  player_id={user!.id}
-			  player_sprite={AVATAR_TO_SPRITE[user!.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE}
-			  onExit={handleExit}
-			  onDeath={handleDeath}
-			  />
-				  <Button
-			type="button"
-			variant="secondary"
-			size="sm"
-			onClick={handleExitMap}
-		  >
-			{t('game_page.exit')}
-		  </Button>
-		  <p className="text-white/60 text-sm">
-			{t('game_page.instructions')}
-		  </p>
-		</div>
+    <>
+      <div className="min-h-screen bg-surface flex flex-col items-center gap-4 p-4">
+        <h2 className="text-xl font-semibold text-silver-100 font-fantasy tracking-wide">
+          {map.name}
+        </h2>
 
-		<Leaderboard
-		  title={t('leaderboard.map_title')}
-		  entries={leaderboardEntries}
-		  loading={leaderboardLoading}
-		  highlightUserId={user?.id}
-		  className="w-64 mt-12 hidden md:flex"
-		/>
-	  </div>
+        <p className="text-white/60 text-sm">
+          {t('game_page.instructions')}
+        </p>
 
-	  <GameOverModal
-		isOpen={dead}
-		backLabel={backLabel}
-		onRestart={handleRestart}
-		onBack={handleBack}
-	  />
-	</>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={handleExitMap}
+        >
+          {t('game_page.exit')}
+        </Button>
+
+        <div className="w-full flex flex-row items-start justify-center gap-4">
+          <ScaledGameFrame>
+            <GameCanvas
+              key={`${map.id}-${gameKey}-${enemySpeed}`}
+              grid={map.grid}
+              settings={settings}
+              player_id={user!.id}
+              player_sprite={AVATAR_TO_SPRITE[user!.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE}
+              onExit={handleExit}
+              onDeath={handleDeath}
+            />
+          </ScaledGameFrame>
+
+          <Leaderboard
+            title={t('leaderboard.map_title')}
+            entries={leaderboardEntries}
+            loading={leaderboardLoading}
+            highlightUserId={user?.id}
+            className="w-64 shrink-0 mt-12 hidden md:flex"
+          />
+        </div>
+      </div>
+
+      <GameOverModal
+        isOpen={dead}
+        backLabel={backLabel}
+        onRestart={handleRestart}
+        onBack={handleBack}
+      />
+    </>
   );
 }

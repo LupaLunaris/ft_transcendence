@@ -1,6 +1,6 @@
 
 import Phaser from 'phaser';
-import { TILE, GRID_SIZE, type Grid } from '@ft/shared';
+import { TILE, GRID_SIZE, type Grid, type Direction } from '@ft/shared';
 import {
   KEY_TILE_FLOOR, KEY_TILE_WALL, KEY_TILE_EXIT,
   ASSET_TILE_FLOOR, ASSET_TILE_WALL, ASSET_TILE_EXIT,
@@ -35,6 +35,23 @@ const TILE_TEXTURE_KEYS: Record<number, string> = {
 // ─── Scène abstraite ──────────────────────────────────────────────────────────
 
 export abstract class BaseScene extends Phaser.Scene {
+
+  // -- Input tactile ---------------------------------------------------------
+  protected touchState: Record<Direction, boolean> = {
+	up: false, down: false, left: false, right:false,
+  };
+
+  private handleTouchInput = (payload: { direction: Direction; pressed: boolean }): void => {
+    this.touchState[payload.direction] = payload.pressed;
+  };
+
+  protected registerTouchInput(): void {
+    this.game.events.on('touch_input', this.handleTouchInput, this);
+  }
+
+  protected unregisterTouchInput(): void {
+    this.game.events.off('touch_input', this.handleTouchInput, this);
+  }
 
   // ── Helpers de chargement ─────────────────────────────────────────────────
 

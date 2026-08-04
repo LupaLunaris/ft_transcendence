@@ -207,6 +207,7 @@ export class GameScene extends BaseScene {
 			right: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D),
 		};
 
+		this.registerTouchInput();
 		this.startTime = this.time.now;
 	}
 
@@ -216,10 +217,10 @@ export class GameScene extends BaseScene {
 	update(_time: number, _delta: number): void {
 		if (this.finished || this.isMoving) return;
 
-		const left = this.cursors.left.isDown || this.wasd.left.isDown;
-		const right = this.cursors.right.isDown || this.wasd.right.isDown;
-		const up = this.cursors.up.isDown || this.wasd.up.isDown;
-		const down = this.cursors.down.isDown || this.wasd.down.isDown;
+		const left = this.cursors.left.isDown || this.wasd.left.isDown || this.touchState.left;
+		const right = this.cursors.right.isDown || this.wasd.right.isDown || this.touchState.right;
+		const up = this.cursors.up.isDown || this.wasd.up.isDown || this.touchState.up;
+		const down = this.cursors.down.isDown || this.wasd.down.isDown || this.touchState.down;
 
 		if (left) this.tryMove(-1, 0, 'left');
 		else if (right) this.tryMove(1, 0, 'right');
@@ -266,10 +267,10 @@ export class GameScene extends BaseScene {
 				// Accélération progressive : raccourcit moveDuration si la touche
 				// est toujours enfoncée, jusqu'au plafond bas de 60ms.
 				const stillPressed =
-					(dir === 'left' && (this.cursors.left.isDown || this.wasd.left.isDown)) ||
-					(dir === 'right' && (this.cursors.right.isDown || this.wasd.right.isDown)) ||
-					(dir === 'up' && (this.cursors.up.isDown || this.wasd.up.isDown)) ||
-					(dir === 'down' && (this.cursors.down.isDown || this.wasd.down.isDown));
+					(dir === 'left' && (this.cursors.left.isDown || this.wasd.left.isDown || this.touchState.left)) ||
+					(dir === 'right' && (this.cursors.right.isDown || this.wasd.right.isDown || this.touchState.right)) ||
+					(dir === 'up' && (this.cursors.up.isDown || this.wasd.up.isDown || this.touchState.up)) ||
+					(dir === 'down' && (this.cursors.down.isDown || this.wasd.down.isDown || this.touchState.down));
 				if (stillPressed) {
 					this.moveDuration = Math.max(60, this.moveDuration - 15);
 				}
@@ -399,5 +400,10 @@ export class GameScene extends BaseScene {
 			this.finished = true;
 			this.game.events.emit('player_caught');
 		}
+	}
+	
+	// -- shutdown ----------------------------------------------------------------
+	shutdown(): void {
+  		this.unregisterTouchInput();
 	}
 }
