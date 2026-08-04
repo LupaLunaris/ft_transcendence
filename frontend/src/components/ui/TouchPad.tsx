@@ -33,7 +33,16 @@ export function TouchPad({ onDirection }: TouchPadProps) {
   }, [onDirection]);
 
   return (
-    <div className="fixed bottom-24 right-4 z-50 grid grid-cols-3 grid-rows-3 md:hidden">
+    <div className="hidden
+    [@media(pointer:coarse)]:grid
+    fixed
+    bottom-24
+    right-4
+    z-50
+    grid-cols-3
+    grid-rows-3
+    gap-1
+   ">
       {ARROWS.map(({ dir, icon: Icon, className }) => (
         <button
           key={dir}
