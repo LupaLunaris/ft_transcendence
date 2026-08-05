@@ -1,5 +1,5 @@
 
-import { useCallback, useState, useLayoutEffect, useRef } from 'react';
+import { useCallback, useEffect, useState, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth.context';
 import { AVATAR_TO_SPRITE, DEFAULT_PLAYER_SPRITE } from '@/game/assets';
@@ -21,6 +21,8 @@ export function TowerGamePage() {
 
   const [dead, setDead] = useState(false);
   const [gameKey, setGameKey] = useState(0);
+  const [runToken, setRunToken] = useState<string | null>(null);
+  const [runStarting, setRunStarting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [completionData, setCompletionData] = useState<{
     tower_progress: number;
@@ -41,6 +43,39 @@ export function TowerGamePage() {
     refetch();
   }, [orderIndex, refetch]);
 
+  useEffect(() => {
+    if (!level || !user) return;
+
+    let cancelled = false;
+
+    async function startRun() {
+      setRunToken(null);
+      setRunStarting(true);
+
+      try {
+        const result = await api.tower.start(orderIndex);
+
+        if (!cancelled) {
+          setRunToken(result.run_token);
+        }
+      } catch {
+        if (!cancelled) {
+          navigate('/tower');
+        }
+      } finally {
+        if (!cancelled) {
+          setRunStarting(false);
+        }
+      }
+    }
+
+    void startRun();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [orderIndex, level?.id, user?.id, gameKey, navigate]);
+
   const handleDeath = useCallback(() => {
     setDead(true);
   }, []);
@@ -57,7 +92,13 @@ export function TowerGamePage() {
   const handleExit = useCallback(
     async (_time_ms: number) => {
       try {
-        const result = await api.tower.complete(orderIndex);
+        if (!runToken) {
+          navigate('/tower');
+          return;
+        }
+
+        const result = await api.tower.complete(orderIndex, runToken);
+        setRunToken(null);
         if (user) {
           updateUser({ ...user, tower_progress: result.tower_progress, diamonds: result.diamonds });
         }
@@ -68,7 +109,7 @@ export function TowerGamePage() {
         navigate('/tower');
       }
     },
-    [orderIndex, user, updateUser, navigate],
+    [orderIndex, user, updateUser, navigate, runToken],
   );
 
   const handleContinue = () => {
@@ -85,7 +126,7 @@ export function TowerGamePage() {
     navigate('/');
   };
 
-if (loading) {
+if (loading || runStarting || !runToken) {
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center">
       <Spinner size="lg" className="text-gold-400" />

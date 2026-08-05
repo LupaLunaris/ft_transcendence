@@ -1,5 +1,5 @@
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import type { AchievementCode, Difficulty, RewardResult } from '@ft/shared';
 import { useAuth } from '@/context/auth.context';
@@ -52,6 +52,8 @@ export function GamePage() {
   const { entries: leaderboardEntries, loading: leaderboardLoading } = useMapLeaderboard(map_id);
   const [dead, setDead] = useState(false);
   const [gameKey, setGameKey] = useState(0);
+  const [runToken, setRunToken] = useState<string | null>(null);
+  const [runStarting, setRunStarting] = useState(false);
   const { t } = useTranslation();
 
   const handleDeath = useCallback(() => {
@@ -98,11 +100,50 @@ export function GamePage() {
 	[showToast, t, updateUser],
   );
 
+  useEffect(() => {
+    if (!map_id || !map || !user) return;
+
+    let cancelled = false;
+
+    async function startRun() {
+      setRunToken(null);
+      setRunStarting(true);
+
+	try {
+	const run = await api.scores.start(map_id);
+
+	if (!cancelled) {
+		setRunToken(run.run_token);
+	}
+	} catch {
+	if (!cancelled) {
+		showToast(t('game_page.toast_score_error'), 'error');
+	}
+    } finally {
+        if (!cancelled) {
+          setRunStarting(false);
+        }
+      }
+    }
+
+    void startRun();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [map_id, map?.id, user?.id, gameKey, showToast, t]);
+
   const handleExit = useCallback(
 	async (time_ms: number) => {
 	  if (!map_id) return;
 	  try {
-		const result = await api.scores.submit(map_id, time_ms);
+		if (!runToken) {
+		showToast(t('game_page.toast_score_error'), 'error');
+		return;
+	  }
+
+		const result = await api.scores.submit(runToken, time_ms);
+		setRunToken(null);
 		showToast(t('game_page.toast_finished', { time: (time_ms / 1000).toFixed(2) }), 'success');
 		await handleReward(result.reward);
 	  } catch {
@@ -121,7 +162,7 @@ export function GamePage() {
 		navigate('/train');
 	  }
 	},
-	[map_id, map, user, navigate, showToast, t, handleReward],
+	[map_id, map, user, navigate, showToast, t, handleReward, runToken],
   );
 
   if (loading) {
@@ -155,6 +196,14 @@ export function GamePage() {
 	enemyCount: savedSettings?.enemyCount ?? 2,
 	enemySpeed,
   };
+
+  if (runStarting || !runToken) {
+	return (
+	  <div className="min-h-screen bg-surface flex items-center justify-center">
+		<Spinner size="lg" className="text-deep-400" />
+      </div>
+	);
+  }
 
   return (
 	<>
