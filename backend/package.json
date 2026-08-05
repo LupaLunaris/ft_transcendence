@@ -17,6 +17,9 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/src/__tests__/setup.ts"
+    ],
     "roots": [
       "<rootDir>/src"
     ],

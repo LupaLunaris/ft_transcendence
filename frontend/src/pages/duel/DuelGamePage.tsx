@@ -7,8 +7,8 @@ import type {
   RaceResult,
   GameState,
   Direction,
-  ClientToServerEvents,
-  ServerToClientEvents,
+  AchievementCode,
+  RewardResult,
 } from '@ft/shared';
 import { useAuth } from '@/context/auth.context';
 import { useSocket } from '@/context/socket.context';
@@ -19,7 +19,6 @@ import { Leaderboard } from '@/components/leaderboard/Leaderboard';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { useToast } from '@/components/ui/useToast';
-import type { AchievementCode } from '@ft/shared';
 import { api } from '@/services/api.service';
 import { useTranslation } from 'react-i18next';
 import { TouchPad } from '@/components/ui/TouchPad';
@@ -32,8 +31,6 @@ const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
   EXPLORER: 'explorer',
   DUEL_CHAMPION: 'duel_champion',
 };
-
-type DuelSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
 const CANVAS_W = 800;
 const CANVAS_H = 600;
@@ -100,12 +97,20 @@ export function DuelGamePage() {
   const { showToast } = useToast();
 
   const state = location.state as DuelStartPayload | null;
+  const raceId = state?.race_id;
+  const userId = user?.id;
   const { entries: leaderboardEntries, loading: leaderboardLoading } = useMapLeaderboard(state?.map_id);
 
   const containerRef  = useRef<HTMLDivElement>(null);
   const gameRef       = useRef<Phaser.Game | null>(null);
   const socketRef = useRef<typeof socket>(null);
   useEffect(() => { socketRef.current = socket; }, [socket]);
+  const translateRef = useRef(t);
+  translateRef.current = t;
+  const showToastRef = useRef(showToast);
+  showToastRef.current = showToast;
+  const updateUserRef = useRef(updateUser);
+  updateUserRef.current = updateUser;
   // Dernier game_state reçu, indépendamment de l'état de chargement de la
   // scène Phaser — permet de rattraper la scène dès qu'elle signale 'scene_ready'
   // (cf. effect Phaser ci-dessous : sans ce cache, un game_state émis avant que
@@ -130,21 +135,24 @@ export function DuelGamePage() {
   // auth.context.tsx), la closure de 'game_state' capture user=null pour
   // toute la durée de la connexion socket (l'effect ne se relance jamais).
   useEffect(() => {
-    if (!state || !user || !socket) return;
+    if (!raceId || !userId || !socket) return;
+
+    const currentRaceId = raceId;
+    const duelSocket = socket;
 
     function handleGameState(gameState: GameState) {
       if (!gameState.started) return;
       setWaiting(false);
       lastGameStateRef.current = gameState;
 
-      const me = gameState.players.find(p => p.id === user!.id);
+      const me = gameState.players.find(p => p.id === userId);
       if (me?.finished) setMyFinished(true);
       if (me && !me.alive) {
         setMyAlive(false);
         gameRef.current?.events.emit('i_died');
       }
 
-      const remotes = gameState.players.filter(p => p.id !== user!.id);
+      const remotes = gameState.players.filter(p => p.id !== userId);
       gameRef.current?.events.emit('remote_states', remotes);
       gameRef.current?.events.emit('remote_enemies', gameState.enemies);
     }
@@ -153,52 +161,51 @@ export function DuelGamePage() {
       setResult(res);
     }
 
-    function handleErrorEvent({ message }: { message: string }) {
-    // Émis uniquement au vainqueur de la course (cf. duelHandler.ts#finishRace)
-    socket.on('reward_earned', (reward) => {
+    function handleRewardEarned(reward: RewardResult) {
+      // Émis uniquement au vainqueur de la course (cf. duelHandler.ts#finishRace)
       if (reward.xp_gained > 0) {
-        showToast(t('toast_xp_gained', { xp: reward.xp_gained }), 'success');
+        showToastRef.current(translateRef.current('toast_xp_gained', { xp: reward.xp_gained }), 'success');
       }
       reward.achievements_unlocked.forEach((achievement) => {
-        showToast(
-          t('toast_achievement_unlocked', { name: t(`achievement.${ACHIEVEMENT_LABEL[achievement.code]}`) }),
+        showToastRef.current(
+          translateRef.current('toast_achievement_unlocked', { name: translateRef.current(`achievement.${ACHIEVEMENT_LABEL[achievement.code]}`) }),
           'success',
         );
       });
-      api.auth.getMe().then(updateUser).catch(() => {
+      api.auth.getMe().then(updateUserRef.current).catch(() => {
         // The next profile load will refresh XP if this background refresh fails.
       });
-    });
+    }
 
-    socket.on('error_event', ({ message }) => {
+    function handleErrorEvent({ message }: { message: string }) {
       console.error('[duel game]', message);
-    });
-    
     }
 
     function handleConnect() {
-      socket!.emit('join_race', { race_id: state!.race_id });
+      duelSocket.emit('join_race', { race_id: currentRaceId });
     }
 
-    socket.on('game_state', handleGameState);
-    socket.on('race_finished', handleRaceFinished);
-    socket.on('error_event', handleErrorEvent);
-    socket.on('connect', handleConnect);
+    duelSocket.on('game_state', handleGameState);
+    duelSocket.on('race_finished', handleRaceFinished);
+    duelSocket.on('reward_earned', handleRewardEarned);
+    duelSocket.on('error_event', handleErrorEvent);
+    duelSocket.on('connect', handleConnect);
 
     // Le socket partagé est peut-être déjà connecté avant ce montage
     // (ex: navigation depuis le lobby) — sans ceci, 'connect' ne se
     // redéclenche jamais et join_race n'est jamais émis.
-    if (socket.connected) {
-      socket.emit('join_race', { race_id: state.race_id });
+    if (duelSocket.connected) {
+      duelSocket.emit('join_race', { race_id: currentRaceId });
     }
 
     return () => {
-      socket.off('game_state', handleGameState);
-      socket.off('race_finished', handleRaceFinished);
-      socket.off('error_event', handleErrorEvent);
-      socket.off('connect', handleConnect);
+      duelSocket.off('game_state', handleGameState);
+      duelSocket.off('race_finished', handleRaceFinished);
+      duelSocket.off('reward_earned', handleRewardEarned);
+      duelSocket.off('error_event', handleErrorEvent);
+      duelSocket.off('connect', handleConnect);
     };
-  }, [socket, state?.race_id, user?.id]);   // eslint-disable-line react-hooks/exhaustive-deps  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [socket, raceId, userId]);
 
   // ── Phaser : initialisation ───────────────────────────────────────────────
   useEffect(() => {
@@ -257,7 +264,7 @@ export function DuelGamePage() {
       game.destroy(true);
       gameRef.current = null;
     };
-  }, [state, user]);  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [state, user]);
 
   const handleDirection = (direction: Direction, pressed: boolean) => {
   gameRef.current?.events.emit('touch_input', { direction, pressed });

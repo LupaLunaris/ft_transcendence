@@ -28,6 +28,7 @@ const CANVAS_HEIGHT = 600;
 	}: GameCanvasProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const gameRef = useRef<Phaser.Game | null>(null);
+	const initialGameConfigRef = useRef({ grid, settings, player_id, player_sprite });
 
 	const onExitRef = useRef(onExit);
 	useEffect(() => { onExitRef.current = onExit; }, [onExit]);
@@ -63,12 +64,13 @@ const CANVAS_HEIGHT = 600;
 		});
 
 		game.events.once('ready', () => {
-		game.scene.add('GameScene', GameScene, true, {
-			grid,
-			settings,
-			player_id,
-			player_sprite,
-		});
+			const initialGameConfig = initialGameConfigRef.current;
+			game.scene.add('GameScene', GameScene, true, {
+				grid: initialGameConfig.grid,
+				settings: initialGameConfig.settings,
+				player_id: initialGameConfig.player_id,
+				player_sprite: initialGameConfig.player_sprite,
+			});
 		});
 
 		return () => {

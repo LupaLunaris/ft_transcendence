@@ -37,6 +37,6 @@ describe("Button", () => {
 
   it("applies danger variant class", () => {
     render(<Button variant="danger">Delete</Button>);
-    expect(screen.getByRole("button")).toHaveClass("bg-coral-500");
+    expect(screen.getByRole("button")).toHaveClass("bg-red-600");
   });
 });

@@ -67,7 +67,6 @@ app.use((_req: Request, res: Response) => {
 });
 
 // Global error handler
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error('[error]', err.message);
   res.status(500).json({ error: 'Internal server error', code: 500 });
