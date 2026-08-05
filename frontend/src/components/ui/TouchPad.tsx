@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 import type { Direction } from '@ft/shared';
-import { ArrowBigUp, ArrowBigDown, ArrowBigLeft, ArrowBigRight, } from "lucide-react";
+import { ArrowBigUp, ArrowBigDown, ArrowBigLeft, ArrowBigRight, } from 'lucide-react';
 
 interface TouchPadProps {
   onDirection: (direction: Direction, pressed: boolean) => void;
