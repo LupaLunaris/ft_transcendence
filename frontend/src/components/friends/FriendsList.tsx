@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api, type FriendPublic } from '@/services/api.service';
 import { Spinner } from '@/components/ui/Spinner';
 import { UserSearch } from '@/components/friends/UserSearch';
@@ -17,7 +17,7 @@ export function FriendsList() {
 	return t('friends_list_offline');
   }
 
-  async function loadFriends() {
+  const loadFriends = useCallback(async () => {
 	try {
 	  setError(null);
 	  const data = await api.friends.getList();
@@ -27,7 +27,7 @@ export function FriendsList() {
 	} finally {
 	  setLoading(false);
 	}
-  }
+  }, [t]);
 
   async function handleRemoveFriend(userId: string) {
 	try {
@@ -40,7 +40,7 @@ export function FriendsList() {
 
   useEffect(() => {
 	void loadFriends();
-  }, []);
+  }, [loadFriends]);
 
   if (loading) {
 	return (

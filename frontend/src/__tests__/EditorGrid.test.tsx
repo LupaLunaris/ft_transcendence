@@ -21,13 +21,12 @@ describe('EditorGrid', () => {
     expect(cells).toHaveLength(GRID_SIZE * GRID_SIZE);
   });
 
-  it('uses fixed 22px columns — not 1fr', () => {
+  it('uses responsive columns', () => {
     const { container } = render(
       <EditorGrid grid={makeGrid()} selectedTile={TILE.WALL} onTileClick={() => {}} />,
     );
     const wrapper = container.firstElementChild as HTMLElement;
-    expect(wrapper.style.gridTemplateColumns).toBe(`repeat(${GRID_SIZE}, 22px)`);
-    expect(wrapper.style.gridTemplateColumns).not.toContain('1fr');
+    expect(wrapper.style.gridTemplateColumns).toBe(`repeat(${GRID_SIZE}, minmax(0, 1fr))`);
   });
 
   it('calls onTileClick with (colIdx, rowIdx) on click', async () => {
@@ -69,6 +68,6 @@ describe('EditorGrid', () => {
       <EditorGrid grid={grid} selectedTile={TILE.EMPTY} onTileClick={() => {}} />,
     );
     const firstCell = container.querySelector('[style*="background-color"]') as HTMLElement;
-    expect(firstCell.style.backgroundColor).toBe('rgb(92, 61, 143)'); // #5c3d8f
+    expect(firstCell.style.backgroundColor).toBe('rgb(42, 37, 32)'); // #2a2520, bordure externe
   });
 });

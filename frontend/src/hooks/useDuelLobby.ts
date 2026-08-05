@@ -3,8 +3,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type {
   LobbyEntry,
   DuelStartPayload,
-  ClientToServerEvents,
-  ServerToClientEvents,
 } from '@ft/shared';
 import { useSocket } from '@/context/socket.context';
 

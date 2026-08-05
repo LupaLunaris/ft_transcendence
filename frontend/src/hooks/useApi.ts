@@ -49,7 +49,6 @@ export function useApi<T>(fn: () => Promise<T>): UseApiResult<T> {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tick]);
 
   return { data, loading, error, refetch };

@@ -6,7 +6,11 @@ interface TouchPadProps {
   onDirection: (direction: Direction, pressed: boolean) => void;
 }
 
-const ARROWS = [
+const ARROWS: ReadonlyArray<{
+  dir: Direction;
+  icon: typeof ArrowBigUp;
+  className: string;
+}> = [
   { dir: "up", icon: ArrowBigUp, className: "col-start-2 row-start-1" },
   { dir: "left", icon: ArrowBigLeft, className: "col-start-1 row-start-2" },
   { dir: "right", icon: ArrowBigRight, className: "col-start-3 row-start-2" },
