@@ -1,7 +1,41 @@
+# Module Custom-made design system
 For the Minor Web Module: Custom-made design system with reusable components, including a proper
 color palette, typography, and icons (minimum: 10 reusable components).
 
-# List of the 10 reusable components
+## Color palette
+
+We defined a custom color palette in the Tailwind configuration.
+Colors are organized with different shades to keep visual consistency across the pages.
+For example, the silver color contains multiple shades:
+
+        silver: {
+          100: "#f3f4f6",
+          200: "#e5e7eb",
+          300: "#d1d5db",
+          400: "#9ca3af",
+          500: "#6b7280",
+        },
+
+## Typography
+
+Same as color palette, we defined the fonts used throughout the project directly in the Tailwind configuration.
+The application uses different font families depending on the context:
+
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+        mono: ["JetBrains Mono", "Fira Code", "monospace"],
+        fantasy: ["Cinzel", "Georgia", "serif"],
+      },
+
+## Icons
+
+We use a combination of emojis and the Lucide icon library depending on the use case.
+The icon style is kept consistent across the application, especially for interactive components such as the TouchPad.
+
+## List of the 10 reusable components
+
+These components are shared across different pages to avoid duplicated UI logic and maintain a consistent design throughout the application.
+
 1. Button
     - Used in many pages and other components for user actions:
         - GameOverModal, Navbar, CongratulatoryModal
@@ -63,7 +97,14 @@ color palette, typography, and icons (minimum: 10 reusable components).
         - Language selection
         - Responsive layout
         
-8. TouchPad ( dans la PR à accepter- à finir quand elle est acceptée )
+8. TouchPad
+    - Used in:
+        - GameCanvas
+        - DuelGamePage (because this page doesn't use GameCanvas)
+    - The component handles:
+        - Four directional controls (up, down, left and right)
+        - Pointer press and release events
+        - Displaying touch controls only on devices with coarse pointers
 
 9. GameOverModal
     - used in game pages when the player loses the game: 
@@ -74,7 +115,7 @@ color palette, typography, and icons (minimum: 10 reusable components).
         - Restart action through a reusable Button component
         - Returning to the previous page through a customizable back action
 
-10. Toast and ToastContainer
+10. Toast notification systemx
     - Used in pages where temporary user feedback messages need to be displayed:
         - LoginPage, RegisterPage, DuelGamePage, EditorPage, GamePage
     - The component handles:
