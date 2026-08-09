@@ -105,7 +105,7 @@ She also reviewed and integrated changes from the different parts of the project
 
 ## Communication
 
-🔴 **JEREM / ELISE - TO COMPLETE**
+🔴 **JEREM - TO COMPLETE**
 
 ---
 
@@ -313,37 +313,6 @@ The project includes XP, levels, achievements, rewards and leaderboards.
 
 **Responsible:** Elise.
 
----
-
-# Individual Contributions
-
-## Martin - malafont
-
-Martin worked mainly on the gameplay part of the project.
-
-His work includes Phaser, player movement, collisions, enemies, game rules, Tower mode, multiplayer gameplay and the core of the map editor.
-
-He also worked on game customization and gamification.
-
-As Product Owner, he was responsible for the general gameplay direction and the main decisions about the game.
-
-## Jerem - jdebrull
-
-🔴 **JEREM - TO COMPLETE**
-
-## Jennifer - jpaulis
-
-Jennifer worked mainly on frontend architecture and integration.
-
-Her work includes the React architecture, frontend/backend communication, shared TypeScript types, frontend user management, game customization and gamification.
-
-As Technical Lead, she also reviewed the code produced across the project and reviewed the team's Pull Requests before integration. This included checking changes from the backend, gameplay and UI parts of the project to keep the different parts coherent and catch integration problems before merging.
-
-She also worked on project documentation and final integration between the different parts of the application.
-
-## Elise - evan-dro
-
-🔴 **ELISE - TO COMPLETE**
 
 ---
 
@@ -406,16 +375,6 @@ Another difficulty was keeping React, Phaser and the backend working together wh
 ### UI / responsive
 
 🔴 **ELISE - TO COMPLETE**
-
----
-
-# Known Limitations
-
-* Tower mode uses predefined levels.
-* The application supports English, French and Dutch.
-* Multiplayer games are session-based.
-* Community maps have to respect the supported map format and game rules.
-* Some ideas we had at the beginning were removed to keep the final project realistic and stable.
 
 ---
 
