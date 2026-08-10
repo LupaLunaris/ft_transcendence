@@ -266,44 +266,12 @@ Ces pages sont Mandatory et peuvent entraîner le rejet si elles sont inadéquat
 
 ---
 
-## 🔴 Responsive — formulaires
-
-Le responsive général est normalement bon.
-
-### À vérifier
-
-- [ ] Petits écrans
-- [ ] Erreurs de formulaire
-- [ ] Clavier mobile
-- [ ] Aucun bouton/champ inaccessible ou coupé
-
----
-
-## 🟠 Notifications — ACTUELLEMENT NON VALIDABLE
+## 🟠 Notifications — A ESSAYER DE FAIRE PASSER
 
 Responsable : Élise.
 
-Le système actuel contient seulement des toasts.
-
-Cela ne correspond pas suffisamment à un `complete notification system`.
-
-### Décision obligatoire
-
-- [ ] Soit implémenter réellement le module
-- [ ] Soit retirer le Minor Notifications des modules revendiqués
-
-### Si le module est conservé
-
-Minimum à ajouter :
-
-- [ ] Notifications persistantes
-- [ ] Notifications consultables dans une interface
-- [ ] État lu / non lu
-- [ ] Notifications générées lors des créations pertinentes
-- [ ] Notifications générées lors des modifications pertinentes
-- [ ] Notifications générées lors des suppressions pertinentes
-
-Si Élise ne souhaite pas implémenter ce système : il faudrait retirer le module.
+Le système actuel contient seulement des toasts mais selon le dictionnaire Larousse : Action de notifier, de faire connaître expressément quelque chose à quelqu'un ; 
+Donc techniquement des toasts ca se défend de mon point de vue.
 
 ---
 
