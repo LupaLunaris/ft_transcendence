@@ -1,274 +1,556 @@
-# Audit - Actions à réaliser avant l'évaluation
+# Audit final — Actions à réaliser avant l'évaluation
+
+> Priorités établies à partir du sujet officiel `ft_transcendence v21.0`.
+
+## Légende
+
+- 🔴 **MANDATORY** : exigence obligatoire du sujet ou point critique pour pouvoir présenter le projet.
+- 🟠 **MODULE** : nécessaire pour valider un module revendiqué.
+- 🟡 **QUALITÉ** : nettoyage ou amélioration importante, mais à faire après les exigences critiques.
 
 ---
 
-# 🔴 Jérémie
+# Jérémie
 
-## Docker / Infrastructure
+## 🔴 Démarrage Docker / infrastructure
 
-### Démarrage du projet
+Le projet doit pouvoir être lancé avec une seule commande après la préparation normale de l'environnement.
 
-❌ Problème
+### À faire
 
-Le projet ne démarre pas correctement après un clone. Il faut créer/configurer certaines choses manuellement alors que le projet devrait être simple à lancer.
-
-À faire :
-
-- [ ] Corriger le démarrage en une commande
-- [ ] Vérifier le fonctionnement de `make dev`
-- [ ] Ajouter les commandes Make manquantes (`make down`, `make logs`)
-- [ ] Ajouter un `.dockerignore`
-- [ ] Retirer les `container_name`
-- [ ] Ajouter les healthchecks
-
----
-
-### Vault / Secrets
-
-❌ Problème
-
-Des secrets ont été retrouvés dans l'historique Git et la gestion actuelle des secrets doit être sécurisée.
-
-À faire :
-
-- [ ] Rotation des secrets
-- [ ] Vérifier qu'aucun secret ne reste accessible
+- [ ] Corriger le démarrage actuel pour qu'une seule commande lance réellement tout le projet
+- [ ] La commande doit démarrer :
+  - frontend
+  - backend
+  - PostgreSQL
+  - HTTPS / proxy
+  - WAF / Vault si nécessaires au fonctionnement revendiqué
+- [ ] Supprimer les étapes manuelles actuellement nécessaires
+- [ ] Tester le démarrage depuis un clone propre
+- [ ] Vérifier que les migrations / initialisations nécessaires sont automatisées ou intégrées au démarrage
+- [ ] Vérifier que les instructions de lancement du README correspondent exactement au fonctionnement réel
 
 ---
 
-### WAF
+## 🔴 Secrets / `.env` / `.env.example`
 
-❌ Problème
+### À faire
 
-La configuration contient des erreurs (directives mal orthographiées) et doit être vérifiée.
-
-À faire :
-
-- [ ] Corriger la configuration
-- [ ] Vérifier que le WAF bloque bien les attaques sans faux positifs
-
----
-
-### Backend
-
-❌ Problèmes
-
-- Upload d'avatar non sécurisé
-- Les avatars disparaissent après recréation des conteneurs
-- Les avatars ne sont pas accessibles correctement via HTTPS
-- Le frontend n'utilise plus les bonnes routes depuis les modifications backend
-
-À faire :
-
-- [ ] Corriger les routes API
-- [ ] Sécuriser l'upload
-- [ ] Rendre les avatars persistants
-- [ ] Vérifier l'intégration frontend
+- [ ] Vérifier que `.env` est ignoré par Git
+- [ ] Vérifier que `.env.example` ne contient aucun vrai secret
+- [ ] Remplacer les vraies valeurs par des placeholders
+- [ ] Changer tous les secrets qui ont déjà été exposés dans GitHub / l'historique Git
+- [ ] Vérifier qu'aucun ancien secret exposé n'est encore utilisé
+- [ ] Vérifier qu'aucun secret actif n'est présent dans le repository
 
 ---
 
-### Friends
+## 🟠 Vault
 
-❌ Problèmes
+Si le module WAF + Vault est revendiqué :
 
-- Suppression d'amis incomplète
-- Statut `online / offline / in_game` incorrect dans certains cas (plusieurs onglets, partie en cours...)
+- [ ] Vérifier que Vault fonctionne réellement
+- [ ] Vérifier que les secrets sont réellement stockés/gérés via Vault
+- [ ] Vérifier que l'application récupère correctement les secrets nécessaires
+- [ ] Vérifier qu'ils ne sont pas simplement recopiés en clair ailleurs
+- [ ] Vérifier que Vault redémarre correctement avec le projet
 
-À faire :
-
-- [ ] Corriger la suppression
-- [ ] Corriger les statuts utilisateurs
-- [ ] Ajouter les tests
-
----
-
-### Socket.IO
-
-❌ Problèmes
-
-- Des utilisateurs non autorisés peuvent rejoindre certaines rooms
-- Les protections côté serveur sont insuffisantes
-
-À faire :
-
-- [ ] Sécuriser les rooms
-- [ ] Vérifier les permissions
-- [ ] Tester le multijoueur
+Si Vault n'est pas réellement fonctionnel, ne pas revendiquer ce Major.
 
 ---
 
-### Progression / Sécurité
+## 🟠 WAF / ModSecurity
 
-❌ Problèmes
+### À faire
 
-Il est actuellement possible de tricher en appelant directement certaines routes (XP, Tower, scores, publication...).
-
-À faire :
-
-- [ ] Sécuriser les scores
-- [ ] Sécuriser la progression Tower
-- [ ] Sécuriser les XP
-- [ ] Sécuriser la publication des maps
-
----
-
-### Qualité
-
-À faire :
-
-- [ ] Corriger les tests backend
-- [ ] Ajouter/configurer ESLint
-- [ ] Corriger les vulnérabilités (`npm audit`)
-- [ ] Corriger les logs inutiles
+- [ ] Corriger les erreurs de configuration
+- [ ] Vérifier que ModSecurity démarre correctement
+- [ ] Vérifier que les requêtes normales ne sont pas bloquées
+- [ ] Tester :
+  - register
+  - login
+  - users
+  - maps
+  - avatars
+  - gameplay/API
+- [ ] Vérifier qu'une requête clairement malveillante est bloquée
+- [ ] Corriger les faux positifs qui cassent l'application
 
 ---
 
-# 🔴 Martin
+## 🔴 Routes API backend
 
-### Gameplay
+### À faire
 
-❌ À vérifier
+Vérifier que les routes réellement exposées par le backend correspondent aux appels frontend actuels :
 
-- Le multijoueur
-- La reconnexion
-- Les parties à plusieurs joueurs
-- Le classement
-- Les fins de partie
-- Les collisions
+- [ ] Auth
+- [ ] Users
+- [ ] Profiles
+- [ ] Friends
+- [ ] Avatars
+- [ ] Maps
+- [ ] Scores
+- [ ] Tower / progression
+- [ ] Admin
+- [ ] Autres routes utilisées par le frontend
 
-À faire :
+Vérifier également :
 
-- [ ] Tester à 2 joueurs
-- [ ] Tester à 4 joueurs
-- [ ] Tester les reconnexions
-- [ ] Corriger les problèmes trouvés
+- [ ] Toutes les routes fonctionnent en HTTPS
+- [ ] Aucun ancien endpoint cassé n'est encore utilisé
+- [ ] Les codes HTTP retournés restent cohérents
 
----
-
-### Tower / Gameplay
-
-À faire :
-
-- [ ] Vérifier Tower
-- [ ] Vérifier la gamification
-- [ ] Vérifier les personnalisations réellement utilisées
-- [ ] Retirer ce qui n'est pas terminé
+Si tout fonctionne après test, il n'y a rien à modifier juste parce que les routes ont changé.
 
 ---
 
-### Qualité
+## 🔴 Base de données / Prisma
 
-- [ ] Corriger les tests gameplay
-- [ ] Retirer les `console.log`
-- [ ] Corriger les `any` inutiles
+### À faire
 
----
+- [ ] Vérifier que les migrations fonctionnent depuis une base vide
+- [ ] Vérifier qu'un clone propre peut créer correctement la DB
+- [ ] Vérifier que le schema Prisma correspond à la DB utilisée réellement
+- [ ] Vérifier les relations importantes :
+  - User ↔ Maps
+  - User ↔ Friends
+  - User ↔ Scores
+  - User ↔ Progression
+  - User ↔ Achievements
+  - User ↔ Notifications si le module est conservé
+- [ ] Vérifier les suppressions liées
+- [ ] Vérifier qu'il n'y a pas d'enregistrements orphelins évidents
+- [ ] Vérifier le comportement lors d'actions simultanées
 
-# 🔴 Élise
-
-### Traductions
-
-❌ Problème
-
-Certaines chaînes sont encore en dur ou incomplètes.
-
-À faire :
-
-- [ ] Finir les traductions
-- [ ] Vérifier FR / EN / NL
-- [ ] Vérifier les dates
-- [ ] Vérifier les messages d'erreur
+ORM Prisma : déjà validé, pas de développement supplémentaire nécessaire.
 
 ---
 
-### Mobile
+## 🔴 Sécurité backend / triche
 
-❌ Problème
+Le projet fonctionne, mais certaines actions semblent encore pouvoir être manipulées directement via les routes.
 
-Le jeu n'est pas encore correctement utilisable sur mobile dans la branche auditée.
+### À faire
 
-À faire :
+- [ ] Impossible de s'ajouter arbitrairement de l'XP
+- [ ] Impossible de falsifier arbitrairement un score
+- [ ] Impossible de débloquer arbitrairement des niveaux Tower
+- [ ] Impossible de publier la map d'un autre utilisateur
+- [ ] Impossible de modifier la map d'un autre utilisateur
+- [ ] Impossible de supprimer la map d'un autre utilisateur
+- [ ] Les routes admin vérifient réellement le rôle admin
+- [ ] Les routes privées utilisent l'identité authentifiée côté serveur
+- [ ] Ne pas faire confiance à un simple `userId` envoyé par le frontend
+- [ ] Les rooms WebSocket vérifient les permissions nécessaires
 
-- [ ] Finaliser le responsive
-- [ ] Vérifier les contrôles tactiles
-- [ ] Tester sur plusieurs tailles d'écran
-
----
-
-### Accessibilité
-
-À faire :
-
-- [ ] Navigation clavier
-- [ ] Focus
-- [ ] Contrastes
-- [ ] Labels
-- [ ] Vérification Firefox / Edge
+Ce point n'est pas forcément un rejet automatique du projet, mais il est risqué et montre une logique serveur insuffisamment protégée.
 
 ---
 
-### Notifications
+## 🟠 User Management — partie backend
 
-❌ Décision à prendre
+### À vérifier côté backend
 
-Le système actuel ressemble davantage à des toasts qu'à un vrai module de notifications.
-
-À faire :
-
-- [ ] Décider si on garde ce module et le refaire
-- [ ] Ou retirer le module revendiqué
+- [ ] Modification du profil persistante après docker-down
+- [ ] Upload avatar fonctionnel
+- [ ] Avatar par défaut
+- [ ] Avatar persistant après recréation des conteneurs
+- [ ] Avatars accessibles correctement en HTTPS
+- [ ] Suppression d'ami complète
+- [ ] Plusieurs onglets d'un même utilisateur ne provoquent pas de faux statut offline
 
 ---
 
-### Pages légales
+## 🔴 README — partie Jérémie
 
-❌ Problème
+- [ ] Terminer ses sections
+- [ ] Vérifier les instructions d'installation
+- [ ] Vérifier les instructions `.env`
+- [ ] Documenter correctement backend / DB / infrastructure
 
-La Privacy Policy et les Terms contiennent des informations qui ne correspondent pas entièrement au fonctionnement réel.
+---
 
-À faire :
+# Martin
+
+## 🔴 Support multi-utilisateur / concurrence
+
+Le projet doit supporter plusieurs utilisateurs simultanément sans conflit ni corruption de données.
+
+### Tests à faire 
+
+#### Maps
+
+- [ ] Joueur A joue actuellement sur une map
+- [ ] Le créateur B essaie de supprimer cette map
+- [ ] Vérifier le comportement obtenu
+- [ ] Décider du comportement attendu :
+  - suppression refusée pendant une partie
+  - suppression différée
+  - ou partie conservant une version stable de la map
+- [ ] Vérifier qu'une suppression ne casse pas la partie en cours
+
+- [ ] Joueur A joue sur une map
+- [ ] Le créateur B modifie la map
+- [ ] Vérifier que la partie de A ne devient pas incohérente
+
+#### Rooms
+
+- [ ] Deux joueurs rejoignent la même room presque simultanément
+- [ ] Deux parties différentes sont lancées en même temps
+- [ ] Les événements de la partie A n'arrivent jamais dans la partie B
+- [ ] Une room terminée est correctement nettoyée
+- [ ] Un utilisateur non autorisé ne peut pas rejoindre une room
+
+#### Connexions
+
+- [ ] Un joueur ferme brutalement l'onglet
+- [ ] Un joueur perd sa connexion
+- [ ] Un joueur se reconnecte
+- [ ] Un joueur ouvre plusieurs onglets
+- [ ] Le statut joueur reste cohérent
+
+#### Données
+
+- [ ] Deux utilisateurs créent/modifient des données simultanément
+- [ ] Aucun score n'est attribué au mauvais utilisateur
+- [ ] Aucun état de partie n'est mélangé entre utilisateurs
+- [ ] Pas de corruption évidente de données
+
+---
+
+## 🟠 Remote Players
+
+Normalement fonctionnel.
+
+### Validation finale
+
+- [ ] Tester sur deux ordinateurs réellement séparés
+
+---
+
+## 🟠 Game Customization — PAS TERMINÉ
+
+Responsables : Martin + Jennifer.
+
+### À terminer
+
+- [ ] Plusieurs maps réellement utilisables dans la customisation
+- [ ] Ajouter le thème différent prévu
+- [ ] Vérifier que le thème est réellement visible pendant le jeu
+- [ ] Garder une configuration par défaut
+- [ ] Vérifier que la customisation sélectionnée est réellement utilisée pendant la partie
+
+Pas besoin d'ajouter énormément d'options : différentes maps + thème + option par défaut suffisent pour une version simple et défendable.
+
+---
+
+# Élise
+
+## 🔴 Privacy Policy / Terms of Service
+
+Responsable : Élise.
+
+Ces pages sont Mandatory et peuvent entraîner le rejet si elles sont inadéquates.
+
+### À faire
 
 - [ ] Corriger la Privacy Policy
 - [ ] Corriger les Terms of Service
+- [ ] Vérifier qu'elles sont facilement accessibles depuis l'application
+- [ ] Retirer les informations qui ne correspondent pas au projet réel
+- [ ] Ne pas parler d'une suppression du projet à la fin du cursus
+- [ ] Retirer les affirmations inadaptées à un projet exécuté localement
+- [ ] Vérifier qu'elles ne contiennent pas de placeholder
+- [ ] Vérifier que leur contenu correspond aux fonctionnalités actuelles
 
 ---
 
-# 🔴 Jennifer
+## 🔴 Responsive — formulaires
 
-⚠️ À faire après les corrections des autres.
+Le responsive général est normalement bon.
 
-### Vérifications frontend
+### À vérifier
 
-- [ ] Vérifier l'intégration frontend/backend
-- [ ] Vérifier les routes API
-- [ ] Vérifier AuthContext
-- [ ] Vérifier SocketProvider
-- [ ] Vérifier les avatars
-- [ ] Vérifier les amis
-- [ ] Vérifier les statuts utilisateurs
+- [ ] Petits écrans
+- [ ] Erreurs de formulaire
+- [ ] Clavier mobile
+- [ ] Aucun bouton/champ inaccessible ou coupé
 
 ---
 
-### Vérifications finales
+## 🟠 Notifications — ACTUELLEMENT NON VALIDABLE
 
-- [ ] Vérifier Chrome
-- [ ] Vérifier qu'il n'y a plus d'erreurs console
-- [ ] Vérifier les modules réellement terminés
-- [ ] Vérifier le calcul des points
-- [ ] Vérifier le README
-- [ ] Vérifier la cohérence globale du projet
+Responsable : Élise.
+
+Le système actuel contient seulement des toasts.
+
+Cela ne correspond pas suffisamment à un `complete notification system`.
+
+### Décision obligatoire
+
+- [ ] Soit implémenter réellement le module
+- [ ] Soit retirer le Minor Notifications des modules revendiqués
+
+### Si le module est conservé
+
+Minimum à ajouter :
+
+- [ ] Notifications persistantes
+- [ ] Notifications consultables dans une interface
+- [ ] État lu / non lu
+- [ ] Notifications générées lors des créations pertinentes
+- [ ] Notifications générées lors des modifications pertinentes
+- [ ] Notifications générées lors des suppressions pertinentes
+
+Si Élise ne souhaite pas implémenter ce système : il faudrait retirer le module.
 
 ---
 
-# ✅ Avant le rendu
+## 🟠 Multiple Languages
 
-- [ ] Le projet démarre sur une machine propre
-- [ ] Plus d'erreurs console
-- [ ] Tous les tests passent
-- [ ] README terminé
-- [ ] Tous les modules revendiqués fonctionnent réellement
-- [ ] Chaque membre sait expliquer sa partie
+Presque terminé.
 
-# 🔴 Tout le monde
+À faire uniquement après que les autres aient fini de modifier les interfaces.
 
-### README
+### Vérification finale
+
+- [ ] Rechercher les textes encore écrits en dur
+- [ ] Traduire les nouveaux textes ajoutés
+- [ ] Vérifier les messages d'erreur
+- [ ] Vérifier les placeholders
+- [ ] Vérifier les textes du gameplay
+- [ ] Vérifier les dates / formats locaux
+- [ ] Tester le changement de langue
+
+---
+
+## 🟠 Additional Browsers
+
+Normalement bon.
+
+### Après les merges finaux
+
+- [ ] Smoke test Firefox
+- [ ] Smoke test du deuxième navigateur revendiqué
+- [ ] Vérifier les principales fonctionnalités
+- [ ] Documenter une éventuelle limitation restante
+
+---
+
+## 🔴 README — partie Élise
+
+- [ ] Terminer ses sections
+- [ ] Vérifier ses contributions
+- [ ] Vérifier les fonctionnalités dont elle est responsable
+- [ ] Vérifier les modules revendiqués dont elle est responsable
+- [ ] Adapter la partie Notifications selon la décision finale
+
+---
+
+# Jennifer
+
+## 🟠 Game Customization
+
+Responsables : Jennifer + Martin.
+
+### À terminer / valider
+
+- [ ] Intégration frontend des différentes maps
+- [ ] Intégration du thème ajouté par Martin
+- [ ] Vérifier le thème par défaut
+- [ ] Vérifier le choix utilisateur
+- [ ] Vérifier que la customisation sélectionnée est réellement appliquée dans le jeu
+
+---
+
+## 🔴 Vérification finale Chrome / console
+
+Cette validation ne peut pas être finalisée tant que les autres membres continuent à modifier le projet.
+
+### Important
+
+**Jennifer ne peut commencer la validation finale complète qu'après la fin des développements et le merge des branches destinées à l'évaluation.**
+
+Prévoir **minimum 2 jours complets après le feature freeze**.
+
+### Pendant ces 2 jours
+
+- [ ] Clone propre
+- [ ] Démarrage complet du projet
+- [ ] Vérification Chrome
+- [ ] Vérifier la console navigateur
+- [ ] Aucun warning React
+- [ ] Aucune erreur JavaScript
+- [ ] Aucune erreur réseau inattendue
+- [ ] Aucune erreur WebSocket non gérée
+- [ ] Vérifier le Network tab
+- [ ] Register
+- [ ] Login
+- [ ] Logout
+- [ ] Profile
+- [ ] Avatars
+- [ ] Friends
+- [ ] Online status
+- [ ] Maps
+- [ ] Editor
+- [ ] Tower
+- [ ] Solo
+- [ ] Multiplayer
+- [ ] Remote players
+- [ ] Multiplayer 3+
+- [ ] Game customization
+- [ ] Gamification
+- [ ] Languages
+- [ ] Notifications si le module est conservé
+- [ ] Admin
+- [ ] WAF / Vault sans casser les fonctionnalités normales
+- [ ] Parcours utilisateur complet
+
+### Blocage actuel
+
+- [ ] Impossible de terminer cette validation tant que les modifications des autres ne sont pas terminées
+- [ ] Les 2 jours de validation doivent être comptés APRÈS la fin de développement
+
+---
+
+## 🔴 README — intégration finale
+
+Les parties Jennifer et Martin sont déjà terminées.
+
+### À faire après réception des autres parties
+
+- [ ] Ajouter / relire les sections de Jérémie
+- [ ] Ajouter / relire les sections d'Élise
+- [ ] Retirer les modules finalement abandonnés
+- [ ] Recalculer les points
+- [ ] Vérifier que la liste des fonctionnalités correspond exactement au projet final
+- [ ] Vérifier que les responsabilités correspondent réellement aux contributions
+- [ ] Vérifier que les limitations sont honnêtes
+- [ ] Dernière relecture anglaise
+
+---
+
+# Tout le monde
+
+## 🟡 Clean du code
+
+À faire après les corrections fonctionnelles et avant l'évaluation finale.
+
+Chaque membre nettoie principalement les fichiers dont il est responsable.
+
+### À faire
+
+- [ ] Supprimer le code mort réellement inutilisé
+- [ ] Supprimer les imports inutilisés
+- [ ] Supprimer les variables inutilisées
+- [ ] Supprimer les fichiers inutiles confirmés
+- [ ] Retirer les commentaires temporaires
+- [ ] Retirer les commentaires inutiles
+- [ ] Retirer les commentaires en français
+- [ ] Retirer les commentaires de debug
+- [ ] Retirer les `console.log` de debug
+- [ ] Retirer les headers 42
+- [ ] Vérifier l'indentation tab et pas d'espaces
+- [ ] Vérifier la cohérence générale du code
+
+### Attention
+
+- [ ] Ne pas supprimer du code sans vérifier son utilisation
+- [ ] Ne pas faire de gros refactor architectural juste avant l'évaluation
+- [ ] Ne pas casser une fonctionnalité fonctionnelle uniquement pour rendre le code "plus propre"
+
+---
+
+# Préparation de l'évaluation
+
+À faire seulement lorsque le projet est gelé et que les vérifications finales sont terminées.
+
+## Toute l'équipe
+
+- [ ] Chacun sait lancer le projet
+- [ ] Chacun comprend l'architecture globale
+- [ ] Chacun connaît les modules revendiqués
+- [ ] Chacun connaît ses fichiers principaux
+- [ ] Chacun sait expliquer ses contributions
+- [ ] Chacun sait expliquer frontend → backend → DB
+- [ ] Chacun sait expliquer HTTP / API / WebSockets
+- [ ] Chacun sait expliquer l'authentification
+- [ ] Chacun sait expliquer les principaux modèles Prisma
+- [ ] Chacun sait expliquer les modules dont il est responsable
+- [ ] Chacun peut modifier quelques lignes dans sa partie sans aide
+- [ ] Pouvoir expliquer n'importe quelle ligne de code au hasard
+- [ ] Connaitre un minimum les autres parties et comment les parties communiquent entre elles.
+
+---
+
+# Ordre réel avant de demander une correction
+
+## 1. Jérémie termine
+
+- Démarrage une commande
+- Secrets / `.env`
+- Rotation des secrets exposés
+- Vault / WAF si revendiqués
+- Routes backend
+- Base de données
+- Sécurité backend
+- User Management backend
+- README
+
+## 2. Martin termine
+
+- Tests multi-utilisateurs
+- Broadcasting / rooms
+- Remote / reconnexion
+- Multiplayer 3+
+- Game customization
+- Validation gameplay
+
+## 3. Élise termine
+
+- Privacy Policy
+- Terms of Service
+- Responsive formulaires
+- Décision Notifications
+- Traductions finales
+- README
+
+## 4. Feature freeze
+
+Plus aucune nouvelle fonctionnalité.
+
+Uniquement correction de bugs bloquants.
+
+## 5. Jennifer — minimum 2 jours
+
+- Tests finaux
+- Chrome
+- Console
+- Régressions
+- Intégration
+- README
+- Validation modules
+- Clean final
+
+## 6. Évaluation blanche
+
+Seulement après tout cela.
+
+---
+
+# Condition minimale avant correction
+
+Le projet ne devrait pas partir en correction sans que :
+
+- [ ] Le projet se lance correctement
+- [ ] Les secrets exposés ont été changés
+- [ ] Privacy Policy / Terms sont conformes
+- [ ] Le multi-utilisateur a été réellement testé
+- [ ] Les modules revendiqués ont été démontrés
+- [ ] Les modules non terminés ont été retirés
+- [ ] Les routes backend sont stables
+- [ ] Le README est terminé
+- [ ] La console Chrome est propre
+- [ ] Les tests finaux ont été faits
+- [ ] Chaque membre se sente prêt pour les questions et petites modifications de code
