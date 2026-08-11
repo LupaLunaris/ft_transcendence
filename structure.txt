@@ -1,0 +1,411 @@
+.
+├── .env
+├── .github
+│   └── workflows
+│       └── ci.yml
+├── .gitignore
+├── Arbre.md
+├── CLAUDE.md
+├── CONTEXT.md
+├── Makefile
+├── PedagoGamePlay
+│   ├── AbreGamePlay.md
+│   ├── TS_explaine.md
+│   └── phaser-heritage.md
+├── README.md
+├── README_install_and_start.md
+├── backend
+│   ├── .env
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── prisma
+│   │   ├── migrations
+│   │   │   ├── 20260527000000_init_postgres
+│   │   │   │   └── migration.sql
+│   │   │   ├── 20260610081611_add_score_cascade_on_map_delete
+│   │   │   │   └── migration.sql
+│   │   │   ├── 20260612093217_add_friendship
+│   │   │   │   └── migration.sql
+│   │   │   ├── 20260717000000_add_gamification
+│   │   │   │   └── migration.sql
+│   │   │   ├── 20260717010000_add_scoring_points
+│   │   │   │   └── migration.sql
+│   │   │   └── migration_lock.toml
+│   │   ├── schema.prisma
+│   │   ├── seed-tower.ts
+│   │   ├── seed.ts
+│   │   └── tsconfig.json
+│   ├── prisma.config.ts
+│   ├── src
+│   │   ├── __tests__
+│   │   │   ├── admin.middleware.test.ts
+│   │   │   ├── admin.routes.test.ts
+│   │   │   ├── auth.middleware.test.ts
+│   │   │   ├── auth.routes.test.ts
+│   │   │   ├── grid.utils.test.ts
+│   │   │   ├── helpers
+│   │   │   │   └── grid.helper.ts
+│   │   │   ├── maps.routes.test.ts
+│   │   │   ├── setup.ts
+│   │   │   └── tower.complete.test.ts
+│   │   ├── bootstrap.ts
+│   │   ├── errors.ts
+│   │   ├── index.ts
+│   │   ├── lib
+│   │   │   └── prisma.ts
+│   │   ├── middleware
+│   │   │   ├── admin.middleware.ts
+│   │   │   ├── auth.middleware.ts
+│   │   │   ├── upload.middleware.ts
+│   │   │   └── validate.middleware.ts
+│   │   ├── routes
+│   │   │   ├── admin.routes.ts
+│   │   │   ├── auth.routes.ts
+│   │   │   ├── friends.routes.ts
+│   │   │   ├── index.ts
+│   │   │   ├── maps.routes.ts
+│   │   │   ├── scores.routes.ts
+│   │   │   ├── tower.routes.ts
+│   │   │   └── users.routes.ts
+│   │   ├── schemas
+│   │   │   ├── auth.schemas.ts
+│   │   │   └── map.schemas.ts
+│   │   ├── server.ts
+│   │   ├── services
+│   │   │   ├── gamification.service.ts
+│   │   │   └── scoring.service.ts
+│   │   ├── socket
+│   │   │   └── duelHandler.ts
+│   │   ├── state
+│   │   │   └── online.state.ts
+│   │   └── utils
+│   │       ├── grid.utils.ts
+│   │       ├── response.utils.ts
+│   │       └── user.serializer.ts
+│   ├── tsconfig.json
+│   └── uploads
+│       └── avatars
+├── backend_doc
+│   ├── cycle-de-vie-map.md
+│   ├── difficulty_enum.md
+│   ├── docker-seed-autorun.md
+│   ├── duel-nplayer-lobby-and-race-lifecycle.md
+│   ├── duel-reconnection-grace-period.md
+│   ├── duel-server-authoritative-enemies.md
+│   ├── grille_seed.md
+│   ├── prisma_client.md
+│   ├── scoring-points-and-leaderboards.md
+│   ├── seed-tower-integration.md
+│   └── seed_ts_node.md
+├── background_doc
+│   ├── backend_middleware_express.md
+│   ├── backend_prisma_seed_grilles.md
+│   └── frontend_contexte_auth_tour.md
+├── docker-compose.yml
+├── docs
+│   ├── AUDIT_ACTIONS_BY_OWNER.md
+│   ├── PROJECT_ROADMAP.md
+│   ├── README.md
+│   ├── Team_responsabilities_for_eval.md
+│   ├── accessibility
+│   │   ├── editor_desktop_accessibility.png
+│   │   ├── editor_mobile_accessibility.png
+│   │   ├── game_desktop_accessibility.png
+│   │   ├── game_mobile_accessibility.png
+│   │   ├── home_desktop_accessibility.png
+│   │   ├── home_mobile_accessibility.png
+│   │   ├── login_desktop_accessibility.png
+│   │   ├── login_mobile_accessibility.png
+│   │   ├── privacy_desktop_accessibility.png
+│   │   ├── privacy_mobile_accessibility.png
+│   │   ├── profile_desktop_accessibility.png
+│   │   ├── profile_mobile_accessibility.png
+│   │   ├── register_desktop_accessibility.png
+│   │   ├── register_mobile_accessibility.png
+│   │   ├── terms_desktop_accessibility.png
+│   │   ├── terms_mobile_accessibility.png
+│   │   ├── tower_desktop_accessibility.png
+│   │   ├── tower_mobile_accessibility.png
+│   │   ├── training_desktop_accessibility.png
+│   │   └── training_mobile_accessibility.png
+│   ├── architecture.md
+│   └── archive
+│       ├── 42 EvalHub.pdf
+│       ├── Martin_role.md
+│       ├── Role_par_fichier.md
+│       ├── dev-mode-check.md
+│       ├── ft_transcendence.subject.pdf
+│       ├── git-commands-guide.md
+│       ├── git-organization.md
+│       ├── modules.md
+│       ├── organisation_role_push.md
+│       ├── ownership-migration.md
+│       ├── ownership.md
+│       ├── project-cleanup-audit.md
+│       ├── proposition_mvp_kickoff
+│       │   ├── description_mvp.md
+│       │   └── screenshots
+│       │       ├── editor.png
+│       │       ├── explore.png
+│       │       ├── inscription.png
+│       │       └── saved_not_validated.png
+│       └── team-organization.md
+├── eslint.config.mjs
+├── frontend
+│   ├── Dockerfile
+│   ├── index.html
+│   ├── nginx.conf
+│   ├── package.json
+│   ├── postcss.config.cjs
+│   ├── public
+│   │   └── assets
+│   │       ├── avatars
+│   │       │   ├── Elise_avatar.png
+│   │       │   ├── Jen_avatar.png
+│   │       │   ├── Jerem_avatar.png
+│   │       │   ├── Martin_avatar2.png
+│   │       │   └── default-avatar.png
+│   │       ├── icons
+│   │       │   ├── diamond.svg
+│   │       │   ├── duel.svg
+│   │       │   ├── map.svg
+│   │       │   ├── tower.svg
+│   │       │   └── training.svg
+│   │       ├── sprites
+│   │       │   ├── Elise2.png
+│   │       │   ├── Enemy_v (2).png
+│   │       │   ├── Girl_Left.png
+│   │       │   ├── Girl_Right.png
+│   │       │   ├── Girl_Up.png
+│   │       │   ├── Girl_Win.png
+│   │       │   ├── JenTopBiche.png
+│   │       │   ├── Martin.png
+│   │       │   ├── Martin1.png
+│   │       │   ├── Martin_right.png
+│   │       │   ├── elise.png
+│   │       │   ├── elise_profil.png
+│   │       │   ├── enemy_h.png
+│   │       │   ├── enemy_test.png
+│   │       │   ├── enemy_v.png
+│   │       │   ├── ennemy.png
+│   │       │   ├── hero_walking.png
+│   │       │   ├── jerem.png
+│   │       │   ├── jerm2.png
+│   │       │   ├── martinPlayer.png
+│   │       │   ├── player.png
+│   │       │   ├── player1.png
+│   │       │   ├── player11.png
+│   │       │   ├── player2.png
+│   │       │   ├── player3.png
+│   │       │   ├── player5.png
+│   │       │   └── player8.png
+│   │       └── tiles
+│   │           ├── exit.png
+│   │           ├── floor.png
+│   │           ├── sprite tuile
+│   │           │   ├── aucun.png
+│   │           │   ├── bas.png
+│   │           │   ├── bas_droit.png
+│   │           │   ├── bas_gauche.png
+│   │           │   ├── haut.png
+│   │           │   ├── haut_droit.png
+│   │           │   ├── haut_gauche.png
+│   │           │   ├── spritesheet.png
+│   │           │   ├── spritesheet_assembler.py
+│   │           │   ├── titleSheet.png
+│   │           │   ├── tous.png
+│   │           │   ├── wall.png
+│   │           │   ├── wall.png:Zone.Identifier
+│   │           │   └── wall2.png
+│   │           ├── wall.png
+│   │           ├── wall.png:Zone.Identifier
+│   │           └── wall2.png
+│   ├── src
+│   │   ├── App.tsx
+│   │   ├── __tests__
+│   │   │   ├── Button.test.tsx
+│   │   │   ├── EditorGrid.test.tsx
+│   │   │   ├── EditorPage.test.tsx
+│   │   │   ├── GamePage.test.tsx
+│   │   │   ├── Input.test.tsx
+│   │   │   ├── LoginPage.test.tsx
+│   │   │   ├── LoginPage.toast.test.tsx
+│   │   │   ├── Modal.test.tsx
+│   │   │   ├── api.service.test.ts
+│   │   │   ├── setup.ts
+│   │   │   ├── useApi.test.tsx
+│   │   │   └── useToast.test.tsx
+│   │   ├── components
+│   │   │   ├── editor
+│   │   │   │   ├── EditorGrid.tsx
+│   │   │   │   ├── MapSettingsPanel.tsx
+│   │   │   │   └── TileSelector.tsx
+│   │   │   ├── friends
+│   │   │   │   ├── FriendsList.tsx
+│   │   │   │   └── UserSearch.tsx
+│   │   │   ├── game
+│   │   │   │   ├── GameOverModal.tsx
+│   │   │   │   └── ScaledGameFrame.tsx
+│   │   │   ├── layout
+│   │   │   │   ├── Footer.tsx
+│   │   │   │   ├── Layout.tsx
+│   │   │   │   ├── Navbar.tsx
+│   │   │   │   └── PlayerHub.tsx
+│   │   │   ├── leaderboard
+│   │   │   │   └── Leaderboard.tsx
+│   │   │   ├── profile
+│   │   │   │   ├── Avatar.tsx
+│   │   │   │   └── ProfileEditor.tsx
+│   │   │   ├── tower
+│   │   │   │   └── CongratulatoryModal.tsx
+│   │   │   └── ui
+│   │   │       ├── Button.tsx
+│   │   │       ├── Input.tsx
+│   │   │       ├── LanguageSelector.tsx
+│   │   │       ├── Modal.tsx
+│   │   │       ├── Spinner.tsx
+│   │   │       ├── Toast.tsx
+│   │   │       ├── TouchPad.tsx
+│   │   │       └── useToast.ts
+│   │   ├── constants
+│   │   │   └── achievements.ts
+│   │   ├── context
+│   │   │   ├── auth.context.tsx
+│   │   │   └── socket.context.tsx
+│   │   ├── game
+│   │   │   ├── GameCanvas.tsx
+│   │   │   ├── assets.ts
+│   │   │   ├── entities
+│   │   │   │   └── Enemy.ts
+│   │   │   └── scenes
+│   │   │       ├── BaseScene.ts
+│   │   │       ├── DuelScene.ts
+│   │   │       └── GameScene.ts
+│   │   ├── hooks
+│   │   │   ├── useApi.ts
+│   │   │   ├── useDuelLobby.ts
+│   │   │   ├── useLeaderboard.ts
+│   │   │   └── useMap.ts
+│   │   ├── i18n.ts
+│   │   ├── index.css
+│   │   ├── language
+│   │   │   ├── en
+│   │   │   │   ├── common.json
+│   │   │   │   └── legal.json
+│   │   │   ├── fr
+│   │   │   │   ├── common.json
+│   │   │   │   └── legal.json
+│   │   │   └── nl
+│   │   │       ├── common.json
+│   │   │       └── legal.json
+│   │   ├── main.tsx
+│   │   ├── pages
+│   │   │   ├── HomePage.tsx
+│   │   │   ├── NotFoundPage.tsx
+│   │   │   ├── ProfilePage.tsx
+│   │   │   ├── TowerPage.tsx
+│   │   │   ├── TrainingPage.tsx
+│   │   │   ├── auth
+│   │   │   │   ├── LoginPage.tsx
+│   │   │   │   └── RegisterPage.tsx
+│   │   │   ├── duel
+│   │   │   │   ├── DuelGamePage.tsx
+│   │   │   │   └── DuelPage.tsx
+│   │   │   ├── editor
+│   │   │   │   └── EditorPage.tsx
+│   │   │   ├── game
+│   │   │   │   ├── GamePage.tsx
+│   │   │   │   ├── RacePage.tsx
+│   │   │   │   └── TowerGamePage.tsx
+│   │   │   └── legal
+│   │   │       ├── PrivacyPolicyPage.tsx
+│   │   │       └── TermsOfServicePage.tsx
+│   │   ├── services
+│   │   │   └── api.service.ts
+│   │   └── types
+│   │       ├── index.ts
+│   │       └── map.ts
+│   ├── tailwind.config.ts
+│   ├── tsconfig.json
+│   └── vite.config.ts
+├── frontend_doc
+│   ├── animation_joueur.md
+│   ├── authentification-jwt-context.md
+│   ├── css_grid_react.md
+│   ├── duel-enemy-sprite-crop-freeze.md
+│   ├── duel-nplayer-remote-rendering.md
+│   ├── duel-remote-ghost-sprite-identity.md
+│   ├── editeur-admin-tour.md
+│   ├── flux-editeur-gamepage.md
+│   ├── modifier_la_grille.md
+│   ├── player-hub-sidebar.md
+│   ├── textures_tuiles.md
+│   ├── toast-provider-container-pattern.md
+│   └── tower-navigation-entre-niveaux.md
+├── history_debug
+│   ├── 2026-05-15_backend-routes-setup.md
+│   ├── 2026-05-15_frontend-setup.md
+│   ├── 2026-05-15_migration-js-vers-typescript.md
+│   ├── 2026-05-15_npm-vulnerabilities.md
+│   ├── 2026-05-15_types-schema-seed.md
+│   ├── 2026-05-16_carte-perdue-et-non-publiable.md
+│   ├── 2026-05-16_editor-grid-colonnes-vides.md
+│   ├── 2026-05-16_login-400-toast-invisible.md
+│   ├── 2026-05-16_reconnexion-impossible-apres-fermeture.md
+│   ├── 2026-05-17_mode-tour-admin-backend.md
+│   ├── 2026-05-17_mode-tour-admin-frontend.md
+│   ├── 2026-05-18_EditorPage_makeEmptyGrid.md
+│   ├── 2026-05-18_admin-editor-level-buttons.md
+│   ├── 2026-05-18_backend_prisma_generate.md
+│   ├── 2026-05-22_player-sprite-scale-crop.md
+│   ├── 2026-07-16_creator-completed-reset-on-edit.md
+│   ├── 2026-07-16_waf-blocks-put-delete-maps.md
+│   ├── 2026-07-17_play-count-jamais-incremente.md
+│   └── 2026-07-17_score-not-saved-poisoned-transaction.md
+├── layout.jason
+├── nginx
+│   ├── modsec
+│   │   ├── crs-setup.conf
+│   │   ├── main.conf
+│   │   ├── modsecurity.conf
+│   │   └── override.conf
+│   └── nginx.conf
+├── package-lock.json
+├── package.json
+├── probleme_rencontre
+│   ├── corrections.md
+│   └── schema_prisma.md
+├── shared
+│   ├── package.json
+│   ├── src
+│   │   ├── game
+│   │   │   └── enemyLogic.ts
+│   │   ├── index.ts
+│   │   └── types
+│   │       ├── api.types.ts
+│   │       ├── auth.types.ts
+│   │       ├── game.types.ts
+│   │       ├── gamification.types.ts
+│   │       ├── leaderboard.types.ts
+│   │       ├── map.types.ts
+│   │       ├── socket.types.ts
+│   │       ├── tiles.types.ts
+│   │       └── user.types.ts
+│   └── tsconfig.json
+├── structure.txt
+└── vault
+    ├── certs
+    │   ├── ca-cert.pem
+    │   ├── ca-key.pem
+    │   ├── vault-cert.pem
+    │   └── vault-key.pem
+    ├── config
+    │   └── vault.hcl
+    ├── generate-certs.sh
+    ├── secrets
+    │   └── init-output.txt
+    └── vault-init.sh
+
+82 directories, 327 files
