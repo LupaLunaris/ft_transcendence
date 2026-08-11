@@ -1,276 +1,411 @@
+*This project has been created as part of the 42 curriculum by malafont, jdebrull, jpaulis, and evan-dro.*
+
 # ft_transcendence - Guilds of the Deep
 
-This project was created as part of the 42 curriculum by malafont, jdebrull, jpaulis, and evan-dro.
+Guilds of the Deep is a multiplayer browser game based on labyrinth exploration and creation.
 
-Guilds of the Deep is a browser game for young players, built around exploration, labyrinth creation, progression, multiplayer races, and community-created maps.
+Players can create their own maps, test and publish them, play maps created by other users, progress through the Tower and play against other players in real time.
 
-## Canonical Documentation
+## Documentation
 
-Use these documents as the source of truth:
+| Document                                                               | Purpose                  |
+| ---------------------------------------------------------------------- | ------------------------ |
+| [README_install_and_start.md](README_install_and_start.md)             | Installation and startup |
+| [docs/architecture.md](docs/architecture.md)                           | Project architecture     |
+| [docs/README.md](docs/README.md)                                       | Documentation overview   |
+| [docs/ft_transcendence.subject.pdf](docs/ft_transcendence.subject.pdf) | Official subject         |
 
-| Document | Purpose |
-|---|---|
-| [README.md](README.md) | Project overview, stack, team, module scope |
-| [README_install_and_start.md](README_install_and_start.md) | Installation, local development, Docker demo/evaluation, troubleshooting |
-| [docs/architecture.md](docs/architecture.md) | Architecture reference and folder overview |
-| [docs/README.md](docs/README.md) | Documentation map, including historical/team notes |
+---
 
-Older notes still exist in the repository for team memory, but they should not override the canonical documents above.
+# Description
 
-## Quick Start
+**Guilds of the Deep** is a labyrinth game where players can create and play different maps.
 
-For the complete install/start procedure, use [README_install_and_start.md](README_install_and_start.md).
+A player can create a labyrinth with the editor, test it and publish it after completing it. Other players can then find and play the published map.
 
-```bash
-cp .env.example .env
-make install
-make dev
-```
+The game also has a Tower mode with predefined levels and multiplayer games where players can play together in real time.
 
-For Docker demo/evaluation mode:
+Around the game, we added user profiles, friends, progression, achievements, leaderboards, customization and several other features required by the modules we selected.
 
-```bash
-make docker-up
-```
+### Main features
 
-Main URLs:
+* Register and login
+* User profiles and avatars
+* Friends and online status
+* Map editor
+* Map testing and publication
+* Community maps
+* Tower mode
+* Multiplayer games
+* Remote players
+* XP and levels
+* Achievements and rewards
+* Leaderboards
+* Game customization
+* Notifications
+* English, French and Dutch languages
+* Responsive interface
 
-| Service | URL |
-|---|---|
-| Frontend | http://localhost:5173 |
-| Backend health | http://localhost:3001/api/health |
+---
 
-## Stack
+# Instructions
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 18 + TypeScript, Vite, Tailwind CSS |
-| Game engine | Phaser |
-| Realtime | Socket.IO |
-| Backend | Node.js + Express + TypeScript |
-| Database | PostgreSQL via Prisma |
-| Auth | JWT |
-| Shared contracts | `shared/` workspace with shared TypeScript types |
-| Internationalization | i18next (`fr`, `en`, `nl`) |
-| Tooling | npm workspaces, Makefile, Docker Compose |
-| Tests | Vitest (frontend) + Jest (backend) |
+🔴 **JEREM - TO COMPLETE**
 
-## Project Description
+The complete installation guide is also available in [README_install_and_start.md](README_install_and_start.md).
 
-This section will be completed by Martin.
+---
 
-## Installation
+# Team
 
-The full install and startup guide is in [README_install_and_start.md](README_install_and_start.md).
+| Member             | Role                           | Main area                             |
+| ------------------ | ------------------------------ | ------------------------------------- |
+| Martin (malafont)  | Product Owner / Gameplay Lead  | Gameplay, Phaser and multiplayer      |
+| Jerem (jdebrull)   | Project Manager / Backend Lead | Backend, database and infrastructure  |
+| Jennifer (jpaulis) | Technical Lead                 | Frontend architecture and integration |
+| Elise (evan-dro)   | UI / UX Lead                   | UI, responsive, i18n and frontend UX  |
 
-This section will be completed by Jerem.
+### Martin - Product Owner / Gameplay Lead
 
-## Team Presentation
+Martin worked mainly on the game and its gameplay.
 
-| Role | Member | Login | Responsibilities |
-|---|---|---|---|
-| Product Owner + Gameplay Lead | Martin | malafont | Gameplay rules, Phaser scenes, map gameplay, tower and duel game flow |
-| Project Manager + Backend Lead | Jerem | jdebrull | Express API, Prisma, PostgreSQL, auth, Docker, Socket.IO server |
-| Technical Lead + Frontend Architecture | Jennifer | jpaulis | Frontend structure, hooks, shared types, API contracts, integration |
-| UI Lead | Elise | evan-dro | UI components, layout, forms, Tailwind, i18n integration |
+He worked on Phaser, player movement, collisions, enemies, game rules, Tower mode, multiplayer gameplay and the core of the map editor.
 
-## Role Distribution
+He also worked with Jennifer on game customization and with Jerem on the multiplayer systems.
 
-The team is split into four main areas:
+As Product Owner, he was also responsible for the general game concept and gameplay decisions.
 
-- Martin leads gameplay and the game rules.
-- Jerem leads backend, infrastructure, and project management.
-- Jennifer leads frontend architecture and integration between all parts.
-- Elise leads the UI system and the user-facing experience.
+### Jerem - Project Manager / Backend Lead
 
-## Responsibilities of Each Role
+🔴 **JEREM - TO COMPLETE**
 
-### Martin - Gameplay
+### Jennifer - Technical Lead
 
-- Owns the Phaser game logic.
-- Defines movement, collisions, win and loss conditions.
-- Works on training mode, tower gameplay, and duel gameplay behavior.
+Jennifer worked mainly on the frontend architecture and the integration between the different parts of the project.
 
-### Jerem - Backend and infrastructure
+She worked on the React structure, API integration, frontend user management, shared types, game customization, gamification and project documentation.
 
-- Owns the Express server and Prisma schema.
-- Handles authentication, protected routes, and database relations.
-- Maintains Docker setup and backend stability.
+She also reviewed and integrated changes from the different parts of the project.
 
-### Jennifer - Frontend architecture and integration
+### Elise - UI / UX Lead
 
-- Owns the React app structure and route organization.
-- Maintains the API service, hooks, auth context, and shared types.
-- Keeps frontend, backend, and Phaser integration coherent.
+🔴 **ELISE - TO COMPLETE**
 
-### Elise - UI and UX
+---
 
-- Owns reusable UI components and layouts.
-- Handles forms, visual consistency, and responsive behavior.
-- Works on notifications, profile UI, and language switching.
+# Project Management
 
 ## Project Organization
 
-This section will be completed by Jerem.
+🔴 **JEREM - TO COMPLETE**
 
 ## Management Tools
 
-This section will be completed by Jerem.
+🔴 **JEREM - TO COMPLETE**
 
-## Communication Methods
+## Communication
 
-This section will be completed by Jerem and Elise.
+🔴 **JEREM - TO COMPLETE**
 
-## Technical Stack
+---
 
-| Area | What we use |
-|---|---|
-| Monorepo | npm workspaces with `frontend`, `backend`, and `shared` |
-| Frontend app | React 18, TypeScript, Vite |
-| Styling | Tailwind CSS |
-| Game rendering | Phaser |
-| Backend API | Node.js, Express, TypeScript |
-| Realtime | Socket.IO |
-| Database | PostgreSQL |
-| ORM | Prisma |
-| Authentication | JWT + bcrypt |
-| Validation | Zod |
-| Internationalization | i18next with French, English, and Dutch files |
-| Tests | Vitest, Testing Library, Jest, Supertest |
-| Local orchestration | Makefile and Docker Compose |
+# Technical Stack
 
-## Why We Chose This Stack
+| Area           | Technology                               |
+| -------------- | ---------------------------------------- |
+| Frontend       | React + TypeScript + Vite                |
+| Game           | Phaser                                   |
+| Styling        | Tailwind CSS                             |
+| Backend        | Node.js + Express + TypeScript           |
+| Realtime       | Socket.IO                                |
+| Database       | PostgreSQL                               |
+| ORM            | Prisma                                   |
+| Authentication | JWT + bcrypt                             |
+| Validation     | Zod                                      |
+| Languages      | i18next                                  |
+| Tests          | Vitest, Jest, Testing Library, Supertest |
+| Infrastructure | Docker Compose + Makefile                |
 
-- React and Vite gave us a simple frontend setup that is fast to run locally.
-- TypeScript helped us keep the API contracts and shared game data clearer.
-- Express was a good fit for a 42 project because it stays simple and easy to debug.
-- Prisma made the PostgreSQL schema and migrations easier to read as a team.
-- Socket.IO was the easiest way for us to build the duel mode with live events.
-- Phaser let us keep the game logic in the browser without building a game engine ourselves.
-- Tailwind was practical for making reusable UI components quickly.
+## Why we chose this stack
 
-## Database Schema
+We chose React for the frontend because it works well for building the different pages and reusable components of the application.
 
-This section will be completed by Jerem.
+Phaser handles the game itself, including scenes, movement, sprites and collisions.
 
-## Main Features
+Express is used for the API and backend logic. PostgreSQL stores the project data and Prisma makes it easier to work with the database from TypeScript.
 
-This section will be completed by Martin.
+Socket.IO is used for the parts of the project that need real-time communication, mainly multiplayer.
 
-## Features By Member
+---
 
-| Member | Main features worked on |
-|---|---|
-| Martin | Gameplay core, tower, game scenes, multiplayer flow, editor core, avatar sprite work |
-| Jerem | Backend API, auth, maps, users, friends, Docker, security, WAF and Vault |
-| Jennifer | Frontend architecture, user management frontend, game customization flow, gamification, docs and integration |
-| Elise | UI components, i18n, legal pages, profile UI, notifications, map panel and UI fixes |
+# Database Schema
 
-## 42 Module Scope
+🔴 **JEREM - TO COMPLETE**
 
-These are the modules currently documented in this README from what is already implemented in the repository.
+---
+# Features
 
-| Module | Level | Points | Current implementation in the project |
-|---|---|---:|---|
-| Use a framework as backend | Major | 2 | Express API with typed routes, middleware, auth, and Socket.IO server |
-| Standard user management and authentication | Major | 2 | Register, login, JWT auth, `/me`, profile update, avatar upload |
-| Implementing a remote player | Major | 2 | Duel mode with Socket.IO lobby and live multiplayer game state |
-| Use a front-end framework or toolkit | Minor | 1 | React application with route-based pages and shared UI |
-| Use a database for the backend | Minor | 1 | PostgreSQL with Prisma models, migrations, and seed data |
-| Game customisation options | Minor | 1 | Map editor, difficulty selection, creator test before publication |
-| Expanding browser compatibility | Minor | 1 | Browser-based client built with Vite and standard web stack |
+| Feature                                     | Contributors                   |
+| ------------------------------------------- | ------------------------------ |
+| Core gameplay                               | Martin                         |
+| Phaser scenes and game logic                | Martin                         |
+| Tower mode                                  | Martin                         |
+| Multiplayer gameplay                        | Martin                         |
+| Remote players                              | Martin                         |
+| Multiplayer 3+ players                      | Martin                         |
+| Map editor core                             | Martin                         |
+| Map customization workflow                  | Jennifer, Martin               |
+| Map backend                                 | Jerem                          |
+| Authentication backend                      | Jerem                          |
+| Authentication frontend                     | Jennifer, Elise                |
+| User profiles                               | Jennifer, Jerem, Elise         |
+| Avatar backend                              | Jerem                          |
+| Avatar frontend                             | Jennifer, Elise                |
+| Avatar sprites                              | Martin                         |
+| Friends backend                             | Jerem                          |
+| Friends frontend                            | Jennifer, Elise                |
+| Online status                               | Jerem, Jennifer                |
+| XP and levels                               | Jennifer                       |
+| Achievements and rewards                    | Jennifer                       |
+| Leaderboards                                | Martin                         |
+| Notifications                               | Elise                          |
+| Internationalization                        | Elise                          |
+| Design system / reusable UI                 | Elise                          |
+| Responsive interface                        | Elise                          |
+| Frontend architecture                       | Jennifer                       |
+| API integration                             | Jennifer, Jerem                |
+| Database / Prisma                           | Jerem                          |
+| Docker / infrastructure                     | Jerem                          |
+| WAF / Vault / security infrastructure       | Jerem                          |
+| Legal pages                                 | Elise                          |
+| Documentation                               | Jennifer, Martin, Jerem, Elise |
+| Pull Request reviews and global code review | Jennifer                       |
 
-## Module Points Calculation
+---
 
-Current total documented in this README: `10 points`
+# 42 Modules
 
-- Major modules: `3 x 2 = 6`
-- Minor modules: `4 x 1 = 4`
+## Major modules
 
-Some other systems already exist in the repository, like i18n, gamification, notifications, and friends. We prefer to keep them out of the counted total here until the team validates what will really be claimed during evaluation.
+| Module                              | Points | Responsible member(s) |
+| ----------------------------------- | -----: | --------------------- |
+| Framework for frontend and backend  |      2 | Jennifer, Jerem       |
+| Real-time features                  |      2 | Martin, Jerem         |
+| Standard user management            |      2 | Jennifer, Jerem       |
+| Complete web-based game             |      2 | Martin                |
+| Remote players                      |      2 | Martin                |
+| Multiplayer game (3+ players)       |      2 | Martin                |
+| WAF / ModSecurity + HashiCorp Vault |      2 | Jerem                 |
 
-## Why These Modules
+**Major: 14 points**
 
-This section will be completed by Martin.
+## Minor modules
 
-## Module Implementation Notes
+| Module                     | Points | Responsible member(s) |
+| -------------------------- | -----: | --------------------- |
+| ORM - Prisma               |      1 | Jerem                 |
+| Custom-made Design System  |      1 | Elise                 |
+| Multiple Languages         |      1 | Elise                 |
+| Game Customization Options |      1 | Jennifer, Martin      |
+| Gamification System        |      1 | Jennifer, Martin      |
+| Notification System        |      1 | Elise                 |
+| Additional Browsers        |      1 | Elise                 |
 
-### Backend framework
+**Minor: 7 points**
 
-The backend is an Express server with REST routes under `/api/v1`, middleware for auth and validation, and a Socket.IO server for realtime features.
-Most backend ownership sits with Jerem. Jennifer only supports the integration side.
+**Total: 21 points**
 
-### Authentication
+> Only modules that are fully working and demonstrable will be claimed during the final evaluation.
 
-Users can register, log in, fetch their own profile, update profile data, and upload an avatar. Passwords are hashed and access is protected with JWT.
-The backend auth flow is mainly Jerem. The frontend auth flow and validation are shared with Jennifer and Elise.
+---
 
-### Remote player
+# Module Implementation
 
-The duel mode uses Socket.IO for lobby registration, match start, and synchronized gameplay updates during the game.
-Martin is the main owner here. Jerem supports the backend side and Jennifer supports the frontend integration.
+### Framework Frontend + Backend
 
-### Frontend framework
+The frontend uses React and the backend uses Express.
 
-The frontend is a React app with protected routes, reusable hooks, a shared API service, and integration with Phaser for the game views.
-This is mainly Jennifer's area, with UI work and translations coming from Elise.
+Jennifer worked on the frontend architecture and Jerem on the backend architecture.
 
-### Database
+**Responsible:** Jennifer, Jerem.
 
-The project uses PostgreSQL with Prisma. The schema includes users, maps, scores, admin tower levels, achievements, XP events, and friendships.
-The audit shows this is shared between Jerem, Jennifer, and Martin, not owned by one person only.
+### Real-time Features
 
-### Game customisation
+Socket.IO is used for real-time communication, mainly for multiplayer gameplay.
 
-Players can create maps, edit grids, choose a difficulty, test their own map, and publish it only after completing it.
-The base gameplay comes from Martin, while Jennifer finalizes the customization flow and Elise helps with the UI around it.
+Martin worked on the multiplayer game logic and Jerem on the Socket.IO backend infrastructure.
 
-### Browser client
+**Responsible:** Martin, Jerem.
 
-The whole project runs in the browser with React and Phaser, which keeps the game accessible without a native client.
-Jennifer owns the integration side of the browser client.
+### Standard User Management
 
-## Modules By Member
+Users can update their profile, use an avatar, manage friends and see their online status.
 
-| Module | Main owner | Support |
-|---|---|---|
-| Backend framework | Jerem | Jennifer, Martin |
-| Authentication | Jerem | Jennifer, Elise |
-| Remote player | Martin | Jerem, Jennifer, Elise |
-| Frontend framework | Jennifer | Elise, Martin |
-| Database | Jerem, Jennifer, Martin | - |
-| Game customisation | Martin, Jennifer | Elise, Jerem |
-| Browser client | Jennifer | Martin, Elise |
+Jennifer worked mainly on the frontend side and Jerem on the backend side.
 
-## Resources Used
+**Responsible:** Jennifer, Jerem.
 
-- [docs/ft_transcendence.subject.pdf](docs/ft_transcendence.subject.pdf) for the official project requirements.
-- [docs/42 EvalHub.pdf](docs/42%20EvalHub.pdf) for evaluation references.
-- The local architecture and setup docs in this repository.
-- Official documentation for React, Vite, Express, Prisma, Socket.IO, Phaser, Tailwind CSS, and i18next.
+### Complete Web-based Game
 
-## AI Usage
+The game is made with Phaser and includes movement, collisions, enemies, maps and win/loss conditions.
 
-AI was used as a support tool, not as a replacement for understanding the project.
+**Responsible:** Martin.
 
-- We used AI help for debugging support, documentation cleanup, wording help, and technical summaries.
-- The repository also contains AI support context files like `CLAUDE.md` and `CONTEXT.md` for project context during assisted work sessions.
-- Final code choices, integration, and testing still had to be checked by the team.
+### Remote Players
 
-## Detailed Individual Contributions
+Players on different computers can join and play the same game in real time.
 
-This section will be completed by the whole team.
+**Responsible:** Martin.
 
-## Difficulties We Met and How We Solved Them
+### Multiplayer 3+
 
-- We had to keep the project coherent between React pages, Phaser scenes, backend routes, and shared types. The `shared/` workspace helped us avoid repeating game and API contracts in several places.
-- The map publication flow was tricky. We now require the creator to finish their own map before publishing it, which made the editor flow more consistent.
-- Multiplayer synchronization was another hard part. The duel mode now uses Socket.IO and shared game state so the live match does not depend only on local rendering.
-- Startup and environment alignment also took time because the project mixes local development and Docker mode. The current setup separates those two modes more clearly.
+The multiplayer game supports more than two players at the same time.
 
-## Known Limitations
+**Responsible:** Martin.
 
-- The current multiplayer work is focused on duel mode, not on a larger shared world.
-- Tower mode is currently based on 8 admin levels.
-- Language support exists for French, English, and Dutch only.
-- The security layer is fine for a student project.
+### Cybersecurity
+
+🔴 **JEREM - TO COMPLETE**
+
+**Responsible:** Jerem.
+
+### ORM
+
+Prisma is used between the Express backend and PostgreSQL.
+
+**Responsible:** Jerem.
+
+### Design System
+
+🔴 **ELISE - TO COMPLETE**
+
+**Responsible:** Elise.
+
+### Multiple Languages
+
+The application uses i18next and supports English, French and Dutch.
+
+**Responsible:** Elise.
+
+### Game Customization
+
+Players can create and customize maps before testing and publishing them.
+
+Martin worked on the gameplay/editor core and Jennifer worked on the customization and publication workflow.
+
+**Responsible:** Martin, Jennifer.
+
+### Gamification
+
+The project includes XP, levels, achievements, rewards and leaderboards.
+
+**Responsible:** Jennifer, Martin.
+
+### Notifications
+
+🔴 **ELISE - TO COMPLETE**
+
+**Responsible:** Elise.
+
+### Additional Browsers
+
+🔴 **ELISE - TO COMPLETE**
+
+**Responsible:** Elise.
+
+
+---
+
+# Why We Chose These Modules
+
+Most of the modules were chosen because they fit naturally with the game we wanted to make.
+
+The gameplay modules were the most important ones for us: the complete game, remote players, multiplayer and real-time features all work together.
+
+Game customization was also a logical choice because the project already has a map editor.
+
+Gamification allowed us to add progression with XP, achievements and leaderboards.
+
+The other modules such as user management, Prisma, multiple languages and the design system are used throughout the application and helped us make the project more complete.
+
+---
+
+# Individual Contributions
+
+## Martin - malafont
+
+Martin worked mainly on gameplay.
+
+His work includes Phaser, movement, collisions, enemies, game rules, Tower mode, multiplayer gameplay and the core map/editor logic.
+
+He also worked on remote players and multiplayer synchronization with Jerem and Jennifer, and on game customization and gamification with Jennifer.
+
+As Product Owner, he was also responsible for the general gameplay direction of the project.
+
+## Jerem - jdebrull
+
+🔴 **JEREM - TO COMPLETE**
+
+## Jennifer - jpaulis
+
+Jennifer worked mainly on frontend architecture and integration.
+
+Her work includes the React architecture, frontend/backend communication, API integration, frontend user management, shared TypeScript types, game customization and gamification.
+
+She also worked on integrating and reviewing features made by the other members and on the project documentation.
+
+## Elise - evan-dro
+
+🔴 **ELISE - TO COMPLETE**
+
+---
+
+# Difficulties and Solutions
+
+One difficulty was connecting the map editor with the game. A map should not just be saved: it also has to be playable. We added a system where the creator has to complete the map before it can be published.
+
+Multiplayer was also one of the more difficult parts because the game state has to stay synchronized between several players. Socket.IO is used to exchange the necessary information between the clients and the backend.
+
+Another difficulty was keeping React, Phaser and the backend working together while several people were modifying different parts of the project. Shared TypeScript types and Pull Request reviews helped us avoid some integration problems.
+
+### Backend / infrastructure
+
+🔴 **JEREM - TO COMPLETE**
+
+### UI / responsive
+
+🔴 **ELISE - TO COMPLETE**
+
+---
+
+# Resources
+
+We mainly used:
+
+* The official ft_transcendence subject
+* 42 evaluation documentation
+* React documentation
+* TypeScript documentation
+* Express documentation
+* Prisma documentation
+* PostgreSQL documentation
+* Socket.IO documentation
+* Phaser documentation
+* Tailwind CSS documentation
+* i18next documentation
+* Docker documentation
+
+---
+
+# AI Usage
+
+We used AI during the project mainly to help us:
+
+* understand errors and unfamiliar code;
+* debug problems;
+* review some code and some Pull Requests;
+* understand new technologies;
+* clean and organize documentation;
+* prepare for the evaluation.
+
+AI suggestions were reviewed and tested before being kept in the project. Each member is still responsible for understanding the parts they worked on.
