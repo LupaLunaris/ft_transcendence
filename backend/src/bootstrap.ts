@@ -7,13 +7,6 @@ const VAULT_ROLE_ID     = process.env.VAULT_ROLE_ID;
 const VAULT_SECRET_ID   = process.env.VAULT_SECRET_ID;
 const SECRET_PATH       = 'secret/data/ft_transcendence/backend';
 
-if (!VAULT_ROLE_ID || !VAULT_SECRET_ID) {
-    throw new Error(
-        '[bootstrap] VAULT_ROLE_ID and VAULT_SECRET_ID must be set in environment. ' + 
-        'Check your .env file and docker-compose.yml.',
-    );
-}
-
 async function getVaultToken(): Promise<string> {
     const res = await fetch(`${VAULT_ADDR}/v1/auth/approle/login`, {
         method: 'POST',
@@ -50,6 +43,27 @@ async function readSecret(token: string, path: string): Promise<Record<string, s
 // Main export: fetch secrets from Vault and inject them into process.env. Must be awaited before any other module that reads process.env is imported.
 
 export async function loadVaultSecrets(): Promise<void> {
+    if (!VAULT_ROLE_ID || !VAULT_SECRET_ID) {
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error(
+                '[bootstrap] VAULT_ROLE_ID and VAULT_SECRET_ID must be set in environment. ' +
+                'Check your .env file and docker-compose.yml.',
+            );
+        }
+
+        // Local dev only (NODE_ENV != production, e.g. `make dev`): no Vault
+        // container to talk to, so fall back to backend/.env like before Vault existed.
+        console.log('[bootstrap] No Vault credentials found and NODE_ENV != production — using backend/.env secrets for local dev.');
+        require('dotenv').config();
+
+        if (!process.env.DATABASE_URL || !process.env.JWT_SECRET) {
+            throw new Error(
+                '[bootstrap] Local dev mode requires DATABASE_URL and JWT_SECRET in backend/.env.',
+            );
+        }
+        return;
+    }
+
     console.log('[bootstrap] Authenticating to Vault via AppRole...');
     const token = await getVaultToken();
     
