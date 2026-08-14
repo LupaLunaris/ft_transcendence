@@ -130,7 +130,7 @@ export function TowerGamePage() {
     navigate('/');
   };
 
-if (loading || runStarting || !runToken) {
+if (loading || runStarting || (!runToken && !showModal)) {
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center">
       <Spinner size="lg" className="text-gold-400" />
