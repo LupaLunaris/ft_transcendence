@@ -22,7 +22,8 @@ export function LanguageSelector() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const current = i18n.language.slice(0, 2).toUpperCase();
+  const language = i18n.resolvedLanguage ?? i18n.language ?? 'fr';
+  const current = language.slice(0, 2).toUpperCase();
 
   return (
     <div ref={ref} className="relative">
@@ -47,7 +48,7 @@ export function LanguageSelector() {
               onClick={() => { i18n.changeLanguage(code); setOpen(false); }}
               className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between
                           hover:bg-surface-raised transition-colors
-                          ${i18n.language.startsWith(code)
+                          ${language.startsWith(code)
                             ? 'text-gold-300'
                             : 'text-silver-300'}`}
             >

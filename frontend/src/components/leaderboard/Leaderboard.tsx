@@ -21,7 +21,7 @@ export function Leaderboard({ title, entries, loading, highlightUserId, classNam
   const { t } = useTranslation();
 
   return (
-    <div className={`bg-surface-raised border border-surface-border rounded-xl p-4 flex flex-col gap-3 ${className ?? ''}`}>
+    <div className={`bg-surface-raised border border-surface-border rounded-xl p-4 flex flex-col gap-3 [@media(orientation:landscape)_and_(pointer:coarse)]:hidden ${className ?? ''}`}>
       <h2 className="font-fantasy text-lg text-gold-300">{title}</h2>
 
       {loading && (

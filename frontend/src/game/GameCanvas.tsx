@@ -1,8 +1,10 @@
 
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
-import type { Grid } from '@ft/shared';
+import type { Grid, Direction } from '@ft/shared';
 import { GameScene } from './scenes/GameScene';
+import { TouchPad } from '@/components/ui/TouchPad';
+import { createPortal } from 'react-dom'
 
 interface GameCanvasProps {
   grid: Grid;
@@ -25,6 +27,8 @@ const CANVAS_HEIGHT = 600;
 	onDeath
 	}: GameCanvasProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
+	const gameRef = useRef<Phaser.Game | null>(null);
+	const initialGameConfigRef = useRef({ grid, settings, player_id, player_sprite });
 
 	const onExitRef = useRef(onExit);
 	useEffect(() => { onExitRef.current = onExit; }, [onExit]);
@@ -49,6 +53,7 @@ const CANVAS_HEIGHT = 600;
 		};
 
 		const game = new Phaser.Game(config);
+		gameRef.current = game;
 
 		game.events.on('player_reached_exit', (time_ms: number) => {
 		onExitRef.current(time_ms);
@@ -59,23 +64,31 @@ const CANVAS_HEIGHT = 600;
 		});
 
 		game.events.once('ready', () => {
-		game.scene.add('GameScene', GameScene, true, {
-			grid,
-			settings,
-			player_id,
-			player_sprite,
-		});
+			const initialGameConfig = initialGameConfigRef.current;
+			game.scene.add('GameScene', GameScene, true, {
+				grid: initialGameConfig.grid,
+				settings: initialGameConfig.settings,
+				player_id: initialGameConfig.player_id,
+				player_sprite: initialGameConfig.player_sprite,
+			});
 		});
 
 		return () => {
 		game.destroy(true);
+		gameRef.current = null;
 		};
 	}, []);
 
+	  const handleDirection = (direction: Direction, pressed: boolean) => {
+      gameRef.current?.events.emit('touch_input', { direction, pressed });
+  	};
+
 	return (
+	  <>
 		<div
 		ref={containerRef}
 		style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}
 		/>
+      	{createPortal(<TouchPad onDirection={handleDirection} />, document.body)}	  </>
 	);
 	}

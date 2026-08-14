@@ -7,6 +7,7 @@ import { TILE, GRID_SIZE } from '@ft/shared';
 // ── vi.hoisted: declare mock functions BEFORE vi.mock factories run ─────────
 
 const mockGetById = vi.hoisted(() => vi.fn());
+const mockGetMine = vi.hoisted(() => vi.fn());
 const mockUseAuth = vi.hoisted(() => vi.fn());
 const mockGetTowerLevels = vi.hoisted(() => vi.fn());
 const mockUpdateTowerLevel = vi.hoisted(() => vi.fn());
@@ -35,6 +36,7 @@ vi.mock('@/services/api.service', () => ({
   api: {
     maps: {
       getById: mockGetById,
+      getMine: mockGetMine,
       create: vi.fn(),
       update: vi.fn(),
       publish: vi.fn(),
@@ -106,6 +108,7 @@ function makeAdminGrid() {
 describe('EditorPage — publish button state', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetMine.mockResolvedValue([]);
     mockUseAuth.mockReturnValue({
       user: { id: 'u1', username: 'alice', is_admin: false },
       logout: vi.fn(),
@@ -165,6 +168,7 @@ describe('EditorPage — admin mode', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetMine.mockResolvedValue([]);
     mockUseAuth.mockReturnValue({
       user: { id: 'u1', username: 'alice', is_admin: true },
       logout: vi.fn(),
@@ -195,7 +199,7 @@ describe('EditorPage — admin mode', () => {
     await waitFor(() => expect(mockGetTowerLevels).toHaveBeenCalled());
 
     expect(await screen.findByText(/Les Catacombes/)).toBeInTheDocument();
-    expect(await screen.findByText(/Salle du Trône/)).toBeInTheDocument();
+    expect(await screen.findByText(/La Forêt de Colonnes/)).toBeInTheDocument();
   });
 
   it('shows fallback "Niveau N" for levels not yet seeded by admin', async () => {
@@ -203,8 +207,8 @@ describe('EditorPage — admin mode', () => {
 
     await waitFor(() => expect(mockGetTowerLevels).toHaveBeenCalled());
 
-    // Level 2 is absent from the mock response
-    expect(await screen.findByText(/Niveau 2/)).toBeInTheDocument();
+    // Level 2 is absent from the mock response but keeps its translated label.
+    expect(await screen.findByText(/Le Couloir Brisé/)).toBeInTheDocument();
   });
 
   it('loads the level name into the input when clicking a known level button', async () => {
@@ -261,7 +265,7 @@ describe('EditorPage — admin mode', () => {
     await waitFor(() => expect(mockGetTowerLevels).toHaveBeenCalled());
 
     // Select level 2 (not yet in DB)
-    const btn2 = await screen.findByText(/Niveau 2/);
+    const btn2 = await screen.findByText(/Le Couloir Brisé/);
     fireEvent.click(btn2.closest('button')!);
 
     // Save
