@@ -133,6 +133,9 @@ export function GamePage() {
     return () => {
       cancelled = true;
     };
+    // map/user are intentionally omitted: keying on their .id avoids
+    // restarting the run (and burning a run_token) on every object refetch.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map_id, map?.id, user?.id, gameKey, showToast, t]);
 
   const handleExit = useCallback(

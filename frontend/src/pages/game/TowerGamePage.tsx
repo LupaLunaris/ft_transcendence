@@ -75,6 +75,9 @@ export function TowerGamePage() {
     return () => {
       cancelled = true;
     };
+    // level/user are intentionally omitted: keying on their .id avoids
+    // restarting the run (and burning a run_token) on every object refetch.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderIndex, level?.id, user?.id, gameKey, navigate]);
 
   const handleDeath = useCallback(() => {
