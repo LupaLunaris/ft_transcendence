@@ -202,6 +202,15 @@ vault-unseal: vault-wait
 	@docker exec vault vault operator unseal "$$(sed -E 's/\x1B\[[0-9;]*[mK]//g' vault/secrets/init-output.txt | grep 'Unseal Key 3:' | awk '{print $$NF}' | tr -d '\r')"
 	@docker exec vault vault status
 
+backend-wait: ## Wait for backend API to respond
+	@printf "$(CYAN)Waiting for backend...$(RESET)\n"
+	@until curl -sk https://localhost/api/health >/dev/null 2>&1; do sleep 1; done
+	@printf "$(GREEN)Backend is up.$(RESET)\n"
+
+db-seed-docker: ## Seed DB inside the running backend container
+	@printf "$(CYAN)Seeding database...$(RESET)\n"
+	$(COMPOSE) exec -T backend npx prisma db seed
+
 docker-up: check-platform-deps certs ## Build and start all services in detached mode
 	@if [ ! -f $(ENV_FILE) ]; then \
 		printf "$(RED)Error: $(ENV_FILE) not found. Create it with the required vars.$(RESET)\n"; \
@@ -217,6 +226,8 @@ docker-up: check-platform-deps certs ## Build and start all services in detached
 		$(MAKE) vault-init; \
 	fi
 	$(COMPOSE) up --build -d
+	@$(MAKE) backend-wait
+	@$(MAKE) db-seed-docker
 	@printf "$(GREEN)Services running:$(RESET)\n"
 	@printf "  App:      https://localhost\n"
 	@printf "  API:      https://localhost/api/health\n"
