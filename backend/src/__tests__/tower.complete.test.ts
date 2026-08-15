@@ -211,15 +211,30 @@ describe('POST /api/v1/tower/:order_index/complete', () => {
       .set('Authorization', `Bearer ${token()}`);
 
     expect(res.status).toBe(403);
-    expect(res.body.error).toMatch(/order/i);
+    expect(res.body.error).toMatch(/unlock/i);
   });
 
-  it('returns 403 when trying to re-complete a finished level', async () => {
-    mockPrisma.user.findUnique.mockResolvedValue(makeUser(3));
+  it('allows replaying an already-completed level without re-awarding progress or diamonds', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(makeUser(3, 3));
 
     const res = await request(app)
       .post('/api/v1/tower/1/complete')
-      .set('Authorization', `Bearer ${token()}`);
+      .set('Authorization', `Bearer ${token()}`)
+      .send({ run_token: runToken(1) });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.tower_progress).toBe(3);
+    expect(res.body.data.diamonds).toBe(3);
+    expect(mockPrisma.user.update).not.toHaveBeenCalled();
+  });
+
+  it('still returns 403 when trying to skip ahead of an already-completed level', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(makeUser(3));
+
+    const res = await request(app)
+      .post('/api/v1/tower/5/complete')
+      .set('Authorization', `Bearer ${token()}`)
+      .send({ run_token: runToken(5) });
 
     expect(res.status).toBe(403);
   });
