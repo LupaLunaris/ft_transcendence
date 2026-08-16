@@ -7,6 +7,8 @@ import type { MapData } from '@ft/shared';
 // ── vi.hoisted: declare mock functions BEFORE vi.mock factories run ─────────
 
 const mockNavigate    = vi.hoisted(() => vi.fn());
+const mockShowToast   = vi.hoisted(() => vi.fn());
+const mockStart       = vi.hoisted(() => vi.fn());
 const mockSubmit      = vi.hoisted(() => vi.fn());
 const mockMarkComplete = vi.hoisted(() => vi.fn());
 
@@ -28,7 +30,7 @@ vi.mock('@/game/GameCanvas', () => ({
 }));
 
 vi.mock('@/components/ui/useToast', () => ({
-  useToast: () => ({ showToast: vi.fn() }),
+  useToast: () => ({ showToast: mockShowToast }),
 }));
 
 vi.mock('@/context/auth.context', () => ({
@@ -37,7 +39,7 @@ vi.mock('@/context/auth.context', () => ({
 
 vi.mock('@/services/api.service', () => ({
   api: {
-    scores: { submit: mockSubmit },
+    scores: { start: mockStart, submit: mockSubmit },
     maps: { markComplete: mockMarkComplete },
   },
 }));
@@ -85,6 +87,7 @@ function renderGame(mapId = 'map-1') {
 describe('GamePage — handleExit', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockStart.mockResolvedValue({ run_token: 'test-run-token', started_at: Date.now() });
     mockSubmit.mockResolvedValue({});
     mockMarkComplete.mockResolvedValue({});
     userRef.current = { id: 'user-creator', username: 'alice' };
@@ -93,8 +96,9 @@ describe('GamePage — handleExit', () => {
 
   it('always submits the score on completion', async () => {
     renderGame('map-1');
-    await userEvent.click(screen.getByTestId('finish'));
-    await waitFor(() => expect(mockSubmit).toHaveBeenCalledWith('map-1', 1500));
+    await userEvent.click(await screen.findByTestId('finish'));
+    expect(mockStart).toHaveBeenCalledWith('map-1');
+    await waitFor(() => expect(mockSubmit).toHaveBeenCalledWith('test-run-token', 1500));
   });
 
   it('calls markComplete and navigates to /editor/:id when the creator finishes', async () => {
@@ -102,7 +106,7 @@ describe('GamePage — handleExit', () => {
     mapRef.current  = makeMap({ creator_id: 'user-creator' });
 
     renderGame('map-1');
-    await userEvent.click(screen.getByTestId('finish'));
+    await userEvent.click(await screen.findByTestId('finish'));
 
     await waitFor(() => expect(mockMarkComplete).toHaveBeenCalledWith('map-1'));
     expect(mockNavigate).toHaveBeenCalledWith('/editor/map-1');
@@ -114,7 +118,7 @@ describe('GamePage — handleExit', () => {
     mapRef.current  = makeMap({ creator_id: 'user-creator' });
 
     renderGame('map-1');
-    await userEvent.click(screen.getByTestId('finish'));
+    await userEvent.click(await screen.findByTestId('finish'));
 
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/train'));
     expect(mockMarkComplete).not.toHaveBeenCalled();
@@ -126,7 +130,7 @@ describe('GamePage — handleExit', () => {
     mapRef.current  = makeMap({ creator_id: 'user-creator' });
 
     renderGame('map-1');
-    await userEvent.click(screen.getByTestId('finish'));
+    await userEvent.click(await screen.findByTestId('finish'));
 
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/editor/map-1'));
   });

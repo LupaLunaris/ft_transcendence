@@ -203,7 +203,8 @@ vault-unseal: vault-wait
 
 docker-up: check-platform-deps certs ## Build and start all services in detached mode	
 	@if [ ! -f .env ]; then \
-		printf "$(RED)Error: .env not found. Copy .env.example and fill in values.$(RESET)\n"; \
+		printf "$(YELLOW).env not found. .env will now be created based on .env.example.$(RESET)\n"; \
+		cp .env.example .env; \
 		exit 1; \
 	fi
 	$(COMPOSE) up --build -d postgres
