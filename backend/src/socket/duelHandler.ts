@@ -1,4 +1,3 @@
-
 import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma';
@@ -338,7 +337,32 @@ export function registerDuelHandlers(
     socket.emit('lobby_state', { entries: getLobbyEntries() });
 
     // ── join_lobby ────────────────────────────────────────────────────────────
-    socket.on('join_lobby', ({ map_id }) => {
+    socket.on('join_lobby', async ({ map_id }) => {
+      try {
+        const map = await prisma.map.findUnique({
+          where: { id: map_id },
+          select: {
+            id: true,
+            published: true,
+          },
+        });
+
+        if (!map) {
+          socket.emit('error_event', {
+            message: 'Map introuvable',
+            code: 404,
+          });
+          return;
+        }
+
+        if (!map.published) {
+          socket.emit('error_event', {
+            message: 'Cette map n’est pas disponible',
+            code: 403,
+          });
+          return;
+        }
+
       const myRegs = socketRegs.get(socket.id) ?? new Set<string>();
 
       if (myRegs.size >= 3 && !myRegs.has(map_id)) {
@@ -380,6 +404,13 @@ export function registerDuelHandlers(
       }
 
       io.emit('lobby_state', { entries: getLobbyEntries() });
+    } catch (error) {
+      console.error('[duel] failed to join lobby', error);
+      socket.emit('error_event', {
+        message: 'Impossible de rejoindre le lobby',
+        code: 500,
+      });
+      }
     });
 
     // ── leave_lobby ──────────────────────────────────────────────────────────
@@ -395,24 +426,49 @@ export function registerDuelHandlers(
         socket.emit('error_event', { message: 'Course introuvable', code: 404 });
         return;
       }
+
+      const player = race.players.get(user.id);
+
+      if (!player) {
+        socket.emit('error_event', {
+          message: 'Accès refusé à cette course',
+          code: 403,
+        });
+        return;
+      }
+
+      if (race.finished) {
+        socket.emit('error_event', {
+          message: 'Cette course est terminée',
+          code: 409,
+        });
+        return;
+      }
+
+      const existingRaceId = socketRace.get(socket.id);
+
+      if (existingRaceId && existingRaceId !== race_id) {
+        socket.emit('error_event', {
+          message: 'Vous participez déjà à une autre course',
+          code: 409,
+        });
+        return;
+      }
+
       socket.join(`race:${race_id}`);
       socketRace.set(socket.id, race_id);
 
       // Mise à jour socket_id : le game socket ≠ lobby socket ; gère aussi
       // la reconnexion (même user_id, nouveau socket).
-      const player = race.players.get(user.id);
-      if (player) {
-        player.socket_id = socket.id;
-        player.connected = true;
-        if (player.disconnect_timer) {
-          clearTimeout(player.disconnect_timer);
-          player.disconnect_timer = undefined;
-        }
+      player.socket_id = socket.id;
+      player.connected = true;
+
+      if (player.disconnect_timer) {
+        clearTimeout(player.disconnect_timer);
+        player.disconnect_timer = undefined;
       }
-      
-      if (player && !race.finished) {
-        setInGame(user.id);
-      }
+
+      setInGame(user.id);
 
       const room = io.sockets.adapter.rooms.get(`race:${race_id}`);
       if (room && room.size === race.players.size && !race.started) {

@@ -40,6 +40,11 @@ import towerRouter from '../routes/tower.routes';
 
 const SECRET = 'test_secret';
 
+// tower.routes.ts reads process.env.JWT_SECRET into a module-level const at
+// import time (above), before this file's beforeAll reassigns it to SECRET —
+// so run_token signing must use the value captured at import, not SECRET.
+const RUN_TOKEN_SECRET = process.env.JWT_SECRET as string;
+
 beforeAll(() => { process.env.JWT_SECRET = SECRET; });
 beforeEach(() => { jest.clearAllMocks(); });
 
@@ -61,6 +66,20 @@ function makeUser(tower_progress: number, diamonds = 0) {
 
 function token(_progress = 0): string {
   return jwt.sign({ id: 'user-uuid-1', email: 'alice@example.com', is_admin: false }, SECRET);
+}
+
+// Valid tower run_token: started_at backdated past MIN_TOWER_RUN_TIME_MS (3s)
+// so the route's minimum-duration check passes without the test having to wait.
+function runToken(order_index: number): string {
+  return jwt.sign(
+    {
+      user_id: 'user-uuid-1',
+      order_index,
+      started_at: Date.now() - 5_000,
+      nonce: `nonce-${order_index}-${Math.random()}`,
+    },
+    RUN_TOKEN_SECRET,
+  );
 }
 
 const app = express();
@@ -176,7 +195,8 @@ describe('POST /api/v1/tower/:order_index/complete', () => {
 
     const res = await request(app)
       .post('/api/v1/tower/1/complete')
-      .set('Authorization', `Bearer ${token()}`);
+      .set('Authorization', `Bearer ${token()}`)
+      .send({ run_token: runToken(1) });
 
     expect(res.status).toBe(200);
     expect(res.body.data.tower_progress).toBe(1);
@@ -191,15 +211,30 @@ describe('POST /api/v1/tower/:order_index/complete', () => {
       .set('Authorization', `Bearer ${token()}`);
 
     expect(res.status).toBe(403);
-    expect(res.body.error).toMatch(/order/i);
+    expect(res.body.error).toMatch(/unlock/i);
   });
 
-  it('returns 403 when trying to re-complete a finished level', async () => {
-    mockPrisma.user.findUnique.mockResolvedValue(makeUser(3));
+  it('allows replaying an already-completed level without re-awarding progress or diamonds', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(makeUser(3, 3));
 
     const res = await request(app)
       .post('/api/v1/tower/1/complete')
-      .set('Authorization', `Bearer ${token()}`);
+      .set('Authorization', `Bearer ${token()}`)
+      .send({ run_token: runToken(1) });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.tower_progress).toBe(3);
+    expect(res.body.data.diamonds).toBe(3);
+    expect(mockPrisma.user.update).not.toHaveBeenCalled();
+  });
+
+  it('still returns 403 when trying to skip ahead of an already-completed level', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(makeUser(3));
+
+    const res = await request(app)
+      .post('/api/v1/tower/5/complete')
+      .set('Authorization', `Bearer ${token()}`)
+      .send({ run_token: runToken(5) });
 
     expect(res.status).toBe(403);
   });
@@ -231,7 +266,8 @@ describe('POST /api/v1/tower/:order_index/complete', () => {
 
     const res = await request(app)
       .post('/api/v1/tower/8/complete')
-      .set('Authorization', `Bearer ${token()}`);
+      .set('Authorization', `Bearer ${token()}`)
+      .send({ run_token: runToken(8) });
 
     expect(res.status).toBe(200);
     expect(res.body.data.tower_progress).toBe(8);

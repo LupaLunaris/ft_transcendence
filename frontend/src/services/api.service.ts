@@ -183,9 +183,24 @@ class ApiService {
 		getLevel: (order_index: number): Promise<TowerLevelFull> =>
 			this.request<TowerLevelFull>('GET', `/tower/${order_index}`),
 
-		complete: (order_index: number): Promise<{ tower_progress: number; diamonds: number }> =>
-			this.request<{ tower_progress: number; diamonds: number }>('POST', `/tower/${order_index}/complete`),
-	};
+  start: (
+    order_index: number,
+  ): Promise<{ run_token: string; started_at: number }> =>
+    this.request<{ run_token: string; started_at: number }>(
+      'POST',
+      `/tower/${order_index}/start`,
+    ),
+
+  complete: (
+    order_index: number,
+    run_token: string,
+  ): Promise<{ tower_progress: number; diamonds: number }> =>
+    this.request<{ tower_progress: number; diamonds: number }>(
+      'POST',
+      `/tower/${order_index}/complete`,
+      { run_token },
+    ),
+  };
 
 	admin = {
 		getTowerLevels: (): Promise<AdminMap[]> =>
@@ -198,12 +213,24 @@ class ApiService {
 			this.request<AdminMap>('PUT', `/admin/tower/${order_index}`, data),
 	};
 
-	scores = {
-		submit: (map_id: string, time_ms: number): Promise<ScoreResult> =>
-			this.request<ScoreResult>('POST', '/scores', {
-				map_id,
-				completion_time_ms: time_ms,
-			}),
+  scores = {
+    start: (
+      map_id: string,
+    ): Promise<{ run_token: string; started_at: number }> =>
+      this.request<{ run_token: string; started_at: number }>(
+        'POST',
+        '/scores/start',
+        { map_id },
+      ),
+
+    submit: (
+      run_token: string,
+      completion_time_ms: number,
+    ): Promise<ScoreResult> =>
+      this.request<ScoreResult>('POST', '/scores', {
+        run_token,
+        completion_time_ms,
+    }),
 
 		getLeaderboard: (map_id: string): Promise<ScoreEntry[]> =>
 			this.request<ScoreEntry[]>('GET', `/scores/leaderboard/${map_id}`),

@@ -23,11 +23,19 @@ export const updateMapSchema = z.object({
   grid: gridSchema.optional(),
 });
 
-export const scoreSchema = z.object({
+export const startScoreRunSchema = z.object({
   map_id: z.string().uuid('Invalid map id'),
-  completion_time_ms: z.number().int().positive('Completion time must be a positive integer'),
+});
+
+export const finishScoreRunSchema = z.object({
+  run_token: z.string().min(1, 'Run token is required'),
+  completion_time_ms: z
+    .number()
+    .int()
+    .positive('Completion time must be a positive integer'),
 });
 
 export type CreateMapInput = z.infer<typeof createMapSchema>;
 export type UpdateMapInput = z.infer<typeof updateMapSchema>;
-export type ScoreInput = z.infer<typeof scoreSchema>;
+export type StartScoreRunInput = z.infer<typeof startScoreRunSchema>;
+export type FinishScoreRunInput = z.infer<typeof finishScoreRunSchema>;
