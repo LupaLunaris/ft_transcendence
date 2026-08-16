@@ -118,8 +118,6 @@ router.post(
       return;
     }
 
-    usedRunNonces.add(payload.nonce);
-
     const serverElapsed = Date.now() - payload.started_at;
 
     if (serverElapsed < MIN_SCORE_RUN_TIME_MS || serverElapsed > RUN_TOKEN_MAX_AGE_MS) {
@@ -183,6 +181,7 @@ router.post(
       return { score, reward };
     });
 
+    usedRunNonces.add(payload.nonce);
     setTimeout(() => {
       usedRunNonces.delete(payload.nonce);
     }, RUN_TOKEN_MAX_AGE_MS).unref();

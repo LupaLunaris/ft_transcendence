@@ -89,8 +89,8 @@ router.post('/:order_index/start', authMiddleware, async (req: Request, res: Res
     return;
   }
 
-  if (orderIndex !== user.tower_progress + 1) {
-    sendError(res, 'You must complete levels in order', 403);
+  if (orderIndex > user.tower_progress + 1) {
+    sendError(res, 'This level is not unlocked yet', 403);
     return;
   }
 
@@ -146,8 +146,8 @@ router.post('/:order_index/complete', authMiddleware, async (req: Request, res: 
     return;
   }
 
-  if (orderIndex !== user.tower_progress + 1) {
-    sendError(res, 'You must complete levels in order', 403);
+  if (orderIndex > user.tower_progress + 1) {
+    sendError(res, 'This level is not unlocked yet', 403);
     return;
   }
 
@@ -189,13 +189,21 @@ router.post('/:order_index/complete', authMiddleware, async (req: Request, res: 
     return;
   }
 
-  const updated = await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      tower_progress: orderIndex,
-      diamonds: { increment: 1 },
-    },
-  });
+  // Only award progress/diamonds the first time this level is cleared —
+  // replaying an already-completed level (orderIndex <= tower_progress)
+  // must still succeed so the frontend can show the victory flow, but
+  // must not re-farm rewards.
+  const isNewProgress = orderIndex === user.tower_progress + 1;
+
+  const updated = isNewProgress
+    ? await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          tower_progress: orderIndex,
+          diamonds: { increment: 1 },
+        },
+      })
+    : user;
 
   usedTowerRunNonces.add(payload.nonce);
 

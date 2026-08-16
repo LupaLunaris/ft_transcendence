@@ -30,6 +30,11 @@ make install
 
 `make install` installs all npm workspace dependencies.
 
+> **Provisional note:** `.env.example` is a temporary placeholder committed only
+> so a fresh clone can run `make install`/`make dev` without extra steps. On
+> defense day, the real `.env` will already exist on the school computer with
+> its own values — just edit it in place, do not overwrite it with `.env.example`.
+
 For local backend development, `make dev` will also create `backend/.env` from `backend/.env.example` if it is missing. The backend env file points to PostgreSQL on `localhost`, because the backend runs locally in development mode.
 
 ---
@@ -216,6 +221,63 @@ Check that `backend/.env` uses `localhost`, not `postgres`:
 ```dotenv
 DATABASE_URL=postgresql://ft_user:change_me_in_prod@localhost:5432/ft_transcendence
 ```
+
+### `P1000: Authentication failed for the database server` (`ft_user`)
+
+This means your local `postgres_data` Docker volume was created with a different
+password than the one currently in your `.env` files. This volume is **local to
+each collaborator** (per `CLAUDE.md`) — it never resets automatically when `.env`
+changes.
+
+Run these commands from the project root, in order:
+
+**Step 1 — sync `backend/.env` with your root `.env` password:**
+
+```bash
+sed -i "s#^DATABASE_URL=.*#DATABASE_URL=postgresql://ft_user:$(grep '^POSTGRES_PASSWORD=' .env | cut -d= -f2)@localhost:5432/ft_transcendence#" backend/.env
+make dev
+```
+
+This fixes it for most people — `ft_user` is literally the Postgres superuser
+(`POSTGRES_USER=ft_user` in the root `.env`), so its real password is normally
+whatever `POSTGRES_PASSWORD` in your root `.env` already is.
+
+**Step 2 — if `make dev` still fails with `P1000`, and you have no local data to keep**
+(fresh machine, or you never had `make dev`/`make docker-up` fully working before):
+
+```bash
+make docker-down-v
+make dev
+```
+
+`docker-down-v` deletes containers **and** the local `postgres_data` volume, so
+Postgres re-initializes cleanly with your current `.env`. This only destroys your
+own local dev database — nothing shared, nothing another collaborator depends on.
+
+**Step 3 — if `make dev` still fails with `P1000`, and you want to keep your local data**
+(you have real accounts/maps saved locally you don't want to lose):
+
+Your live Postgres password is neither the root `.env` value nor the `backend/.env`
+value — you'll need to reconnect with whichever password last worked, then reset it
+to match your current `.env`:
+
+```bash
+docker compose up -d postgres
+docker exec -it ft_transcendence-postgres-1 psql -U ft_user -d ft_transcendence
+```
+
+`psql` will prompt for the password interactively — try the last password you
+remember using. Once connected, run:
+
+```sql
+ALTER USER ft_user WITH PASSWORD 'paste_your_current_.env_POSTGRES_PASSWORD_here';
+\q
+```
+
+Then rerun step 1's `sed` command and `make dev`.
+
+If you don't remember any working password, fall back to Step 2 (you will lose
+your local test data, but nothing outside your machine).
 
 ### Temporary `ECONNREFUSED 127.0.0.1:3001` from Vite
 
