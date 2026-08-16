@@ -6,7 +6,7 @@ set -e
 
 SECRETS_DIR="vault/secrets"
 INIT_FILE="$SECRETS_DIR/init-output.txt"
-ENV_FILE=".env"
+ENV_FILE="${1:-.env}"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
