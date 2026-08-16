@@ -70,7 +70,7 @@ Les emails suivants ont is_admin=true automatiquement à la création de compte 
 - Delete map + Unpublish map : **complets** (backend + frontend)
 - Éditeur admin de la tour : **complet** (GET/PUT /admin/tower/:order_index + EditorPage admin mode)
 - RacePage (`/play/:map_id/race`) : placeholder conservé, le vrai mode multijoueur passe par `/duel`
-- **À traiter (responsable Martin, PO + Gameplay)** : `player_input` (duel) n'a pas de limite de fréquence côté serveur — speed-hack possible via `socket.emit` en boucle depuis la console. Problème de fair-play/gameplay, pas de sécurité au sens strict. Détails et piste de fix dans `CONTEXT.md` (section "À traiter") et `history_debug/2026-08-14_faille-scores-forgeable.md`.
+- Fair-play `player_input` (duel) : **corrigé** (2026-08-15, commit `c9a8ad7`, branche `fix/game-fair-play`) — pacing minimum serveur (`MIN_INPUT_INTERVAL_MS=60`) + durée minimale plausible sur `POST /scores` (`MIN_SCORE_RUN_TIME_MS=3000`). Détails dans `CONTEXT.md` et `history_debug/2026-08-14_faille-scores-forgeable.md` / `history_debug/2026-08-16_merge-audit2-into-fair-play.md`.
 
 ## Architecture Socket.IO Duel (implémentée)
 
