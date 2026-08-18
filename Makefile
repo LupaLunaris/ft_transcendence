@@ -204,7 +204,7 @@ vault-unseal: vault-wait
 
 backend-wait: ## Wait for backend API to respond
 	@printf "$(CYAN)Waiting for backend...$(RESET)\n"
-	@until curl -sk https://localhost/api/health >/dev/null 2>&1; do sleep 1; done
+	@until curl -sk https://localhost:8443/api/health >/dev/null 2>&1; do sleep 1; done
 	@printf "$(GREEN)Backend is up.$(RESET)\n"
 
 db-seed-docker: ## Seed DB inside the running backend container
