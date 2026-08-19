@@ -157,7 +157,7 @@ The objective is to balance:
 
 Important:
 
-* PM and Tech Lead include major invisible workloads.
+* PO and Tech Lead include major invisible workloads.
 * Therefore their feature quantity must remain realistic.
 * Gameplay and UI responsibilities must include substantial technical implementation.
 * Every member must contribute significantly to coding.
@@ -289,6 +289,7 @@ Martin must be able to explain:
 * collisions,
 * synchronization logic,
 * room lifecycle,
+* WebSocket client integration,
 * customization systems,
 * gamification systems,
 * balancing decisions,
@@ -320,11 +321,9 @@ Jerem is responsible for:
 * preparing agendas,
 * writing meeting summaries,
 * maintaining task tracking,
-* maintaining GitHub Issues / project board,
 * tracking blockers,
 * assigning tasks clearly,
 * tracking MVP progress,
-* maintaining roadmap visibility,
 * ensuring unfinished tasks are followed.
 
 ---
@@ -405,10 +404,12 @@ Jerem must be able to explain:
 * planning structure,
 * backend architecture,
 * authentication,
+* frontend/backend communication,
 * database structure,
 * WebSocket infrastructure,
 * synchronization infrastructure,
 * deployment logic,
+* WebSocket client integration,
 * what he personally implemented.
 
 ---
@@ -441,7 +442,13 @@ Jennifer is responsible for:
 * architecture validation,
 * risky technical decisions validation,
 * API contracts coordination,
+* maintaining GitHub Issues / project board,
+* maintaining roadmap visibility,
 * integration strategy,
+* tracking blockers,
+* assigning tasks clearly,
+* tracking MVP progress,
+* ensuring unfinished tasks are followed,
 * technical documentation.
 
 ---
@@ -515,7 +522,6 @@ Jennifer must be able to explain:
 
 * frontend architecture,
 * integration strategy,
-* WebSocket client integration,
 * rendering architecture,
 * frontend/backend communication,
 * technical conventions,
