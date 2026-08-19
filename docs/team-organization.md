@@ -157,7 +157,7 @@ The objective is to balance:
 
 Important:
 
-* PM and Tech Lead include major invisible workloads.
+* PO and Tech Lead include major invisible workloads.
 * Therefore their feature quantity must remain realistic.
 * Gameplay and UI responsibilities must include substantial technical implementation.
 * Every member must contribute significantly to coding.
