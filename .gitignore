@@ -43,3 +43,6 @@ vault/certs/*.pem
 vault/secrets/
 
 .claude/
+
+# User-uploaded content (local runtime data)
+backend/uploads/

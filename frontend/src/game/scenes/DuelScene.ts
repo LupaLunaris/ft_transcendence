@@ -38,23 +38,23 @@ const ENEMY_ANIM_FRAMES: Record<Direction, number[]> = {
   up:    [12, 13, 14, 15],
 };
 
-// ─── Data passée à la scène ───────────────────────────────────────────────────
+// ─── Data passed to the scene ─────────────────────────────────────────────────
 
 export interface DuelSceneData {
   grid:             Grid;
   my_id:            string;
   my_username:      string;
   my_sprite?:       string;
-  // 1 à 3 adversaires (course de 2 à 4 joueurs) + URL de sprite par id.
+  // 1 to 3 opponents (2 to 4 player race) + sprite URL per id.
   opponents:        { id: string; username: string; avatar: string | null }[];
   opponent_sprites: Record<string, string>;
 }
 
-// ─── Fantôme adverse ──────────────────────────────────────────────────────────
-// Un adversaire = une texture dédiée + un jeu d'anims dédié (cf.
-// frontend_doc/duel-remote-ghost-sprite-identity.md) : une anim Phaser garde
-// sa texture d'origine même jouée sur un sprite différent, donc pas moyen de
-// partager un seul jeu d'anims entre plusieurs adversaires aux skins distincts.
+// ─── Opponent ghost ───────────────────────────────────────────────────────────
+// An opponent = a dedicated texture + a dedicated animation set (cf.
+// frontend_doc/duel-remote-ghost-sprite-identity.md): a Phaser animation keeps
+// its original texture even when played on a different sprite, so there's no
+// way to share a single animation set across opponents with distinct skins.
 
 interface RemoteGhost {
   sprite:  Phaser.GameObjects.Sprite;
@@ -77,12 +77,12 @@ function depthForGridY(gridY: number): number {
 
 export class DuelScene extends BaseScene {
 
-  // ── Sprite URL résolue depuis l'avatar du joueur local ────────────────────
+  // ── Sprite URL resolved from the local player's avatar ────────────────────
   private playerSpriteUrl = DEFAULT_PLAYER_SPRITE;
   private opponents: DuelSceneData['opponents'] = [];
   private opponentSpriteUrls: Record<string, string> = {};
 
-  // ── Joueur local ──────────────────────────────────────────────────────────
+  // ── Local player ──────────────────────────────────────────────────────────
   private grid:          Grid     = [];
   private gridX         = 0;
   private gridY         = 0;
@@ -99,10 +99,10 @@ export class DuelScene extends BaseScene {
   private lastDirection: Direction = 'down';
   private moveDuration  = 150;
 
-  // ── Adversaires distants (1 à 3) ──────────────────────────────────────────
-  private remotes = new Map<string, RemoteGhost>(); // clé = user_id adversaire
+  // ── Remote opponents (1 to 3) ─────────────────────────────────────────────
+  private remotes = new Map<string, RemoteGhost>(); // key = opponent user_id
 
-  // ── Ennemis (positions pilotées par le serveur, cf. duelHandler.ts) ───────
+  // ── Enemies (positions driven by the server, cf. duelHandler.ts) ──────────
   private enemySprites = new Map<string, EnemyGameObject>();
 
   constructor() {
@@ -156,7 +156,7 @@ export class DuelScene extends BaseScene {
 
     this.buildTilemap(data.grid);
 
-    // Cherche le SPAWN
+    // Find the SPAWN tile
     for (let row = 0; row < GRID_SIZE; row++) {
       for (let col = 0; col < GRID_SIZE; col++) {
         if (data.grid[row][col] === TILE.SPAWN) {
@@ -169,7 +169,7 @@ export class DuelScene extends BaseScene {
     const spawnPx = this.gridX * TILE_SIZE + TILE_SIZE / 2;
     const spawnPy = this.gridY * TILE_SIZE + TILE_SIZE / 2;
 
-    // ── Animations du joueur local (walk + idle × 4 directions) ──────────────
+    // ── Local player animations (walk + idle × 4 directions) ─────────────────
     (Object.entries(ANIM_FRAMES) as [Direction, { walk: number[]; idle: number }][])
       .forEach(([dir, { walk, idle }]) => {
         if (!this.anims.exists(`walk_${dir}`)) {
@@ -190,7 +190,7 @@ export class DuelScene extends BaseScene {
         }
       });
 
-    // ── Sprite joueur local ──────────────────────────────────────────────────
+    // ── Local player sprite ───────────────────────────────────────────────────
     this.localPlayer = this.add.sprite(spawnPx, spawnPy, KEY_SPRITE_PLAYER);
     this.localPlayer.setScale(SCALE_PLAYER);
     this.localPlayer.setCrop(5, 5, FRAME_W - 15, FRAME_H - 10);
@@ -198,7 +198,7 @@ export class DuelScene extends BaseScene {
     this.localPlayer.setDepth(depthForGridY(this.gridY));
     this.localPlayer.anims.play('idle_down');
 
-    // ── Fantômes adverses (1 à 3), chacun avec sa propre texture + anims ────
+    // ── Opponent ghosts (1 to 3), each with its own texture + anims ─────────
     for (const opponent of data.opponents) {
       const key = opponentTextureKey(opponent.id);
 
@@ -250,11 +250,11 @@ export class DuelScene extends BaseScene {
 
     this.spawnEnemies(data.grid);
 
-    // Caméra suit le joueur local
+    // Camera follows the local player
     this.cameras.main.setBounds(0, 0, GRID_SIZE * TILE_SIZE, GRID_SIZE * TILE_SIZE);
     this.cameras.main.startFollow(this.localPlayer, true);
 
-    // Clavier
+    // Keyboard
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.wasd = {
       up:    this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W),
@@ -263,24 +263,24 @@ export class DuelScene extends BaseScene {
       right: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D),
     };
 
-    // Écoute les mises à jour serveur (depuis React via game.events) :
-    // positions des adversaires et des ennemis, toutes deux pilotées par le
-    // tick autoritaire du serveur (cf. backend_doc/duel-server-authoritative-enemies.md).
+    // Listens for server updates (from React via game.events): opponent and
+    // enemy positions, both driven by the server's authoritative tick
+    // (cf. backend_doc/duel-server-authoritative-enemies.md).
     this.game.events.on('remote_states',  this.handleRemoteStates,  this);
     this.game.events.on('remote_enemies', this.handleRemoteEnemies, this);
-    // Le mouvement local est prédictif (tween immédiat, sans attendre le
-    // serveur) : sans ce signal explicite, le joueur continue de se déplacer
-    // visuellement après sa mort côté serveur alors que ses inputs sont déjà
-    // ignorés — cf. DuelGamePage.tsx `me.alive === false`.
+    // Local movement is predictive (immediate tween, without waiting for
+    // the server): without this explicit signal, the player keeps moving
+    // visually after their server-side death even though their inputs are
+    // already being ignored — cf. DuelGamePage.tsx `me.alive === false`.
     this.game.events.on('i_died', this.handleIDied, this);
 
     this.registerTouchInput();
-    // Signale à React que les listeners ci-dessus sont prêts : tout
-    // game_state émis PENDANT le chargement des assets (preload) était
-    // silencieusement perdu (aucun listener encore inscrit) — React rejoue
-    // alors son dernier état connu pour rattraper l'écart. Sans ça, un
-    // adversaire qui termine très vite pendant que cette scène charge encore
-    // reste figé au spawn pour toujours sur cet écran.
+    // Signals to React that the listeners above are ready: any game_state
+    // emitted WHILE assets were still loading (preload) was silently lost
+    // (no listener registered yet) — React then replays its last known
+    // state to catch up. Without this, an opponent who finishes very fast
+    // while this scene is still loading stays frozen at spawn forever on
+    // this screen.
     this.game.events.emit('scene_ready');
   }
 
@@ -308,10 +308,10 @@ export class DuelScene extends BaseScene {
   }
 
   // ── tryMove ───────────────────────────────────────────────────────────────
-  // Mouvement prédictif côté client (feedback immédiat) ; le serveur reste
-  // seul autoritaire sur la collision ennemie et l'arrivée réelle en EXIT
-  // (cf. duelHandler.ts `player_input`) — le client ne fait ici que geler
-  // son propre input une fois la case EXIT visuellement atteinte.
+  // Predictive client-side movement (immediate feedback); the server remains
+  // the sole authority on enemy collision and actual EXIT arrival
+  // (cf. duelHandler.ts `player_input`) — the client here only freezes its
+  // own input once the EXIT tile is visually reached.
 
   private tryMove(dx: number, dy: number, dir: Direction): void {
     const nx = this.gridX + dx;
@@ -328,7 +328,7 @@ export class DuelScene extends BaseScene {
 
     this.localPlayer.anims.play(`walk_${dir}`, true);
 
-    // Notifie React pour l'envoi socket
+    // Notify React to send it over the socket
     this.game.events.emit('emit_player_input', { direction: dir });
 
     this.tweens.add({
@@ -355,20 +355,20 @@ export class DuelScene extends BaseScene {
   }
 
   // ── handleIDied ───────────────────────────────────────────────────────────
-  // Gèle l'input local : le serveur a déjà marqué ce joueur `alive: false`
-  // (collision ennemie ou forfait de reconnexion) et ignore ses player_input
-  // depuis. Réutilise le même gate que l'arrivée en EXIT (`update()` ignore
-  // tout input tant que `this.finished` est vrai).
+  // Freezes local input: the server has already marked this player
+  // `alive: false` (enemy collision or reconnection forfeit) and has been
+  // ignoring their player_input since. Reuses the same gate as EXIT arrival
+  // (`update()` ignores all input while `this.finished` is true).
 
   private handleIDied(): void {
     this.finished = true;
   }
 
   // ── handleRemoteStates ────────────────────────────────────────────────────
-  // Reçoit le PlayerState de chaque adversaire depuis React et anime le
-  // fantôme correspondant vers sa nouvelle position. Un adversaire mort/fini
-  // arrête naturellement de bouger : le serveur ne fait plus progresser sa
-  // position, donc plus aucune nouvelle valeur ne diffère de la précédente.
+  // Receives each opponent's PlayerState from React and animates the
+  // matching ghost toward its new position. A dead/finished opponent
+  // naturally stops moving: the server no longer advances their position,
+  // so no new value ever differs from the previous one.
 
   private handleRemoteStates(states: PlayerState[]): void {
     for (const state of states) {
@@ -393,7 +393,7 @@ export class DuelScene extends BaseScene {
       ghost.sprite.anims.play(`remote_walk_${state.id}_${state.direction}`, true);
 
       if (ghost.moving) {
-        // Déjà en mouvement : on saute directement à la cible
+        // Already moving: jump straight to the target
         ghost.sprite.setPosition(targetX, targetY);
         ghost.label.setPosition(targetX, targetY - TILE_SIZE);
         continue;
@@ -415,9 +415,9 @@ export class DuelScene extends BaseScene {
   }
 
   // ── spawnEnemies ──────────────────────────────────────────────────────────
-  // Crée uniquement les sprites visuels, à leur position de spawn définie par
-  // la grille. Le déplacement n'est plus simulé localement : il est piloté
-  // par le tick serveur via handleRemoteEnemies() (cf. duelHandler.ts).
+  // Creates only the visual sprites, at their spawn position defined by the
+  // grid. Movement is no longer simulated locally: it's driven by the
+  // server tick via handleRemoteEnemies() (cf. duelHandler.ts).
 
   private spawnEnemies(grid: Grid): void {
     this.enemySprites.clear();
@@ -461,8 +461,8 @@ export class DuelScene extends BaseScene {
   }
 
   // ── handleRemoteEnemies ───────────────────────────────────────────────────
-  // Tween chaque sprite ennemi vers la position reçue du serveur (même
-  // cadence que le tick serveur, 400ms — cf. duelHandler.ts ENEMY_TICK_MS).
+  // Tweens each enemy sprite toward the position received from the server
+  // (same cadence as the server tick, 400ms — cf. duelHandler.ts ENEMY_TICK_MS).
 
   private handleRemoteEnemies(enemies: EnemyState[]): void {
     for (const enemy of enemies) {
@@ -472,9 +472,9 @@ export class DuelScene extends BaseScene {
       const targetX = enemy.position.x * TILE_SIZE + TILE_SIZE / 2;
       const targetY = enemy.position.y * TILE_SIZE + TILE_SIZE / 2;
 
-      // Plus la ligne Y est basse à l'écran, plus le sprite passe devant.
-      // Un ennemi au-dessus du joueur a donc une profondeur inférieure,
-      // tandis qu'un ennemi en dessous passe devant le joueur.
+      // The lower the Y row on screen, the more the sprite is drawn in front.
+      // An enemy above the player therefore has a lower depth, while an
+      // enemy below is drawn in front of the player.
       obj.setDepth(depthForGridY(enemy.position.y));
 
       if (obj instanceof Phaser.GameObjects.Sprite) {

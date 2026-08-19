@@ -24,6 +24,11 @@ const MAX_RACE_PLAYERS = 4;
 const LOBBY_COUNTDOWN_MS = 30_000;
 const DISCONNECT_GRACE_MS = 10_000;
 const ENEMY_TICK_MS = 400;
+// Fastest a legitimate client ever moves (DuelScene.ts moveDuration floor).
+// Rejects player_input spam faster than this instead of trusting the client
+// to pace itself — a console socket.emit loop could otherwise move a player
+// far faster than any real tween allows.
+const MIN_INPUT_INTERVAL_MS = 60;
 
 // ─── Types internes ───────────────────────────────────────────────────────────
 
@@ -52,6 +57,7 @@ interface RacePlayer {
   finish_time?: number;
   death_time?: number;
   disconnect_timer?: ReturnType<typeof setTimeout>;
+  last_input_at?: number;
 }
 
 interface ActiveRace {
@@ -502,6 +508,10 @@ export function registerDuelHandlers(
 
       const player = race.players.get(user.id);
       if (!player || !player.alive || player.finished) return;
+
+      const now = Date.now();
+      if (player.last_input_at !== undefined && now - player.last_input_at < MIN_INPUT_INTERVAL_MS) return;
+      player.last_input_at = now;
 
       const { x, y } = player.position;
       const dx = direction === 'left' ? -1 : direction === 'right' ? 1 : 0;
