@@ -1,4 +1,4 @@
-
+// Root application component: configures global providers, routing, and protected routes.
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { ToastProvider } from '@/components/ui/useToast';
@@ -60,9 +60,7 @@ function AppRoutes() {
 			<Route path="/play/:map_id/race"       element={<ProtectedRoute><RacePage /></ProtectedRoute>} />
 			<Route path="/duel"                    element={<ProtectedRoute><DuelPage /></ProtectedRoute>} />
 			<Route path="/duel/game"               element={<ProtectedRoute><DuelGamePage /></ProtectedRoute>} />
-			<Route path="/terms"                   element={<TermsOfServicePage />} />
-			<Route path="/privacy"                 element={<PrivacyPolicyPage />} />
-	
+
 			{/* 404 */}
 			<Route path="*" element={<NotFoundPage />} />
 		</Routes>
@@ -76,7 +74,7 @@ export default function App() {
 				<SocketProvider>
 					<BrowserRouter>
 						<AppRoutes />
-						</BrowserRouter> 
+						</BrowserRouter>
 					</SocketProvider>
 				</AuthProvider>
 			<ToastContainer />

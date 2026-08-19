@@ -1,3 +1,4 @@
+// Centralizes HTTP requests, authentication headers, and API endpoints used by the frontend.
 
 import type {
 	UserPublic,
