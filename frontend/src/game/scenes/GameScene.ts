@@ -123,8 +123,6 @@ export class GameScene extends BaseScene {
 	// ── create ───────────────────────────────────────────────────────────────────
 
 	create(data: any): void {
-		console.log("DATA RECEIVED:", data);
-		console.log("DATA:", data);
 		this.settings = data.settings ?? {
 		enemySpeed: "normal",
 		};
@@ -180,7 +178,6 @@ export class GameScene extends BaseScene {
 				}
 			})
 
-		console.log("SETTINGS:", this.settings);
 		// Idle facing camera at spawn (Row 2 = 'down' = facing forward).
 		this.player.anims.play('idle_down');
 		this.spawnEnemies(data.grid);
