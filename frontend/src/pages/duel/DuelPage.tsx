@@ -32,7 +32,7 @@ const DIFFICULTY_COLOR: Record<Difficulty, string> = {
 };
 
 const PAGE_SIZE = 20;
-// Doit rester synchronisé avec MAX_RACE_PLAYERS dans backend/src/socket/duelHandler.ts
+// Must stay in sync with MAX_RACE_PLAYERS in backend/src/socket/duelHandler.ts
 const MAX_LOBBY_PLAYERS = 4;
 
 export function DuelPage() {
@@ -57,8 +57,8 @@ export function DuelPage() {
     onError: (msg) => setError(msg),
   });
 
-  // Force un re-render chaque seconde pour rafraîchir le compte à rebours
-  // affiché (dérivé de countdown_ends_at - Date.now(), pas d'état serveur poussé).
+  // Forces a re-render every second to refresh the displayed countdown
+  // (derived from countdown_ends_at - Date.now(), not server-pushed state).
   const [, tick] = useState(0);
   useEffect(() => {
     const id = setInterval(() => tick(t => t + 1), 1000);
@@ -98,7 +98,7 @@ export function DuelPage() {
           </p>
         )}
 
-        {/* Filtre difficulté */}
+        {/* Difficulty filter */}
         <div className="flex gap-2 flex-wrap">
           {DIFFICULTIES.map(({ value, key }) => (
             <button
@@ -116,7 +116,7 @@ export function DuelPage() {
           ))}
         </div>
 
-        {/* Contenu */}
+        {/* Content */}
         {loading && (
           <div className="flex justify-center py-12">
             <Spinner size="lg" className="text-deep-400" />
@@ -149,7 +149,7 @@ export function DuelPage() {
                   key={map.id}
                   className="flex items-center justify-between bg-surface-raised border border-surface-border rounded-lg px-4 py-3"
                 >
-                  {/* Infos map */}
+                  {/* Map info */}
                   <div>
                     <p className="font-medium text-white">{map.name}</p>
                     <p className={`text-xs mt-0.5 ${DIFFICULTY_COLOR[map.difficulty]}`}>
@@ -159,7 +159,7 @@ export function DuelPage() {
                     </p>
                   </div>
 
-                  {/* Zone lobby + bouton */}
+                  {/* Lobby zone + button */}
                   <div className="flex items-center gap-3">
                     {count > 0 && (
                       <span className="text-sm text-white/70 font-medium">

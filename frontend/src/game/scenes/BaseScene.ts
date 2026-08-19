@@ -9,19 +9,8 @@ import {
 
 export const TILE_SIZE = 36;
 
-// ─── Fallback couleurs (utilisées quand la texture PNG est absente) ───────────
-
-// const TILE_COLORS: Record<number, number> = {
-//   [TILE.EMPTY]:   0x2a2a3e,
-//   [TILE.WALL]:    0x5c3d8f,
-//   [TILE.EXIT]:    0x00e5a0,
-//   [TILE.SPAWN]:   0x2a2a3e, // même couleur que le sol — invisible en jeu
-//   [TILE.ENEMY_H]: 0x2a2a3e, // case ennemi dessinée comme sol (ennemi par-dessus)
-//   [TILE.ENEMY_V]: 0x2a2a3e,
-// };
-
-// ─── Mapping tuile → clé texture Phaser ──────────────────────────────────────
-// Les cases ENEMY sont rendues comme le sol : l'ennemi (sprite) est superposé.
+// ─── Tile → Phaser texture key mapping ───────────────────────────────────────
+// ENEMY tiles are rendered as floor: the enemy (sprite) is layered on top.
 
 const TILE_TEXTURE_KEYS: Record<number, string> = {
   [TILE.EMPTY]:   KEY_TILE_FLOOR,
@@ -32,11 +21,11 @@ const TILE_TEXTURE_KEYS: Record<number, string> = {
   [TILE.ENEMY_V]: KEY_TILE_FLOOR,
 };
 
-// ─── Scène abstraite ──────────────────────────────────────────────────────────
+// ─── Abstract scene ───────────────────────────────────────────────────────────
 
 export abstract class BaseScene extends Phaser.Scene {
 
-  // -- Input tactile ---------------------------------------------------------
+  // -- Touch input -------------------------------------------------------
   protected touchState: Record<Direction, boolean> = {
 	up: false, down: false, left: false, right:false,
   };
@@ -53,10 +42,10 @@ export abstract class BaseScene extends Phaser.Scene {
     this.game.events.off('touch_input', this.handleTouchInput, this);
   }
 
-  // ── Helpers de chargement ─────────────────────────────────────────────────
+  // ── Loading helpers ───────────────────────────────────────────────────────
 
-  // À appeler dans preload() de la scène concrète avant de charger
-  // les assets spécifiques (joueur, ennemis).
+  // Call from the concrete scene's preload() before loading
+  // scene-specific assets (player, enemies).
   protected preloadTileAssets(): void {
 	this.load.image(KEY_TILE_FLOOR, ASSET_TILE_FLOOR);
 	this.load.image(KEY_TILE_WALL,  ASSET_TILE_WALL);
@@ -82,23 +71,23 @@ export abstract class BaseScene extends Phaser.Scene {
 	const SE = isWall(row + 1, col + 1);
 	const SW = isWall(row + 1, col - 1);
 
-	if (!N && !S && !E && !W)  return 6; // isolé
-	if (!N && (E || W))        return 0; // bord nord
-	if (!S && (E || W))        return 3; // bord sud
-	if (N && E && !NE)         return 1; // coin NE intérieur
-	if (N && W && !NW)         return 2; // coin NW intérieur
-	if (S && E && !SE)         return 4; // coin SE intérieur
-	if (S && W && !SW)         return 5; // coin SW intérieur
-	return 0;                            // mur plein
+	if (!N && !S && !E && !W)  return 6; // isolated
+	if (!N && (E || W))        return 0; // north edge
+	if (!S && (E || W))        return 3; // south edge
+	if (N && E && !NE)         return 1; // NE inner corner
+	if (N && W && !NW)         return 2; // NW inner corner
+	if (S && E && !SE)         return 4; // SE inner corner
+	if (S && W && !SW)         return 5; // SW inner corner
+	return 0;                            // solid wall
   }
 
-  // ── Construction de la carte ──────────────────────────────────────────────
+  // ── Map construction ──────────────────────────────────────────────────────
 
-  // Pour chaque tuile :
-  //   - Si la texture est chargée → this.add.image (PNG)
-  //   - Sinon → graphics.fillRect avec la couleur de fallback (aucun crash)
-  // Les cases ENEMY_H / ENEMY_V sont rendues comme le sol.
-  // Les sprites ennemis sont placés par-dessus dans GameScene.spawnEnemies().
+  // For each tile:
+  //   - If the texture is loaded → this.add.image (PNG)
+  //   - Otherwise → graphics.fillRect with the fallback color (no crash)
+  // ENEMY_H / ENEMY_V tiles are rendered as floor.
+  // Enemy sprites are placed on top in GameScene.spawnEnemies().
   protected buildTilemap(grid: Grid): void {
 	const graphics = this.add.graphics();
 
@@ -130,7 +119,7 @@ export abstract class BaseScene extends Phaser.Scene {
 	  }
 	}
 
-	// Lignes de grille légères — toujours dessinées pour la lisibilité
+	// Light grid lines — always drawn for readability
 	graphics.lineStyle(1, 0x000000, 0.15);
 	for (let i = 0; i <= GRID_SIZE; i++) {
 	  graphics.strokeLineShape(

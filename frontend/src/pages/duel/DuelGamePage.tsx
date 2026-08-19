@@ -35,9 +35,9 @@ const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
 const CANVAS_W = 800;
 const CANVAS_H = 600;
 
-// ─── Overlay résultat ─────────────────────────────────────────────────────────
-// Classement complet (2 à 4 joueurs) — remplace le win/lose binaire de la
-// version 2 joueurs, cf. shared/src/types/game.types.ts RaceRankingEntry.
+// ─── Result overlay ───────────────────────────────────────────────────────────
+// Full ranking (2 to 4 players) — replaces the binary win/lose of the
+// 2-player version, cf. shared/src/types/game.types.ts RaceRankingEntry.
 
 function ResultOverlay({
   result,
@@ -111,12 +111,12 @@ export function DuelGamePage() {
   showToastRef.current = showToast;
   const updateUserRef = useRef(updateUser);
   updateUserRef.current = updateUser;
-  // Dernier game_state reçu, indépendamment de l'état de chargement de la
-  // scène Phaser — permet de rattraper la scène dès qu'elle signale 'scene_ready'
-  // (cf. effect Phaser ci-dessous : sans ce cache, un game_state émis avant que
-  // create() ait enregistré ses listeners est perdu pour toujours, ce qui
-  // laisse un adversaire qui finit très vite figé au spawn sur les écrans plus
-  // lents à charger — cf. frontend_doc/duel-nplayer-remote-rendering.md).
+  // Last game_state received, independent of the Phaser scene's loading
+  // state — lets the scene catch up as soon as it signals 'scene_ready'
+  // (cf. the Phaser effect below: without this cache, a game_state emitted
+  // before create() has registered its listeners is lost forever, which
+  // leaves an opponent who finishes very fast frozen at spawn on screens
+  // that are slower to load — cf. frontend_doc/duel-nplayer-remote-rendering.md).
   const lastGameStateRef = useRef<GameState | null>(null);
 
   const [result,      setResult]      = useState<RaceResult | null>(null);
@@ -124,16 +124,16 @@ export function DuelGamePage() {
   const [myFinished,  setMyFinished]  = useState(false);
   const [myAlive,     setMyAlive]     = useState(true);
 
-  // Redirige si on arrive sans state (navigation directe)
+  // Redirect if we land here without state (direct navigation)
   useEffect(() => {
     if (!state) navigate('/duel', { replace: true });
   }, [state, navigate]);
 
-  // ── Socket : connexion + join_race ────────────────────────────────────────
-  // Dépend explicitement de user?.id : sans ça, si cet effect se monte avant
-  // que /auth/me ait résolu (AuthProvider pose `token` avant `user`, cf.
-  // auth.context.tsx), la closure de 'game_state' capture user=null pour
-  // toute la durée de la connexion socket (l'effect ne se relance jamais).
+  // ── Socket: connection + join_race ────────────────────────────────────────
+  // Explicitly depends on user?.id: without this, if this effect mounts
+  // before /auth/me has resolved (AuthProvider sets `token` before `user`,
+  // cf. auth.context.tsx), the 'game_state' closure captures user=null for
+  // the whole duration of the socket connection (the effect never re-runs).
   useEffect(() => {
     if (!raceId || !userId || !socket) return;
 
@@ -162,7 +162,7 @@ export function DuelGamePage() {
     }
 
     function handleRewardEarned(reward: RewardResult) {
-      // Émis uniquement au vainqueur de la course (cf. duelHandler.ts#finishRace)
+      // Emitted only to the race winner (cf. duelHandler.ts#finishRace)
       if (reward.xp_gained > 0) {
         showToastRef.current(translateRef.current('toast_xp_gained', { xp: reward.xp_gained }), 'success');
       }
@@ -191,9 +191,9 @@ export function DuelGamePage() {
     duelSocket.on('error_event', handleErrorEvent);
     duelSocket.on('connect', handleConnect);
 
-    // Le socket partagé est peut-être déjà connecté avant ce montage
-    // (ex: navigation depuis le lobby) — sans ceci, 'connect' ne se
-    // redéclenche jamais et join_race n'est jamais émis.
+    // The shared socket may already be connected before this mount
+    // (e.g. navigating from the lobby) — without this, 'connect' never
+    // fires again and join_race is never emitted.
     if (duelSocket.connected) {
       duelSocket.emit('join_race', { race_id: currentRaceId });
     }
@@ -207,7 +207,7 @@ export function DuelGamePage() {
     };
   }, [socket, raceId, userId]);
 
-  // ── Phaser : initialisation ───────────────────────────────────────────────
+  // ── Phaser: initialization ────────────────────────────────────────────────
   useEffect(() => {
     if (!state || !containerRef.current || !user) return;
 
@@ -228,15 +228,15 @@ export function DuelGamePage() {
     const game = new Phaser.Game(config);
     gameRef.current = game;
 
-    // Phaser → React : input local
+    // Phaser → React: local input
     game.events.on('emit_player_input', ({ direction }: { direction: Direction }) => {
       socketRef.current?.emit('player_input', { direction });
     });
 
-    // La scène signale la fin de son create() (textures chargées, listeners
-    // enregistrés) — on lui rejoue alors le dernier game_state connu, pour
-    // rattraper tout ce qui a pu être émis (et perdu, faute de listener)
-    // pendant le chargement des assets.
+    // The scene signals the end of its create() (textures loaded, listeners
+    // registered) — we then replay the last known game_state, to catch up
+    // on anything that may have been emitted (and lost, for lack of a
+    // listener) during asset loading.
     game.events.on('scene_ready', () => {
       const gs = lastGameStateRef.current;
       if (!gs) return;
@@ -274,7 +274,7 @@ export function DuelGamePage() {
 
 return (
   <div className="min-h-screen bg-surface flex flex-col items-center gap-4 p-4">
-    {/* En-tête avec pseudos adversaires */}
+    {/* Header with opponent usernames */}
     <div className="flex items-center gap-4 text-sm text-white/60 flex-wrap justify-center">
       <span className="text-white font-medium">{user?.username}</span>
       <span className="text-white/30">vs</span>
@@ -293,7 +293,7 @@ return (
       <ScaledGameFrame
         overlay={
           <>
-            {/* Attente que tous les joueurs soient connectés */}
+            {/* Waiting for all players to connect */}
             {waiting && !result && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3">
                 <Spinner size="lg" className="text-deep-400" />
@@ -303,7 +303,7 @@ return (
               </div>
             )}
 
-            {/* Le joueur local a fini, la course continue pour les autres */}
+            {/* The local player has finished, the race continues for the others */}
             {!waiting && myFinished && !result && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3 pointer-events-none">
                 <Spinner size="lg" className="text-deep-400" />
@@ -313,7 +313,7 @@ return (
               </div>
             )}
 
-            {/* Le joueur local est mort (ennemi/forfait), la course continue pour les autres */}
+            {/* The local player has died (enemy/forfeit), the race continues for the others */}
             {!waiting && !myAlive && !myFinished && !result && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg gap-3 pointer-events-none">
                 <p className="text-3xl">💀</p>
