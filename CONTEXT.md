@@ -368,6 +368,10 @@ Docs de référence : `backend_doc/duel-nplayer-lobby-and-race-lifecycle.md`,
 - **Plan de remédiation (Martin, 2026-08-14)** : régénérer les secrets Vault (role_id/secret_id) et le mot de passe Postgres, déployer un `.env` provisoire à base de placeholders sur la machine de l'école (`cp .env.example .env`, flow déjà documenté dans `README_install_and_start.md`), puis réimporter une DB de démo (maps + utilisateurs) pour les soutenances.
 - **Pourquoi ce n'est pas grave pour les DB locales des collaborateurs** : chaque collaborateur a son propre volume Docker `postgres_data`, qui persiste à travers `make docker-down`/`make dev` — seul `make docker-down-v` le supprime. Le `.env` racine (secrets Vault) n'est consommé que par `make docker-up` (mode démo/éval) ; le mode dev local (`make dev`) utilise `backend/.env` avec une URL Postgres locale simple, sans Vault. Donc régénérer les secrets ne nécessite de reset la DB de personne — seule la stack Docker démo doit redémarrer avec le nouveau `.env`.
 
+## Nettoyage headers 42 / commentaires (2026-08-19)
+- Table de responsabilité par fichier ("headers 42") retirée de `CLAUDE.md` — plus d'actualité pour ce projet.
+- `shared/src/game/enemyLogic.ts` : commentaires traduits en anglais (conservés, pas supprimés — documentent des invariants non triviaux : portage 1:1 avec `frontend/src/game/entities/Enemy.ts`, ordre row/col qui doit rester identique serveur/client).
+
 ## Ce qui reste
 - RacePage (`/play/:map_id/race`) : encore placeholder
 - `GameScene.ts` (solo) n'utilise pas `shared/game/enemyLogic.ts` — garde sa propre classe `entities/Enemy.ts`, ce qui est correct (pas de sync à assurer en solo) mais crée une duplication d'algorithme assumée (cf. `backend_doc/duel-server-authoritative-enemies.md`)

@@ -1,20 +1,20 @@
 
-// Logique de déplacement des ennemis, partagée entre le serveur (tick
-// autoritaire du mode duel) et le client (mode solo). Portage 1:1 de
-// frontend/src/game/entities/Enemy.ts — ne pas modifier le comportement
-// sans mettre à jour les deux côtés, sous peine de changer la difficulté
-// perçue des maps déjà publiées.
+// Enemy movement logic, shared between the server (authoritative tick
+// of duel mode) and the client (solo mode). 1:1 port of
+// frontend/src/game/entities/Enemy.ts — do not change the behavior
+// without updating both sides, or the perceived difficulty of already
+// published maps will change.
 
 import { TILE, GRID_SIZE, type Grid } from '../types/tiles.types';
 import type { Direction, EnemyKind } from '../types/game.types';
 
 export interface EnemyRuntimeState {
-  id: string;   // stable, dérivé de la position de spawn : `enemy_${row}_${col}`
+  id: string;   // stable, derived from spawn position: `enemy_${row}_${col}`
   kind: EnemyKind;
   x: number;
   y: number;
-  dx: 1 | -1;   // pertinent seulement si kind === 'horizontal'
-  dy: 1 | -1;   // pertinent seulement si kind === 'vertical'
+  dx: 1 | -1;   // relevant only if kind === 'horizontal'
+  dy: 1 | -1;   // relevant only if kind === 'vertical'
   direction: Direction;
 }
 
@@ -23,9 +23,9 @@ export function canStepOn(grid: Grid, x: number, y: number): boolean {
   return grid[y][x] !== TILE.WALL;
 }
 
-// Fonction pure : (état actuel, grille) → nouvel état. Rebond déterministe
-// sur les murs, direction initiale droite/bas — voir HorizontalEnemy /
-// VerticalEnemy dans entities/Enemy.ts pour la version historique.
+// Pure function: (current state, grid) → new state. Deterministic bounce
+// off walls, initial direction right/down — see HorizontalEnemy /
+// VerticalEnemy in entities/Enemy.ts for the historical version.
 export function stepEnemy(state: EnemyRuntimeState, grid: Grid): EnemyRuntimeState {
   if (state.kind === 'horizontal') {
     const nx = state.x + state.dx;
@@ -39,8 +39,8 @@ export function stepEnemy(state: EnemyRuntimeState, grid: Grid): EnemyRuntimeSta
       return { ...state, x: nx2, dx: flipped, direction: flipped === 1 ? 'right' : 'left' };
     }
 
-    // Bloqué des deux côtés : la direction inversée est conservée pour la
-    // prochaine tentative, position et lastDirection inchangées.
+    // Blocked on both sides: the flipped direction is kept for the
+    // next attempt, position and lastDirection unchanged.
     return { ...state, dx: flipped };
   }
 
@@ -59,9 +59,9 @@ export function stepEnemy(state: EnemyRuntimeState, grid: Grid): EnemyRuntimeSta
   return { ...state, dy: flipped };
 }
 
-// Parcourt la grille dans l'ordre row puis col — l'ordre doit rester
-// identique entre le serveur (état initial de la course) et le client
-// (création des sprites visuels) pour que les id générés correspondent.
+// Walks the grid in row-then-col order — the order must stay identical
+// between the server (initial race state) and the client (visual sprite
+// creation) so that the generated ids match.
 export function extractEnemiesFromGrid(grid: Grid): EnemyRuntimeState[] {
   const enemies: EnemyRuntimeState[] = [];
 
