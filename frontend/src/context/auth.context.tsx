@@ -1,4 +1,4 @@
-
+// Manages the authenticated user, JWT session state, and auth actions for React components.
 import {
 	createContext,
 	useCallback,
