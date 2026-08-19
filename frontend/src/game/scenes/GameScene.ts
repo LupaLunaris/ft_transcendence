@@ -10,13 +10,13 @@ import {
 } from '../assets';
 import { type Enemy, HorizontalEnemy, VerticalEnemy, type EnemyGameObject } from '../entities/Enemy';
 
-// ─── Constantes de la scène ───────────────────────────────────────────────────
+// ─── Scene constants ────────────────────────────────────────────────────────
 
-const FRAME_RATE = 8;  // fps animation marche
+const FRAME_RATE = 8;  // walk animation fps
 
 
-//ATTENTION CE COMENTAIRE N"EST PAS LA PAR ERREUR- Ne pas suprimer
-//pour player hero
+// WARNING THIS COMMENT IS NOT HERE BY MISTAKE - Do not delete
+// for hero player
 
 // ─── Player ───────────────────────────────────────────────────────────────────
 
@@ -24,32 +24,33 @@ const FRAME_RATE = 8;  // fps animation marche
 // const FRAME_H = 900;
 // const SCALE_PLAYER = 0.12
 // const ANIM_FRAMES: Record<Direction, { walk: number[]; idle: number }> = {
-// 	down: { walk: [3, 2, 1, 0], idle: 4 },//
-// 	left: { walk: [5, 6, 7, 8], idle: 9 },//
+// 	down: { walk: [3, 2, 1, 0], idle: 4 },
+// 	left: { walk: [5, 6, 7, 8], idle: 9 },
 // 	right: { walk: [3, 2, 1, 0], idle: 4 },
 // 	up: { walk: [10, 11, 12, 13], idle: 14 },
 // };
 
-//ATTENTION CE COMENTAIRE N"EST PAS LA PAR ERREUR- Ne pas suprimer
-//pour player martin/jen
+// WARNING THIS COMMENT IS NOT HERE BY MISTAKE - Do not delete
+// for martin/jen player
 const FRAME_W = 200;
 const FRAME_H = 320;
 const SCALE_PLAYER = 0.2;
 const ANIM_FRAMES: Record<Direction, { walk: number[]; idle: number }> = {
-	down: { walk: [0,1,2,1], idle: 0 },//
-	left: { walk: [6, 7, 8, 7], idle: 7 },//
+	down: { walk: [0,1,2,1], idle: 0 },
+	left: { walk: [6, 7, 8, 7], idle: 7 },
 	right: { walk: [3, 4, 5, 4], idle: 4 },
 	up: { walk: [9, 10, 9, 11], idle: 9 },
 };
 
-// //LES COMENTAIRE LAYOUT NE SONT PAS BON JE REMODIF QUAND VERSION FINAL
-// // ─── Ennemis ──────────────────────────────────────────────────────────────────
-// // Layout enemy_h.png / enemy_v.png (4 col × 4 rows) — à ajuster selon le PNG :
-// //   Row 0 (frames  0– 3) → down   Row 1 (frames  4– 7) → left
-// //   Row 2 (frames  8–11) → right  Row 3 (frames 12–15) → up
+// NOTE: the layout comments below may not be accurate — recheck against
+// the final enemy_h.png / enemy_v.png sheet.
+// ─── Enemies ──────────────────────────────────────────────────────────────────
+// Layout enemy_h.png / enemy_v.png (4 cols × 4 rows):
+//   Row 0 (frames  0– 3) → down   Row 1 (frames  4– 7) → left
+//   Row 2 (frames  8–11) → right  Row 3 (frames 12–15) → up
 
-const ENEMY_FRAME_W   = 240;  // 962px / 4 colonnes  (floor — 2px perdus bord droit)
-const ENEMY_H_FRAME_H = 343;  // 1375px / 4 rangées  (floor — 3px perdus bord bas)
+const ENEMY_FRAME_W   = 240;  // 962px / 4 columns (floor — 2px lost on right edge)
+const ENEMY_H_FRAME_H = 343;  // 1375px / 4 rows   (floor — 3px lost on bottom edge)
 const ENEMY_V_FRAME_H = 343;
 
 const ENEMY_ANIM_FRAMES: Record<Direction, number[]> = {
@@ -58,13 +59,6 @@ const ENEMY_ANIM_FRAMES: Record<Direction, number[]> = {
 	right: [1, 3, 2, 1, 3],
 	up: [12, 13, 14, 15],
 };
-
-// // ─── Interface des données passées à la scène ─────────────────────────────────
-
-// export interface GameSceneData {
-// 	grid: Grid;
-// 	player_id: string;
-// }
 
 // ─── GameScene ────────────────────────────────────────────────────────────────
 
@@ -100,7 +94,7 @@ export class GameScene extends BaseScene {
 	}
 
 	// ── init ─────────────────────────────────────────────────────────────────────
-	// Phaser appelle init() avant preload() — c'est ici qu'on capture le sprite.
+	// Phaser calls init() before preload() — this is where we capture the sprite.
 
 	init(data: { player_sprite?: string }): void {
 		if (data.player_sprite) this.playerSpriteUrl = data.player_sprite;
@@ -141,7 +135,7 @@ export class GameScene extends BaseScene {
 
 		this.buildTilemap(data.grid);
 
-		// Localise la case SPAWN.
+		// Locate the SPAWN tile.
 		for (let row = 0; row < GRID_SIZE; row++) {
 			for (let col = 0; col < GRID_SIZE; col++) {
 				if (data.grid[row][col] === TILE.SPAWN) {
@@ -151,23 +145,21 @@ export class GameScene extends BaseScene {
 			}
 		}
 
-		// Crée le sprite centré sur la case SPAWN.
+		// Create the sprite centered on the SPAWN tile.
 		const spawnPixelX = this.gridX * TILE_SIZE + TILE_SIZE / 2;
 		const spawnPixelY = this.gridY * TILE_SIZE + TILE_SIZE / 2;
 
 		this.player = this.add.sprite(spawnPixelX, spawnPixelY, KEY_SPRITE_PLAYER);
 
-		// Scale 1, pas de crop : TILE_SIZE=36 = FRAME_W → sprite natif aligné exactement.
-		// Débordement vertical résiduel : (64-36)/2 = 14px haut/bas → look RPG voulu.
 		this.player.setScale(SCALE_PLAYER);
 		this.player.setCrop(5, 5, FRAME_W - 15 , FRAME_H -10)
-		this.player.setOrigin(0.5, 0.70)  // ancre au 3/4 → pieds au bas de la case
+		this.player.setOrigin(0.5, 0.70)  // anchor at 3/4 height → feet at the bottom of the tile
 		this.player.setDepth(10 + this.gridY);
 
 
 
-		// Enregistre les animations (walk + idle × 4 directions).
-		// anims.exists() empêche les erreurs si la scène est redémarrée.
+		// Register animations (walk + idle × 4 directions).
+		// anims.exists() prevents errors if the scene is restarted.
 		(Object.entries(ANIM_FRAMES) as [Direction, { walk: number[]; idle: number }][])
 			.forEach(([dir, { walk, idle }]) => {
 				if (!this.anims.exists(`walk_${dir}`)) {
@@ -189,16 +181,16 @@ export class GameScene extends BaseScene {
 			})
 
 		console.log("SETTINGS:", this.settings);
-		// Idle face caméra au spawn (Row 2 = 'down' = face).
+		// Idle facing camera at spawn (Row 2 = 'down' = facing forward).
 		this.player.anims.play('idle_down');
 		this.spawnEnemies(data.grid);
 
 		this.cameras.main.setBounds(0, 0, GRID_SIZE * TILE_SIZE, GRID_SIZE * TILE_SIZE);
-		// Suivi instantané — le lerp (0.1) combiné à pixelArt+roundPixels
-		// provoque un saut d'1px pendant le tween → fantôme dans la case adjacente.
+		// Instant follow — lerp (0.1) combined with pixelArt+roundPixels
+		// causes a 1px jump during the tween → ghosting into the adjacent tile.
 		this.cameras.main.startFollow(this.player, true);
 
-		// Clavier.
+		// Keyboard.
 		this.cursors = this.input.keyboard!.createCursorKeys();
 		this.wasd = {
 			up: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W),
@@ -212,7 +204,7 @@ export class GameScene extends BaseScene {
 	}
 
 	// ── update ───────────────────────────────────────────────────────────────────
-	// Appelée ~60x par seconde. Ignorée pendant un tween (isMoving = true).
+	// Called ~60x per second. Ignored during a tween (isMoving = true).
 
 	update(_time: number, _delta: number): void {
 		if (this.finished || this.isMoving) return;
@@ -236,8 +228,8 @@ export class GameScene extends BaseScene {
 	}
 
 	// ── tryMove ──────────────────────────────────────────────────────────────────
-	// Vérifie collision → met à jour la position logique → lance le tween.
-	// La détection EXIT est dans onComplete (joueur visuellement arrivé).
+	// Checks collision → updates the logical position → starts the tween.
+	// EXIT detection happens in onComplete (player visually arrived).
 
 	private tryMove(dx: number, dy: number, dir: Direction): void {
 		const nx = this.gridX + dx;
@@ -264,8 +256,8 @@ export class GameScene extends BaseScene {
 			onComplete: () => {
 				this.isMoving = false;
 
-				// Accélération progressive : raccourcit moveDuration si la touche
-				// est toujours enfoncée, jusqu'au plafond bas de 60ms.
+				// Progressive acceleration: shortens moveDuration while the key
+				// stays pressed, down to the 60ms floor.
 				const stillPressed =
 					(dir === 'left' && (this.cursors.left.isDown || this.wasd.left.isDown || this.touchState.left)) ||
 					(dir === 'right' && (this.cursors.right.isDown || this.wasd.right.isDown || this.touchState.right)) ||
@@ -295,8 +287,8 @@ export class GameScene extends BaseScene {
 	}
 
 	// ── spawnEnemies ─────────────────────────────────────────────────────────────
-	// Parcourt la grille, crée un Sprite animé par case ENEMY_H / ENEMY_V
-	// (Rectangle coloré en fallback si le PNG est absent), puis lance le timer.
+	// Walks the grid, creates an animated Sprite per ENEMY_H / ENEMY_V tile
+	// (colored Rectangle as fallback if the PNG is missing), then starts the timer.
 
 	private spawnEnemies(grid: Grid): void {
 		this.enemies = [];
@@ -320,8 +312,8 @@ export class GameScene extends BaseScene {
 						.setOrigin(0.5, 0.75)
 						.setDepth(10 + row);
 
-					// Enregistre les animations walk × 4 directions pour ce type d'ennemi.
-					// La clé est préfixée par 'key' pour éviter les conflits H/V.
+					// Registers walk animations × 4 directions for this enemy type.
+					// The key is prefixed with 'key' to avoid H/V conflicts.
 					(Object.entries(ENEMY_ANIM_FRAMES) as [Direction, number[]][])
 						.forEach(([dir, frames]) => {
 							const animKey = `${key}_walk_${dir}`;
@@ -367,8 +359,9 @@ export class GameScene extends BaseScene {
 	}
 
 	// ── moveEnemies ──────────────────────────────────────────────────────────────
-	// Appelée toutes les 400ms. Déplace chaque ennemi, joue l'animation de marche
-	// correspondant à sa direction, puis vérifie la collision avec le joueur.
+	// Called on each enemy tick (interval set by enemySpeed). Moves each enemy,
+	// plays the walk animation matching its direction, then checks collision
+	// with the player.
 
 	private moveEnemies(duration: number): void {
 		for (const enemy of this.enemies) {
@@ -401,7 +394,7 @@ export class GameScene extends BaseScene {
 			this.game.events.emit('player_caught');
 		}
 	}
-	
+
 	// -- shutdown ----------------------------------------------------------------
 	shutdown(): void {
   		this.unregisterTouchInput();
