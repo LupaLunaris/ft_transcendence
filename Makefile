@@ -21,7 +21,7 @@ RED    := \033[31m
 
 .DEFAULT_GOAL := help
 
-ENV_FILE := /home/jdebrull/.ft_transcendence.env
+ENV_FILE := .env
 COMPOSE := docker compose --env-file $(ENV_FILE)
 NPM := npm
 NPM_INSTALL := $(NPM) install --include=optional
@@ -213,10 +213,14 @@ db-seed-docker: ## Seed DB inside the running backend container
 
 docker-up: check-platform-deps certs ## Build and start all services in detached mode
 	@if [ ! -f $(ENV_FILE) ]; then \
-		printf "$(RED)Error: $(ENV_FILE) not found. Create it with the required vars.$(RESET)\n"; \
-		exit 1; \
+		cp .env.example $(ENV_FILE); \
+		PW=$$(openssl rand -hex 16); \
+		JWT=$$(openssl rand -base64 48 | tr -d '\n'); \
+		sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$$PW|" $(ENV_FILE); \
+		sed -i "s|^JWT_SECRET=.*|JWT_SECRET=$$JWT|" $(ENV_FILE); \
+		sed -i "s|^DATABASE_URL=.*|DATABASE_URL=postgresql://ft_user:$$PW@postgres:5432/ft_transcendence|" $(ENV_FILE); \
 	fi
-	@ln -sf $(ENV_FILE) backend/.env
+	@ln -sf $(CURDIR)/$(ENV_FILE) backend/.env
 	$(COMPOSE) up --build -d postgres
 	$(COMPOSE) up --build -d --no-deps vault
 	@$(MAKE) vault-wait
