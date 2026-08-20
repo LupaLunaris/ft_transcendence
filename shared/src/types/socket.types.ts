@@ -5,14 +5,14 @@ import { RewardResult } from './gamification.types';
 
 export interface LobbyEntry {
   map_id: string;
-  // File d'attente pour cette map — 1 à 4 joueurs (MAX_LOBBY_PLAYERS côté serveur).
+  // Queue for this map — 1 to 4 players (MAX_LOBBY_PLAYERS server-side).
   players: {
     id: string;
     username: string;
     avatar: string | null;
   }[];
-  // Timestamp (ms) de départ de la course, ou null tant qu'un seul joueur attend
-  // (le countdown ne démarre qu'à partir de 2 inscrits).
+  // Race start timestamp (ms), or null while only one player is waiting
+  // (the countdown only starts once 2 players are registered).
   countdown_ends_at: number | null;
 }
 
@@ -20,7 +20,7 @@ export interface DuelStartPayload {
   race_id: string;
   map_id: string;
   grid: Grid;
-  // 1 à 3 adversaires (course de 2 à 4 joueurs).
+  // 1 to 3 opponents (race of 2 to 4 players).
   opponents: {
     id: string;
     username: string;
@@ -43,6 +43,6 @@ export interface ServerToClientEvents {
   error_event: (data: { message: string; code: number }) => void;
   lobby_state: (data: { entries: LobbyEntry[] }) => void;
   duel_start: (payload: DuelStartPayload) => void;
-  // Émis uniquement au vainqueur d'une course (rank 1, cf. duelHandler.ts#finishRace)
+  // Emitted only to the winner of a race (rank 1, cf. duelHandler.ts#finishRace)
   reward_earned: (reward: RewardResult) => void;
 }

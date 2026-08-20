@@ -35,8 +35,8 @@ export interface GameState {
   finished: boolean;
 }
 
-// Classement complet — 2 à 4 entrées, triées par rank croissant.
-// duration_ms est null pour un joueur qui n'a pas atteint l'EXIT (mort ou forfait).
+// Full ranking — 2 to 4 entries, sorted by ascending rank.
+// duration_ms is null for a player who did not reach the EXIT (dead or forfeited).
 export interface RaceRankingEntry {
   user_id: string;
   username: string;

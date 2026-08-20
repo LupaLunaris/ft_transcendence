@@ -4,7 +4,7 @@
 // Both are consumed ONLY by GameScene.ts and BaseScene.ts.
 // Never import these in EditorPage, EditorGrid, or TileSelector.
 
-// ─── Clés internes Phaser (this.load.image / this.textures.exists) ────────────
+// ─── Internal Phaser keys (this.load.image / this.textures.exists) ────────────
 
 export const KEY_TILE_FLOOR = 'tile_floor';
 export const KEY_TILE_WALL = 'tile_wall';
@@ -15,7 +15,7 @@ export const KEY_SPRITE_PLAYER = 'sprite_player';
 export const KEY_SPRITE_ENEMY_H = 'sprite_enemy_h';
 export const KEY_SPRITE_ENEMY_V = 'sprite_enemy_v';
 
-// ─── Chemins vers les fichiers dans public/ ───────────────────────────────────
+// ─── Paths to files in public/ ────────────────────────────────────────────────
 
 export const ASSET_TILE_FLOOR = '/assets/tiles/floor.png';
 export const ASSET_TILE_WALL = '/assets/tiles/wall.png';

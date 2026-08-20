@@ -67,7 +67,7 @@ describe('LoginPage', () => {
     authRef.current = { user: null, login: mockLogin, loading: true };
     renderPage();
     expect(screen.queryByRole('button', { name: /se connecter/i })).not.toBeInTheDocument();
-    // Le spinner est présent (pas le formulaire)
+    // The spinner is present (not the form)
     expect(screen.queryByLabelText(/email/i)).not.toBeInTheDocument();
   });
 
@@ -82,14 +82,14 @@ describe('LoginPage', () => {
         <LoginPage />
       </MemoryRouter>,
     );
-    // Le composant Navigate remplace la route — aucun formulaire rendu
+    // The Navigate component replaces the route — no form rendered
     expect(container.querySelector('form')).toBeNull();
   });
 
   it('appelle login() avec les valeurs du formulaire et navigue sur succès', async () => {
     mockLogin.mockResolvedValueOnce(undefined);
-    // Après login, l'état auth change — on simule en mettant user dans le ref
-    // puis en forçant un re-render via mockLogin qui résout
+    // After login, the auth state changes — we simulate this by putting user in the ref
+    // then forcing a re-render via mockLogin resolving
     renderPage();
 
     await userEvent.type(screen.getByLabelText(/email/i), 'alice@example.com');
