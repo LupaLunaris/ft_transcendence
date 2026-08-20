@@ -24,6 +24,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// Provides authentication data and actions to the entire React application.
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<UserPublic | null>(null);
 	const [token, setToken] = useState<string | null>(null);
