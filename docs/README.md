@@ -9,6 +9,8 @@ This repository contains both canonical documentation and historical/team notes.
 | [../README.md](../README.md) | Project overview, stack, team, module scope |
 | [../README_install_and_start.md](../README_install_and_start.md) | Setup, local development, Docker demo/evaluation, shutdown, troubleshooting |
 | [architecture.md](architecture.md) | Current architecture and folder reference |
+| [architecture-deep-dive/README.md](architecture-deep-dive/README.md) | Architecture design highlights — the key decisions, why they were made, with diagrams |
+| [testing/README.md](testing/README.md) | Testing strategy — stacks, mocking approach, coverage, how to run |
 | [major_modules/README.md](major_modules/README.md) | One README per major 42 module (intro, stack, how it works, diagram) — evaluation/defense reference |
 
 If another document contradicts one of these, prefer the canonical document.
