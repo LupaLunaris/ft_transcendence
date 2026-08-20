@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 
-// Points attribués au classement de vitesse d'une map : rang 1 → 5 points,
-// rang 2 → 4, ... rang 5 → 1. Au-delà, aucun point.
+// Points awarded for a map's speed ranking: rank 1 → 5 points,
+// rank 2 → 4, ... rank 5 → 1. Beyond that, no points.
 export const POINTS_BY_RANK = [5, 4, 3, 2, 1];
 
 export async function upsertBestScore(
@@ -29,9 +29,9 @@ export async function upsertBestScore(
   return { improved: true };
 }
 
-// Recalcule le top 5 (temps le plus rapide en premier) d'une map et met à
-// jour MapRankingPoints en conséquence : les joueurs qui sortent du top 5
-// perdent leurs points, ceux qui y entrent/progressent sont mis à jour.
+// Recalculates a map's top 5 (fastest time first) and updates
+// MapRankingPoints accordingly: players who drop out of the top 5
+// lose their points, those who enter/move up are updated.
 export async function recalculateMapPoints(tx: Prisma.TransactionClient, mapId: string): Promise<void> {
   const top = await tx.score.findMany({
     where: { map_id: mapId },
