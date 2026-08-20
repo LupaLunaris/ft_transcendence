@@ -50,19 +50,6 @@ Les emails suivants ont is_admin=true automatiquement à la création de compte 
 - jpaulis@student.42belgium.be
 - evan-dro@student.42belgium.be
 
-## Responsabilité des fichiers (headers 42)
-- /backend/**                    → jdebrull
-- /frontend/src/game/**          → malafont
-- /frontend/src/components/**    → evan-dro
-- /frontend/src/hooks/**         → jpaulis
-- /frontend/src/context/**       → jpaulis
-- /frontend/src/services/**      → jpaulis
-- /frontend/src/pages/auth/**    → evan-dro
-- /frontend/src/pages/editor/**  → malafont
-- /frontend/src/pages/game/**    → malafont
-- /frontend/src/pages/home/**    → evan-dro
-- /shared/**                     → jpaulis
-
 ## État du projet
 - Étapes 1-4 : complètes
 - Migration PostgreSQL : **complète** (schema.prisma + migration 20260527000000_init_postgres + Docker)
@@ -70,6 +57,7 @@ Les emails suivants ont is_admin=true automatiquement à la création de compte 
 - Delete map + Unpublish map : **complets** (backend + frontend)
 - Éditeur admin de la tour : **complet** (GET/PUT /admin/tower/:order_index + EditorPage admin mode)
 - RacePage (`/play/:map_id/race`) : placeholder conservé, le vrai mode multijoueur passe par `/duel`
+- Fair-play `player_input` (duel) : **corrigé** (2026-08-15, commit `c9a8ad7`, branche `fix/game-fair-play`) — pacing minimum serveur (`MIN_INPUT_INTERVAL_MS=60`) + durée minimale plausible sur `POST /scores` (`MIN_SCORE_RUN_TIME_MS=3000`). Détails dans `CONTEXT.md` et `history_debug/2026-08-14_faille-scores-forgeable.md` / `history_debug/2026-08-16_merge-audit2-into-fair-play.md`.
 
 ## Architecture Socket.IO Duel (implémentée)
 

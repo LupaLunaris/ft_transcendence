@@ -22,6 +22,11 @@ if (!JWT_SECRET) {
 const RUN_TOKEN_EXPIRY = '30m';
 const RUN_TOKEN_MAX_AGE_MS = 30 * 60 * 1000;
 const ALLOWED_TIME_DIFFERENCE_MS = 2_000;
+// Same floor as tower.routes.ts's MIN_TOWER_RUN_TIME_MS: without it, a
+// start -> immediate submit script nets a near-zero record without ever
+// playing the map (the server only checked that completion_time_ms matched
+// elapsed time, not that elapsed time was plausible for a real run).
+const MIN_SCORE_RUN_TIME_MS = 3_000;
 
 interface ScoreRunPayload {
   user_id: string;
@@ -115,7 +120,7 @@ router.post(
 
     const serverElapsed = Date.now() - payload.started_at;
 
-    if (serverElapsed <= 0 || serverElapsed > RUN_TOKEN_MAX_AGE_MS) {
+    if (serverElapsed < MIN_SCORE_RUN_TIME_MS || serverElapsed > RUN_TOKEN_MAX_AGE_MS) {
       sendError(res, 'Run duration is invalid or expired', 400);
       return;
     }

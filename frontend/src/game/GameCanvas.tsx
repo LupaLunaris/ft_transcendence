@@ -1,10 +1,10 @@
-
+// Connects React to Phaser by creating the game, passing initial data, and forwarding game events back to React.
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import type { Grid, Direction } from '@ft/shared';
 import { GameScene } from './scenes/GameScene';
 import { TouchPad } from '@/components/ui/TouchPad';
-import { createPortal } from 'react-dom'
+import { createPortal } from 'react-dom';
 
 interface GameCanvasProps {
   grid: Grid;
