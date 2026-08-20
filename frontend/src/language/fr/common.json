@@ -11,7 +11,7 @@
     "common.next": "Suivant",
     "common.page": "Page {{current}} / {{total}}",
 
-    "navbar.home": "Home",
+    "navbar.home": "Accueil",
     "navbar.editor": "Éditeur",
     "navbar.disconnect": "Déconnexion",
     "navbar.train": "S'entraîner",
@@ -179,6 +179,7 @@
     "tower_page.levels": "/ 8 niveaux",
 
     "training_page.play": "Jouer",
+    "training_page.speed": "Vitesse des ennemis",
 
     "errors.invalid_grid": "Grille invalide : 25x25 requis, avec bordures, 1 SPAWN et 1 EXIT",
     "errors.no_path": "Aucun chemin entre le SPAWN et la sortie",
