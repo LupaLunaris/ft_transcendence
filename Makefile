@@ -204,7 +204,7 @@ vault-unseal: vault-wait
 
 backend-wait: ## Wait for backend API to respond
 	@printf "$(CYAN)Waiting for backend...$(RESET)\n"
-	@until curl -sk https://localhost/api/health >/dev/null 2>&1; do sleep 1; done
+	@until curl -sk https://localhost:8443/api/health >/dev/null 2>&1; do sleep 1; done
 	@printf "$(GREEN)Backend is up.$(RESET)\n"
 
 db-seed-docker: ## Seed DB inside the running backend container
@@ -233,9 +233,9 @@ docker-up: check-platform-deps certs ## Build and start all services in detached
 	@$(MAKE) backend-wait
 	@$(MAKE) db-seed-docker
 	@printf "$(GREEN)Services running:$(RESET)\n"
-	@printf "  App:      https://localhost\n"
-	@printf "  API:      https://localhost/api/health\n"
-	@printf "  HTTP:     http://localhost (redirects to HTTPS)\n"
+	@printf "  App:      https://localhost:8443\n"
+	@printf "  API:      https://localhost:8443/api/health\n"
+	@printf "  HTTP:     http://localhost:8443 (redirects to HTTPS)\n"
 
 docker-down: ## Stop and remove containers (keeps volumes)
 	$(COMPOSE) down
