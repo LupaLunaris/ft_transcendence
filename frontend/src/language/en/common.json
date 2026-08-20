@@ -178,6 +178,7 @@
     "tower_page.levels": "/ 8 levels",
 
     "training_page.play": "Play",
+    "training_page.speed": "Enemy speed",
 
     "errors.invalid_grid": "Invalid grid: 25x25 required, with borders, 1 SPAWN and 1 EXIT",
     "errors.no_path": "No path between SPAWN and exit",

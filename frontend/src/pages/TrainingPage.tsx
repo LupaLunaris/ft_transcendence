@@ -46,7 +46,7 @@ export function TrainingPage() {
 
         <div className="flex flex-col gap-2">
           <p className="text-xs font-medium text-white/50 uppercase tracking-wide">
-            Vitesse des ennemis
+            {t('training_page.speed')}
           </p>
         <div className="flex gap-2 flex-wrap">
           {DIFFICULTIES.map(({ value, key }) => (
