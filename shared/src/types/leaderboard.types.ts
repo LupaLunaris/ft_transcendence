@@ -4,7 +4,7 @@ export interface LeaderboardEntry {
   username: string;
   avatar: string | null;
   points: number;
-  // Présent uniquement sur le classement d'une map précise (meilleur temps
-  // du joueur sur cette map) — absent sur le classement global.
+  // Present only on a specific map's leaderboard (the player's best time
+  // on that map) — absent on the global leaderboard.
   completion_time_ms?: number;
 }

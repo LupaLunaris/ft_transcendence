@@ -202,10 +202,10 @@ router.post(
 );
 
 // GET /api/v1/scores/leaderboard/global
-// Classement toutes maps confondues, par somme des points de classement de
-// vitesse (cf. scoring.service.ts) — tous les joueurs ayant au moins un
-// point (pas de limite). Doit rester déclaré avant /leaderboard/:map_id
-// pour ne pas être capturé par ce paramètre.
+// Ranking across all maps combined, by sum of speed ranking points
+// (cf. scoring.service.ts) — every player with at least one point
+// (no limit). Must stay declared before /leaderboard/:map_id
+// so it isn't captured by that route parameter.
 router.get('/leaderboard/global', async (_req: Request, res: Response) => {
   const totals = await prisma.mapRankingPoints.groupBy({
     by: ['user_id'],
@@ -261,9 +261,9 @@ router.get('/leaderboard/:map_id', async (req: Request, res: Response) => {
 });
 
 // GET /api/v1/scores/leaderboard/:map_id/points
-// Top 5 de cette map par vitesse — mêmes joueurs que MapRankingPoints (même
-// requête, même ordre), mais lu directement depuis Score pour renvoyer le
-// meilleur temps de chacun (affiché à la place des points côté frontend).
+// Top 5 of this map by speed — same players as MapRankingPoints (same
+// query, same order), but read directly from Score to return each
+// player's best time (shown instead of points on the frontend).
 router.get('/leaderboard/:map_id/points', async (req: Request, res: Response) => {
   const map = await prisma.map.findUnique({ where: { id: req.params.map_id } });
   if (!map) {

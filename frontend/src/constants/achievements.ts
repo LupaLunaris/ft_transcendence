@@ -7,7 +7,7 @@ export const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
   DUEL_CHAMPION: 'duel_champion',
 };
 
-// Ordre d'affichage stable, y compris pour les achievements pas encore débloqués.
+// Stable display order, including for achievements not yet unlocked.
 export const ALL_ACHIEVEMENT_CODES: AchievementCode[] = [
   'FIRST_ESCAPE',
   'FIRST_CREATOR',

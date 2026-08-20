@@ -18,7 +18,7 @@ const ARROWS: ReadonlyArray<{
 ];
 
 export function TouchPad({ onDirection }: TouchPadProps) {
-  // Évite un double onDirection(dir, false) si pointerup ET pointercancel arrivent.
+  // Avoids a double onDirection(dir, false) if both pointerup AND pointercancel fire.
   const activeRef = useRef<Set<Direction>>(new Set());
 
   const start = useCallback((dir: Direction) => (e: React.PointerEvent<HTMLButtonElement>) => {
