@@ -1,16 +1,16 @@
 
 export interface ApiError {
-  error: string;
-  code: number;
+	error: string;
+	code: number;
 }
 
 export interface ApiResponse<T> {
-  data: T;
-  message?: string;
+	data: T;
+	message?: string;
 }
 
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
-  total: number;
-  page: number;
-  limit: number;
+	total: number;
+	page: number;
+	limit: number;
 }

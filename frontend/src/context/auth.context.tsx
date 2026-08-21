@@ -24,6 +24,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// Provides the global authentication state and actions to the entire application.
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<UserPublic | null>(null);
 	const [token, setToken] = useState<string | null>(null);
@@ -87,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	);
 }
 
+// Returns the authentication context for any component inside AuthProvider.
 export function useAuth(): AuthContextValue {
 	const ctx = useContext(AuthContext);
 	if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
