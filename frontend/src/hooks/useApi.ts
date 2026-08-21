@@ -9,6 +9,7 @@ interface UseApiResult<T> {
 	refetch: () => void;
 }
 
+// Loads data from an async API function and exposes loading, error and refetch states.
 export function useApi<T>(fn: () => Promise<T>): UseApiResult<T> {
 	const [data, setData] = useState<T | null>(null);
 	const [loading, setLoading] = useState(true);

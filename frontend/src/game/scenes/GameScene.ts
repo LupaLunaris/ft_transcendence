@@ -1,4 +1,4 @@
-
+// Main Phaser scene for the single-player game.
 import Phaser from 'phaser';
 import { TILE, GRID_SIZE, type Grid, type Direction } from '@ft/shared';
 import { BaseScene, TILE_SIZE } from './BaseScene';

@@ -19,37 +19,37 @@ const userRef = vi.hoisted(() => ({ current: { id: 'user-creator', username: 'al
 // ── Mocks ──────────────────────────────────────────────────────────────────
 
 vi.mock('react-router-dom', async (importActual) => {
-  const actual = await importActual<typeof import('react-router-dom')>();
-  return { ...actual, useNavigate: () => mockNavigate };
+	const actual = await importActual<typeof import('react-router-dom')>();
+	return { ...actual, useNavigate: () => mockNavigate };
 });
 
 vi.mock('@/game/GameCanvas', () => ({
-  GameCanvas: ({ onExit }: { onExit: (ms: number) => void }) => (
-    <button data-testid="finish" onClick={() => onExit(1500)}>finish</button>
-  ),
+	GameCanvas: ({ onExit }: { onExit: (ms: number) => void }) => (
+		<button data-testid="finish" onClick={() => onExit(1500)}>finish</button>
+	),
 }));
 
 vi.mock('@/components/ui/useToast', () => ({
-  useToast: () => ({ showToast: mockShowToast }),
+	useToast: () => ({ showToast: mockShowToast }),
 }));
 
 vi.mock('@/context/auth.context', () => ({
-  useAuth: () => ({ user: userRef.current, logout: vi.fn(), loading: false }),
+	useAuth: () => ({ user: userRef.current, logout: vi.fn(), loading: false }),
 }));
 
 vi.mock('@/services/api.service', () => ({
-  api: {
-    scores: { start: mockStart, submit: mockSubmit },
-    maps: { markComplete: mockMarkComplete },
-  },
+	api: {
+		scores: { start: mockStart, submit: mockSubmit },
+		maps: { markComplete: mockMarkComplete },
+	},
 }));
 
 vi.mock('@/hooks/useMap', () => ({
-  useMap: () => ({ map: mapRef.current, loading: false, error: null }),
+	useMap: () => ({ map: mapRef.current, loading: false, error: null }),
 }));
 
 vi.mock('@/hooks/useLeaderboard', () => ({
-  useMapLeaderboard: () => ({ entries: [], loading: false, error: null }),
+	useMapLeaderboard: () => ({ entries: [], loading: false, error: null }),
 }));
 
 // ── Component under test ────────────────────────────────────────────────────
@@ -58,80 +58,80 @@ import { GamePage } from '@/pages/game/GamePage';
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function makeMap(overrides: Partial<MapData> = {}): MapData {
-  return {
-    id: 'map-1',
-    name: 'Test Map',
-    grid: [] as any,
-    creator_id: 'user-creator',
-    published: false,
-    creator_completed: false,
-    difficulty: 'easy',
-    play_count: 0,
-    created_at: '',
-    ...overrides,
-  };
+	return {
+		id: 'map-1',
+		name: 'Test Map',
+		grid: [] as any,
+		creator_id: 'user-creator',
+		published: false,
+		creator_completed: false,
+		difficulty: 'easy',
+		play_count: 0,
+		created_at: '',
+		...overrides,
+	};
 }
 
 function renderGame(mapId = 'map-1') {
-  return render(
-    <MemoryRouter initialEntries={[`/play/${mapId}`]}>
-      <Routes>
-        <Route path="/play/:map_id" element={<GamePage />} />
-      </Routes>
-    </MemoryRouter>,
-  );
+	return render(
+		<MemoryRouter initialEntries={[`/play/${mapId}`]}>
+			<Routes>
+				<Route path="/play/:map_id" element={<GamePage />} />
+			</Routes>
+		</MemoryRouter>,
+	);
 }
 
 // ── Tests ──────────────────────────────────────────────────────────────────
 
 describe('GamePage — handleExit', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockStart.mockResolvedValue({ run_token: 'test-run-token', started_at: Date.now() });
-    mockSubmit.mockResolvedValue({});
-    mockMarkComplete.mockResolvedValue({});
-    userRef.current = { id: 'user-creator', username: 'alice' };
-    mapRef.current  = makeMap();
-  });
+	beforeEach(() => {
+		vi.clearAllMocks();
+		mockStart.mockResolvedValue({ run_token: 'test-run-token', started_at: Date.now() });
+		mockSubmit.mockResolvedValue({});
+		mockMarkComplete.mockResolvedValue({});
+		userRef.current = { id: 'user-creator', username: 'alice' };
+		mapRef.current  = makeMap();
+	});
 
-  it('always submits the score on completion', async () => {
-    renderGame('map-1');
-    await userEvent.click(await screen.findByTestId('finish'));
-    expect(mockStart).toHaveBeenCalledWith('map-1');
-    await waitFor(() => expect(mockSubmit).toHaveBeenCalledWith('test-run-token', 1500));
-  });
+	it('always submits the score on completion', async () => {
+		renderGame('map-1');
+		await userEvent.click(await screen.findByTestId('finish'));
+		expect(mockStart).toHaveBeenCalledWith('map-1');
+		await waitFor(() => expect(mockSubmit).toHaveBeenCalledWith('test-run-token', 1500));
+	});
 
-  it('calls markComplete and navigates to /editor/:id when the creator finishes', async () => {
-    userRef.current = { id: 'user-creator', username: 'alice' };
-    mapRef.current  = makeMap({ creator_id: 'user-creator' });
+	it('calls markComplete and navigates to /editor/:id when the creator finishes', async () => {
+		userRef.current = { id: 'user-creator', username: 'alice' };
+		mapRef.current  = makeMap({ creator_id: 'user-creator' });
 
-    renderGame('map-1');
-    await userEvent.click(await screen.findByTestId('finish'));
+		renderGame('map-1');
+		await userEvent.click(await screen.findByTestId('finish'));
 
-    await waitFor(() => expect(mockMarkComplete).toHaveBeenCalledWith('map-1'));
-    expect(mockNavigate).toHaveBeenCalledWith('/editor/map-1');
-    expect(mockNavigate).not.toHaveBeenCalledWith('/train');
-  });
+		await waitFor(() => expect(mockMarkComplete).toHaveBeenCalledWith('map-1'));
+		expect(mockNavigate).toHaveBeenCalledWith('/editor/map-1');
+		expect(mockNavigate).not.toHaveBeenCalledWith('/train');
+	});
 
-  it('does NOT call markComplete and navigates to /train when a non-creator finishes', async () => {
-    userRef.current = { id: 'other-user', username: 'bob' };
-    mapRef.current  = makeMap({ creator_id: 'user-creator' });
+	it('does NOT call markComplete and navigates to /train when a non-creator finishes', async () => {
+		userRef.current = { id: 'other-user', username: 'bob' };
+		mapRef.current  = makeMap({ creator_id: 'user-creator' });
 
-    renderGame('map-1');
-    await userEvent.click(await screen.findByTestId('finish'));
+		renderGame('map-1');
+		await userEvent.click(await screen.findByTestId('finish'));
 
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/train'));
-    expect(mockMarkComplete).not.toHaveBeenCalled();
-  });
+		await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/train'));
+		expect(mockMarkComplete).not.toHaveBeenCalled();
+	});
 
-  it('still navigates to editor even when markComplete rejects (already completed)', async () => {
-    mockMarkComplete.mockRejectedValue(new Error('already done'));
-    userRef.current = { id: 'user-creator', username: 'alice' };
-    mapRef.current  = makeMap({ creator_id: 'user-creator' });
+	it('still navigates to editor even when markComplete rejects (already completed)', async () => {
+		mockMarkComplete.mockRejectedValue(new Error('already done'));
+		userRef.current = { id: 'user-creator', username: 'alice' };
+		mapRef.current  = makeMap({ creator_id: 'user-creator' });
 
-    renderGame('map-1');
-    await userEvent.click(await screen.findByTestId('finish'));
+		renderGame('map-1');
+		await userEvent.click(await screen.findByTestId('finish'));
 
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/editor/map-1'));
-  });
+		await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/editor/map-1'));
+	});
 });
