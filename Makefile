@@ -235,7 +235,6 @@ docker-up: check-platform-deps certs ## Build and start all services in detached
 	@printf "$(GREEN)Services running:$(RESET)\n"
 	@printf "  App:      https://localhost:8443\n"
 	@printf "  API:      https://localhost:8443/api/health\n"
-	@printf "  HTTP:     http://localhost:8443 (redirects to HTTPS)\n"
 
 docker-down: ## Stop and remove containers (keeps volumes)
 	$(COMPOSE) down
