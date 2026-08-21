@@ -28,7 +28,7 @@ export function ProfileEditor() {
 
 		let updatedUser;
 
-		// 🔥 CAS 1 — upload fichier
+		// 🔥 CASE 1 — file upload
 		if (file) {
 		const formData = new FormData();
 		formData.append("avatar", file);
@@ -48,7 +48,7 @@ export function ProfileEditor() {
 		updatedUser = json.data;
 		}
 
-		// 🔥 CAS 2 — avatars prédéfinis
+		// 🔥 CASE 2 — predefined avatars
 		else {
 		updatedUser = await api.auth.updateProfile({
 			username,

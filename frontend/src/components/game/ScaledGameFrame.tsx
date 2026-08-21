@@ -7,7 +7,7 @@ const LEADERBOARD_RESERVED_WIDTH = 256 + 16;
 
 interface ScaledGameFrameProps {
   children: ReactNode;
-  /** Rendu par-dessus le jeu (spinners, overlays d'état...), non affecté par le scale */
+  /** Rendered above the game (spinners, state overlays...), unaffected by scale */
   overlay?: ReactNode;
 }
 
@@ -35,8 +35,8 @@ export function ScaledGameFrame({ children, overlay }: ScaledGameFrameProps) {
 
     updateScale();
 
-    // Observe le PARENT, pas notre propre élément (dont la hauteur dépend
-    // du scale qu'on vient de calculer) — sinon on s'auto-déclenche en boucle.
+    // Observe the PARENT, not our own element (whose height depends
+    // on the scale we just computed) — otherwise we trigger ourselves in a loop.
     const resizeObserver = new ResizeObserver(updateScale);
     resizeObserver.observe(el.parentElement);
     window.addEventListener('resize', updateScale);

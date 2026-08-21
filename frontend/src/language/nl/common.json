@@ -11,7 +11,7 @@
     "common.next": "Volgende",
     "common.page": "Pagina {{current}} / {{total}}",
 
-    "navbar.home": "Home",
+    "navbar.home": "Homepage",
     "navbar.editor": "Editor",
     "navbar.disconnect": "Afmelden",
     "navbar.train": "Trainen",
@@ -178,6 +178,7 @@
     "tower_page.levels": "/ 8 niveaus",
 
     "training_page.play": "Spelen",
+    "training_page.speed": "Snelheid van de vijanden",
 
     "errors.invalid_grid": "Ongeldige grid: 25x25 vereist, met randen, 1 SPAWN en 1 EXIT",
     "errors.no_path": "Geen pad tussen SPAWN en uitgang",
@@ -198,7 +199,7 @@
     "friends_list_loadfriends_error": "Kan vriendenlijst niet laden.",
     "friends_list_delete_error": "Kan deze vriend niet verwijderen.",
     "friends_list_friends": "Vrienden",
-    "friends_list_friends_list": "Guild broeders",
+    "friends_list_friends_list": "Guild zusters en broeders",
     "friends_list_no_friend": "Nog geen vrienden",
     "friends_list_add_friend": "Je kunt andere spelers toevoegen via de gebruikerszoekfunctie.",
     "friends_list_remove": "Verwijderen",

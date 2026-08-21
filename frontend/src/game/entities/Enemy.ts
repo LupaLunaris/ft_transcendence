@@ -5,21 +5,21 @@ import { TILE_SIZE } from '../scenes/BaseScene';
 
 // ─── Type alias ───────────────────────────────────────────────────────────────
 
-// Sprite quand la texture est chargée, Rectangle en fallback.
-// Les deux implémentent Transform → setPosition() sans cast.
+// Sprite when the texture is loaded, Rectangle as fallback.
+// Both implement Transform → setPosition() without a cast.
 export type EnemyGameObject = Phaser.GameObjects.Sprite | Phaser.GameObjects.Rectangle;
 
-// ─── Classe abstraite ─────────────────────────────────────────────────────────
+// ─── Abstract class ─────────────────────────────────────────────────────────
 //
-// En C ce serait une struct + un pointeur de fonction :
+// In C this would be a struct + a function pointer:
 //   typedef struct s_enemy {
 //     int grid_x, grid_y;
 //     t_pos (*compute_next)(struct s_enemy *, Grid);
 //   } t_enemy;
 //
-// En TypeScript : classe abstraite avec une méthode abstraite.
-// Chaque sous-classe DOIT implémenter computeNextPosition().
-// GameScene n'a pas besoin de savoir quel type d'ennemi il manipule.
+// In TypeScript: an abstract class with an abstract method.
+// Each subclass MUST implement computeNextPosition().
+// GameScene doesn't need to know which enemy type it's handling.
 
 export abstract class Enemy {
   gridX: number;
@@ -33,26 +33,26 @@ export abstract class Enemy {
     this.rect  = rect;
   }
 
-  // Appelée par GameScene à chaque tick du timer.
-  // Retourne la prochaine position logique souhaitée par cet ennemi.
-  // GameScene décide ensuite si la case est praticable et met à jour
+  // Called by GameScene on every timer tick.
+  // Returns the next logical position this enemy wants to move to.
+  // GameScene then decides whether the tile is walkable and updates
   // gridX/gridY + rect.setPosition().
   //
-  // Paramètres :
-  //   grid — la grille complète, pour tester les murs
-  // Retour :
-  //   { x, y } — la case cible (peut être la case actuelle si bloqué)
+  // Parameters:
+  //   grid — the full grid, to test for walls
+  // Returns:
+  //   { x, y } — the target tile (may be the current tile if blocked)
   abstract computeNextPosition(grid: Grid): { x: number; y: number };
 
-  // Utilitaire partagé entre toutes les sous-classes.
-  // Vérifie qu'une case est dans la grille et n'est pas un mur.
+  // Shared utility across all subclasses.
+  // Checks that a tile is within the grid and is not a wall.
   protected canStepOn(grid: Grid, x: number, y: number): boolean {
     if (x < 0 || y < 0 || x >= GRID_SIZE || y >= GRID_SIZE) return false;
     return grid[y][x] !== TILE.WALL;
   }
 
-  // Met à jour la position graphique Phaser après un déplacement validé.
-  // Appelée par GameScene une fois qu'il a confirmé le déplacement.
+  // Updates the Phaser graphical position after a validated move.
+  // Called by GameScene once it has confirmed the move.
   applyPosition(): void {
     this.rect.setPosition(
       this.gridX * TILE_SIZE + TILE_SIZE / 2,
@@ -61,19 +61,19 @@ export abstract class Enemy {
   }
 }
 
-// ─── Ennemi horizontal ────────────────────────────────────────────────────────
+// ─── Horizontal enemy ─────────────────────────────────────────────────────────
 //
-// Se déplace uniquement sur l'axe X (dx = ±1, dy = 0).
-// Rebondit quand il rencontre un mur : inverse dx.
-// Déterministe — pas de hasard.
+// Moves only along the X axis (dx = ±1, dy = 0).
+// Bounces off walls: flips dx.
+// Deterministic — no randomness.
 
 export class HorizontalEnemy extends Enemy {
   private dx: 1 | -1;
 
   constructor(gridX: number, gridY: number, rect: EnemyGameObject) {
     super(gridX, gridY, rect);
-    // Direction initiale : droite par défaut.
-    // Si la case à droite est un mur dès le départ, on part à gauche.
+    // Initial direction: right by default.
+    // If the tile to the right is a wall from the start, it moves left instead.
     this.dx = 1;
   }
 
@@ -97,9 +97,9 @@ export class HorizontalEnemy extends Enemy {
   }
 }
 
-// ─── Ennemi vertical ──────────────────────────────────────────────────────────
+// ─── Vertical enemy ───────────────────────────────────────────────────────────
 //
-// Même logique que HorizontalEnemy mais sur l'axe Y (dx = 0, dy = ±1).
+// Same logic as HorizontalEnemy but on the Y axis (dx = 0, dy = ±1).
 
 export class VerticalEnemy extends Enemy {
   private dy: 1 | -1;

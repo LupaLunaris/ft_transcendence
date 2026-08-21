@@ -23,20 +23,20 @@ function emptyGrid(): number[][] {
   return Array.from({ length: SIZE }, () => new Array<number>(SIZE).fill(E));
 }
 
-// ─── Niveau 1 : couloir simple diagonal ──────────────────────────────────────
+// ─── Level 1: simple diagonal corridor ───────────────────────────────────────
 function level1(): number[][] {
   const g = emptyGrid();
-  // Remplir l'intérieur de murs sauf un couloir horizontal
+  // Fill the interior with walls except for one horizontal corridor
   for (let r = 1; r < SIZE - 1; r++) {
     for (let c = 1; c < SIZE - 1; c++) {
       g[r][c] = W;
     }
   }
-  // Couloir horizontal au milieu (row 12)
+  // Horizontal corridor in the middle (row 12)
   for (let c = 1; c < SIZE - 1; c++) g[12][c] = E;
-  // Couloir vertical gauche
+  // Left vertical corridor
   for (let r = 1; r <= 12; r++) g[r][1] = E;
-  // Couloir vertical droit
+  // Right vertical corridor
   for (let r = 12; r < SIZE - 1; r++) g[r][SIZE - 2] = E;
 
   g[1][1] = S;
@@ -44,21 +44,21 @@ function level1(): number[][] {
   return border(g);
 }
 
-// ─── Niveau 2 : zigzag simple ────────────────────────────────────────────────
+// ─── Level 2: simple zigzag ───────────────────────────────────────────────────
 function level2(): number[][] {
   const g = emptyGrid();
   for (let r = 1; r < SIZE - 1; r++)
     for (let c = 1; c < SIZE - 1; c++) g[r][c] = W;
 
-  // Couloir 1 : rangée 2 de col 1 à 18
+  // Corridor 1: row 2 from col 1 to 18
   for (let c = 1; c <= 18; c++) g[2][c] = E;
-  // Descente col 18 de row 2 à 12
+  // Descent col 18 from row 2 to 12
   for (let r = 2; r <= 12; r++) g[r][18] = E;
-  // Couloir 2 : rangée 12 de col 6 à 18
+  // Corridor 2: row 12 from col 6 to 18
   for (let c = 6; c <= 18; c++) g[12][c] = E;
-  // Descente col 6 de row 12 à 22
+  // Descent col 6 from row 12 to 22
   for (let r = 12; r <= 22; r++) g[r][6] = E;
-  // Couloir final : rangée 22 de col 6 à 23
+  // Final corridor: row 22 from col 6 to 23
   for (let c = 6; c <= 23; c++) g[22][c] = E;
 
   g[2][1] = S;
@@ -66,18 +66,18 @@ function level2(): number[][] {
   return border(g);
 }
 
-// ─── Niveau 3 : labyrinthe colonnes ──────────────────────────────────────────
+// ─── Level 3: column maze ─────────────────────────────────────────────────────
 function level3(): number[][] {
   const g = emptyGrid();
   for (let r = 1; r < SIZE - 1; r++)
     for (let c = 1; c < SIZE - 1; c++) g[r][c] = E;
 
-  // Murs verticaux alternés avec passages
-  // Col 6 : mur de row 1 à 18
+  // Alternating vertical walls with passages
+  // Col 6: wall from row 1 to 18
   for (let r = 1; r <= 18; r++) g[r][6] = W;
-  // Col 12 : mur de row 6 à 23
+  // Col 12: wall from row 6 to 23
   for (let r = 6; r <= 23; r++) g[r][12] = W;
-  // Col 18 : mur de row 1 à 18
+  // Col 18: wall from row 1 to 18
   for (let r = 1; r <= 18; r++) g[r][18] = W;
 
   g[1][1] = S;
@@ -85,13 +85,13 @@ function level3(): number[][] {
   return border(g);
 }
 
-// ─── Niveau 4 : labyrinthe lignes ────────────────────────────────────────────
+// ─── Level 4: row maze ─────────────────────────────────────────────────────────
 function level4(): number[][] {
   const g = emptyGrid();
   for (let r = 1; r < SIZE - 1; r++)
     for (let c = 1; c < SIZE - 1; c++) g[r][c] = E;
 
-  // Murs horizontaux alternés
+  // Alternating horizontal walls
   for (let c = 1; c <= 20; c++) g[5][c] = W;
   for (let c = 4; c <= 23; c++) g[10][c] = W;
   for (let c = 1; c <= 20; c++) g[15][c] = W;
@@ -102,13 +102,13 @@ function level4(): number[][] {
   return border(g);
 }
 
-// ─── Niveau 5 : labyrinthe en croix ──────────────────────────────────────────
+// ─── Level 5: cross maze ───────────────────────────────────────────────────────
 function level5(): number[][] {
   const g = emptyGrid();
   for (let r = 1; r < SIZE - 1; r++)
     for (let c = 1; c < SIZE - 1; c++) g[r][c] = E;
 
-  // Grille de murs intérieurs (croix toutes les 6 cases)
+  // Grid of interior walls (cross every 6 cells)
   for (let r = 4; r <= 20; r += 4) {
     for (let c = 1; c < SIZE - 1; c++) {
       if (c % 6 !== 0) g[r][c] = W;
@@ -125,20 +125,20 @@ function level5(): number[][] {
   return border(g);
 }
 
-// ─── Niveau 6 : labyrinthe dense colonnes+lignes ─────────────────────────────
+// ─── Level 6: dense column+row maze ────────────────────────────────────────────
 function level6(): number[][] {
   const g = emptyGrid();
   for (let r = 1; r < SIZE - 1; r++)
     for (let c = 1; c < SIZE - 1; c++) g[r][c] = W;
 
-  // Serpentin horizontal
+  // Horizontal serpentine
   for (let r = 2; r < SIZE - 1; r += 4) {
     const leftToRight = (r / 4) % 2 === 0;
     const from = leftToRight ? 1 : 2;
     const to = leftToRight ? SIZE - 2 : SIZE - 1;
     for (let c = from; c < to; c++) g[r][c] = E;
   }
-  // Connexions verticales alternées
+  // Alternating vertical connections
   for (let r = 2; r < SIZE - 4; r += 4) {
     const leftToRight = (r / 4) % 2 === 0;
     const col = leftToRight ? SIZE - 2 : 1;
@@ -152,13 +152,13 @@ function level6(): number[][] {
   return border(g);
 }
 
-// ─── Niveau 7 : labyrinthe en U imbriqués ────────────────────────────────────
+// ─── Level 7: nested U-shaped maze ─────────────────────────────────────────────
 function level7(): number[][] {
   const g = emptyGrid();
   for (let r = 1; r < SIZE - 1; r++)
     for (let c = 1; c < SIZE - 1; c++) g[r][c] = E;
 
-  // U imbriqués ouverts en alternance bas/haut
+  // Nested U shapes, alternating open bottom/top
   const walls = [
     // [row_start, row_end, col_start, col_end, opening_side, opening_col]
     [3, 3, 2, 20],
@@ -184,13 +184,13 @@ function level7(): number[][] {
   return border(g);
 }
 
-// ─── Niveau 8 : labyrinthe maximal ────────────────────────────────────────────
+// ─── Level 8: maximal maze ──────────────────────────────────────────────────────
 function level8(): number[][] {
   const g = emptyGrid();
   for (let r = 1; r < SIZE - 1; r++)
     for (let c = 1; c < SIZE - 1; c++) g[r][c] = W;
 
-  // Couloir serpentin très serré
+  // Very tight serpentine corridor
   for (let r = 1; r < SIZE - 1; r += 2) {
     if (r % 4 === 1) {
       for (let c = 1; c < SIZE - 1; c++) g[r][c] = E;
@@ -202,7 +202,7 @@ function level8(): number[][] {
   }
 
   g[1][1] = S;
-  // EXIT sur la dernière ligne libre
+  // EXIT on the last free row
   const lastFreeRow = SIZE % 2 === 0 ? SIZE - 3 : SIZE - 2;
   g[lastFreeRow][SIZE - 2] = X;
   return border(g);
@@ -236,7 +236,7 @@ export async function seedTower(prisma: PrismaClient): Promise<void> {
   }
 }
 
-// Exécution standalone : npx ts-node prisma/seed-tower.ts
+// Standalone execution: npx ts-node prisma/seed-tower.ts
 if (require.main === module) {
   const prisma = new PrismaClient();
   seedTower(prisma)

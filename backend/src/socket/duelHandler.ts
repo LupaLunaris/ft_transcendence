@@ -17,15 +17,20 @@ import { setOnline, setInGame, setOffline } from '../state/online.state';
 import { upsertBestScore } from '../services/scoring.service';
 import { rewardDuelVictory } from '../services/gamification.service';
 
-// ─── Constantes ──────────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const MIN_RACE_PLAYERS = 2;
 const MAX_RACE_PLAYERS = 4;
 const LOBBY_COUNTDOWN_MS = 30_000;
 const DISCONNECT_GRACE_MS = 10_000;
 const ENEMY_TICK_MS = 400;
+// Fastest a legitimate client ever moves (DuelScene.ts moveDuration floor).
+// Rejects player_input spam faster than this instead of trusting the client
+// to pace itself — a console socket.emit loop could otherwise move a player
+// far faster than any real tween allows.
+const MIN_INPUT_INTERVAL_MS = 60;
 
-// ─── Types internes ───────────────────────────────────────────────────────────
+// ─── Internal types ────────────────────────────────────────────────────────────
 
 interface SocketUser {
   id: string;
@@ -34,8 +39,8 @@ interface SocketUser {
 }
 
 interface LobbyQueue {
-  players: SocketUser[]; // 1 à MAX_RACE_PLAYERS, ordre d'arrivée
-  socket_ids: Map<string, string>; // user_id → socket_id (pour retirer un joueur précis)
+  players: SocketUser[]; // 1 to MAX_RACE_PLAYERS, arrival order
+  socket_ids: Map<string, string>; // user_id → socket_id (to remove a specific player)
   countdown_timer?: ReturnType<typeof setTimeout>;
   countdown_ends_at: number | null;
 }
@@ -52,6 +57,7 @@ interface RacePlayer {
   finish_time?: number;
   death_time?: number;
   disconnect_timer?: ReturnType<typeof setTimeout>;
+  last_input_at?: number;
 }
 
 interface ActiveRace {
@@ -67,15 +73,15 @@ interface ActiveRace {
   created_at: number;
 }
 
-// ─── État en mémoire ──────────────────────────────────────────────────────────
+// ─── In-memory state ────────────────────────────────────────────────────────────
 
-// map_id → file d'attente
+// map_id → queue
 const lobbies = new Map<string, LobbyQueue>();
-// socket_id → ensemble de map_ids où ce joueur est inscrit
+// socket_id → set of map_ids this player is registered on
 const socketRegs = new Map<string, Set<string>>();
-// race_id → état de la course
+// race_id → race state
 const activeRaces = new Map<string, ActiveRace>();
-// socket_id → race_id (pour retrouver la course sur player_input)
+// socket_id → race_id (to find the race on player_input)
 const socketRace = new Map<string, string>();
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -122,7 +128,7 @@ function buildGameState(race: ActiveRace): GameState {
   };
 }
 
-// Un joueur est résolu quand il a fini (EXIT) ou n'est plus en course (mort/forfait).
+// A player is resolved once they've finished (EXIT) or are no longer racing (dead/forfeited).
 function isRaceOver(race: ActiveRace): boolean {
   return Array.from(race.players.values()).every(p => p.finished || !p.alive);
 }
@@ -134,8 +140,8 @@ function buildRanking(race: ActiveRace): RaceRankingEntry[] {
     .filter(p => p.finished)
     .sort((a, b) => (a.finish_time! - a.start_time) - (b.finish_time! - b.start_time));
 
-  // Non-finishers classés après, par ordre de survie décroissante
-  // (celui qui a tenu le plus longtemps est mieux classé).
+  // Non-finishers ranked after, in descending order of survival time
+  // (whoever lasted longest ranks better).
   const others = players
     .filter(p => !p.finished)
     .sort((a, b) => (b.death_time ?? Date.now()) - (a.death_time ?? Date.now()));
@@ -196,11 +202,11 @@ async function finishRace(io: Server<ClientToServerEvents, ServerToClientEvents>
   io.to(`race:${race.race_id}`).emit('race_finished', result);
   cleanupRace(race.race_id);
 
-  // Chaque joueur qui a atteint l'EXIT compte comme un essai sur cette map,
-  // au même titre qu'une partie solo (record personnel + points de
-  // classement de vitesse, cf. backend_doc/duel-server-authoritative-enemies.md).
-  // Le vainqueur (rank 1, doit avoir fini) reçoit en plus la récompense de
-  // victoire en duel.
+  // Every player who reached the EXIT counts as an attempt on this map,
+  // just like a solo run (personal best + speed ranking points,
+  // cf. backend_doc/duel-server-authoritative-enemies.md).
+  // The winner (rank 1, must have finished) additionally receives the
+  // duel victory reward.
   try {
     await prisma.$transaction(async (tx) => {
       for (const entry of ranking) {
@@ -223,8 +229,8 @@ async function finishRace(io: Server<ClientToServerEvents, ServerToClientEvents>
   }
 }
 
-// Marque un joueur forfait (mort/déconnexion résolue) et termine la course
-// si c'était le dernier joueur non résolu.
+// Marks a player as forfeited (death/resolved disconnection) and ends
+// the race if they were the last unresolved player.
 function resolvePlayerLoss(
   io: Server<ClientToServerEvents, ServerToClientEvents>,
   race: ActiveRace,
@@ -241,13 +247,13 @@ function resolvePlayerLoss(
   if (isRaceOver(race)) void finishRace(io, race);
 }
 
-// ─── Enregistrement des handlers ─────────────────────────────────────────────
+// ─── Handler registration ─────────────────────────────────────────────────────
 
 export function registerDuelHandlers(
   io: Server<ClientToServerEvents, ServerToClientEvents>,
 ): void {
 
-  // Authentification JWT sur chaque connexion socket
+  // JWT authentication on every socket connection
   io.use(async (socket, next) => {
     const token = socket.handshake.auth.token as string | undefined;
     if (!token) return next(new Error('Authentication required'));
@@ -265,14 +271,14 @@ export function registerDuelHandlers(
     }
   });
 
-  // ── Démarrage effectif d'une course à partir d'une file d'attente ─────────
+  // ── Actually starting a race from a queue ─────────────────────────────────
   async function tryStartRace(map_id: string): Promise<void> {
     const queue = lobbies.get(map_id);
     if (!queue) return;
 
     if (queue.players.length < MIN_RACE_PLAYERS) {
-      // Personne d'autre ne s'est inscrit à temps : on relance l'attente
-      // plutôt que d'annuler l'inscription du joueur déjà présent.
+      // Nobody else registered in time: restart the wait
+      // instead of canceling the already-present player's registration.
       queue.countdown_ends_at = Date.now() + LOBBY_COUNTDOWN_MS;
       queue.countdown_timer = setTimeout(() => void tryStartRace(map_id), LOBBY_COUNTDOWN_MS);
       io.emit('lobby_state', { entries: getLobbyEntries() });
@@ -333,7 +339,7 @@ export function registerDuelHandlers(
     setOnline(user.id);
     console.log(`[duel] ${user.username} connected (${socket.id})`);
 
-    // Envoie l'état courant du lobby au nouveau connecté
+    // Send the current lobby state to the newly connected client
     socket.emit('lobby_state', { entries: getLobbyEntries() });
 
     // ── join_lobby ────────────────────────────────────────────────────────────
@@ -396,8 +402,8 @@ export function registerDuelHandlers(
         return;
       }
 
-      // Le countdown démarre dès l'inscription du premier joueur sur cette
-      // map ; tryStartRace() le relance tout seul si <2 joueurs à expiration.
+      // The countdown starts as soon as the first player registers on this
+      // map; tryStartRace() restarts it on its own if <2 players at expiry.
       if (!queue.countdown_timer) {
         queue.countdown_ends_at = Date.now() + LOBBY_COUNTDOWN_MS;
         queue.countdown_timer = setTimeout(() => void tryStartRace(map_id), LOBBY_COUNTDOWN_MS);
@@ -458,8 +464,8 @@ export function registerDuelHandlers(
       socket.join(`race:${race_id}`);
       socketRace.set(socket.id, race_id);
 
-      // Mise à jour socket_id : le game socket ≠ lobby socket ; gère aussi
-      // la reconnexion (même user_id, nouveau socket).
+      // Update socket_id: the game socket ≠ the lobby socket; this also
+      // handles reconnection (same user_id, new socket).
       player.socket_id = socket.id;
       player.connected = true;
 
@@ -503,6 +509,10 @@ export function registerDuelHandlers(
       const player = race.players.get(user.id);
       if (!player || !player.alive || player.finished) return;
 
+      const now = Date.now();
+      if (player.last_input_at !== undefined && now - player.last_input_at < MIN_INPUT_INTERVAL_MS) return;
+      player.last_input_at = now;
+
       const { x, y } = player.position;
       const dx = direction === 'left' ? -1 : direction === 'right' ? 1 : 0;
       const dy = direction === 'up'   ? -1 : direction === 'down'  ? 1 : 0;
@@ -516,9 +526,9 @@ export function registerDuelHandlers(
       player.direction = direction;
       race.tick++;
 
-      // Vérifie aussi la collision ici (en plus du tick ennemi) : sinon un
-      // joueur qui marche sur la case d'un ennemi entre deux ticks (400ms)
-      // n'est jamais détecté si l'ennemi a déjà bougé au tick suivant —
+      // Also check collision here (in addition to the enemy tick): otherwise a
+      // player who steps onto an enemy's tile between two ticks (400ms)
+      // is never detected if the enemy has already moved by the next tick —
       // cf. backend_doc/duel-server-authoritative-enemies.md.
       const hitEnemy = race.enemies.some(e => e.x === nx && e.y === ny);
       if (hitEnemy) {
@@ -542,8 +552,8 @@ export function registerDuelHandlers(
     socket.on('disconnect', () => {
       setOffline(user.id);
       console.log(`[duel] ${user.username} disconnected`);
-      // Désinscription immédiate des lobbies en attente — pas de délai de
-      // grâce hors course active.
+      // Immediate deregistration from pending lobbies — no grace
+      // period outside of an active race.
       cleanupLobby(socket.id);
 
       const race_id = socketRace.get(socket.id);
@@ -553,8 +563,8 @@ export function registerDuelHandlers(
         const race = activeRaces.get(race_id);
         const player = race?.players.get(user.id);
 
-        // Ignore si un autre socket a déjà repris ce joueur (reconnexion plus
-        // rapide que la propagation de l'event 'disconnect' de l'ancien socket).
+        // Ignore if another socket has already taken over this player (reconnection
+        // faster than the propagation of the old socket's 'disconnect' event).
         if (race && !race.finished && player && player.socket_id === socket.id && player.alive && !player.finished) {
           player.connected = false;
           player.disconnect_timer = setTimeout(() => {
