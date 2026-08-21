@@ -1,3 +1,4 @@
+// Scales the game frame to fit the available screen space while preserving its aspect ratio.
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 const GAME_WIDTH = 800;

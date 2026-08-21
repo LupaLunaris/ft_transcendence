@@ -1,3 +1,4 @@
+// Displays the user's friends, their online status, and provides friend management actions.
 import { useCallback, useEffect, useState } from 'react';
 import { api, type FriendPublic } from '@/services/api.service';
 import { Spinner } from '@/components/ui/Spinner';
@@ -11,12 +12,14 @@ export function FriendsList() {
 	const [error, setError] = useState<string | null>(null);
 	const { t } = useTranslation();
 
+	// Converts a friend's status into a translated label for display.
 	function getStatusLabel(status: FriendPublic['online_status']) {
 	if (status === 'online') return t('friends_list_online');
 	if (status === 'in_game') return t('friends_list_ingame');
 	return t('friends_list_offline');
 	}
 
+	// Loads the authenticated user's friends from the backend.
 	const loadFriends = useCallback(async () => {
 	try {
 		setError(null);
