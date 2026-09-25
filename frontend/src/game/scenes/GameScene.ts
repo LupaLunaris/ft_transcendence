@@ -182,6 +182,9 @@ export class GameScene extends BaseScene {
 		this.player.anims.play('idle_down');
 		this.spawnEnemies(data.grid);
 
+		// Zoom before the bounds: the clamping is computed from the zoomed
+		// display size. Integer zoom only (cf. game/constants.ts).
+		this.cameras.main.setZoom(data.camera_zoom ?? 1);
 		this.cameras.main.setBounds(0, 0, GRID_SIZE * TILE_SIZE, GRID_SIZE * TILE_SIZE);
 		// Instant follow — lerp (0.1) combined with pixelArt+roundPixels
 		// causes a 1px jump during the tween → ghosting into the adjacent tile.

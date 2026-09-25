@@ -212,25 +212,23 @@ export function GamePage() {
 
   return (
     <>
-      <div className="min-h-screen bg-surface flex flex-col items-center gap-4 p-4">
-        <h2 className="text-xl font-semibold text-silver-100 font-fantasy tracking-wide">
-          {map.name}
-        </h2>
+      <div className="game-screen">
+        <header className="game-screen-header">
+          <h2 className="min-w-0 truncate text-xl font-semibold text-silver-100 font-fantasy tracking-wide">
+            {map.name}
+          </h2>
 
-        <p className="text-white/60 text-sm">
-          {t('game_page.instructions')}
-        </p>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={handleExitMap}
+          >
+            {t('game_page.exit')}
+          </Button>
+        </header>
 
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={handleExitMap}
-        >
-          {t('game_page.exit')}
-        </Button>
-
-        <div className="w-full flex flex-row items-start justify-center gap-4">
+        <div className="game-screen-body">
           <ScaledGameFrame>
             <GameCanvas
               key={`${map.id}-${gameKey}-${enemySpeed}`}
@@ -248,7 +246,7 @@ export function GamePage() {
             entries={leaderboardEntries}
             loading={leaderboardLoading}
             highlightUserId={user?.id}
-            className="w-64 shrink-0 mt-12 hidden md:flex"
+            className="game-leaderboard"
           />
         </div>
       </div>

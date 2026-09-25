@@ -6,8 +6,12 @@ import {
   ASSET_TILE_FLOOR, ASSET_TILE_WALL, ASSET_TILE_EXIT,
   KEY_TILE_WALL_SHEET, ASSET_TILE_WALL_SHEET,
 } from '../assets';
+import { TILE_SIZE } from '../constants';
 
-export const TILE_SIZE = 36;
+// TILE_SIZE now lives in a Phaser-free module so React can read it too
+// (cf. game/constants.ts); re-exported here because the scenes, the entities
+// and the editor already import it from this file.
+export { TILE_SIZE };
 
 // ─── Tile → Phaser texture key mapping ───────────────────────────────────────
 // ENEMY tiles are rendered as floor: the enemy (sprite) is layered on top.

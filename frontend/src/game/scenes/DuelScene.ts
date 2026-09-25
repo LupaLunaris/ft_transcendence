@@ -48,6 +48,8 @@ export interface DuelSceneData {
   // 1 to 3 opponents (2 to 4 player race) + sprite URL per id.
   opponents:        { id: string; username: string; avatar: string | null }[];
   opponent_sprites: Record<string, string>;
+  /** Integer camera zoom — the touch layout renders its square view at 2x. */
+  camera_zoom?:     number;
 }
 
 // ─── Opponent ghost ───────────────────────────────────────────────────────────
@@ -250,7 +252,9 @@ export class DuelScene extends BaseScene {
 
     this.spawnEnemies(data.grid);
 
-    // Camera follows the local player
+    // Camera follows the local player. Zoom first: the bounds clamping is
+    // computed from the zoomed display size. Integer zoom only (cf. constants).
+    this.cameras.main.setZoom(data.camera_zoom ?? 1);
     this.cameras.main.setBounds(0, 0, GRID_SIZE * TILE_SIZE, GRID_SIZE * TILE_SIZE);
     this.cameras.main.startFollow(this.localPlayer, true);
 

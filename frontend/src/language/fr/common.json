@@ -66,7 +66,6 @@
     "duel_game_page.lose": "Défaite",
     "duel_game_page.back_duel": "Retour au duel",
     "duel_game_page.wait_other_player": "En attente des autres joueurs…",
-    "duel_game_page.instructions": "Flèches ou WASD · Atteins la sortie avant tes adversaires",
     "duel_game_page.waiting_others": "Terminé ! En attente des autres joueurs…",
     "duel_game_page.dead_waiting": "Éliminé ! En attente des autres joueurs…",
     "duel_game_page.rank": "Place : {{rank}}/{{total}}",
@@ -137,7 +136,6 @@
     "editor_page.toast_unsaved_before_publish": "Tu as des modifications non sauvegardées. Tu dois d'abord sauvegarder et tester ta map avant de la publier.",
 
     "game_page.toast_score_error": "Score non enregistré",
-    "game_page.instructions": "Utilisez les flèches ou WASD pour vous déplacer",
     "game_page.no_map": "Map introuvable",
     "game_page.toast_finished": "Terminé en {{time}}s !",
     "game_page.exit": "Quitter",
