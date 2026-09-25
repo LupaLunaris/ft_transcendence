@@ -51,4 +51,103 @@
 			0 0 18px rgba(212, 175, 55, 0.28);
 		transform: translateY(-1px);
 	}
+
+	/* ── Game screens (GamePage, TowerGamePage, DuelGamePage) ─────────────── */
+	/* Shared by the three pages so the desktop and touch layouts are defined
+	   once instead of as stacked arbitrary variants in each page. */
+
+	.game-screen {
+		@apply min-h-screen bg-surface flex flex-col items-center gap-4 p-4;
+	}
+
+	.game-screen-header {
+		@apply flex flex-col items-center gap-4;
+	}
+
+	.game-screen-body {
+		@apply w-full flex flex-row items-start justify-center gap-4;
+	}
+
+	.game-frame {
+		@apply relative shrink-0;
+	}
+
+	.game-leaderboard {
+		@apply w-64 shrink-0 mt-12;
+	}
+
+	/* Touch devices: the game is a square, the leaderboard takes what is left.
+	   The page itself never scrolls — the leaderboard does. */
+	@media (pointer: coarse) {
+		.game-screen {
+			/* dvh, so a collapsing mobile URL bar doesn't push the leaderboard off
+			   screen. The vh line is a fallback for engines without dvh; the build
+			   drops it when every target supports dvh. */
+			height: 100vh;
+			height: 100dvh;
+			min-height: 0;
+			gap: 0;
+			padding: 0;
+			overflow: hidden;
+		}
+
+		.game-screen-header {
+			@apply w-full flex-row items-center justify-between gap-2 px-3 py-2;
+			flex-shrink: 0;
+		}
+
+		.game-screen-body {
+			flex: 1 1 0%;
+			min-height: 0;
+			flex-direction: column;
+			gap: 0;
+			/* stretch, so the leaderboard really fills the leftover space and can
+			   scroll inside it (portrait: full width, landscape: full height). */
+			align-items: stretch;
+		}
+
+		/* Portrait: a square the width of the screen. */
+		.game-frame {
+			width: 100%;
+			aspect-ratio: 1 / 1;
+		}
+
+		.game-leaderboard {
+			width: auto;
+			margin-top: 0;
+			flex: 1 1 0%;
+			min-height: 0;
+			min-width: 0;
+		}
+
+		/* Flush against the screen edges. Two classes on purpose: the card's own
+		   `border` / `rounded-xl` live in Tailwind's utilities layer, which is
+		   emitted after this one, so a single-class selector would lose to them. */
+		.game-screen-body > .game-leaderboard {
+			border-radius: 0;
+			border-width: 1px 0 0 0;
+		}
+
+		/* Room to scroll the last rows clear of the fixed joystick. */
+		.game-leaderboard > ol {
+			padding-bottom: 11rem;
+		}
+
+		/* Landscape: the square is bound by the height, the leaderboard sits
+		   on the remaining width. */
+		@media (orientation: landscape) {
+			.game-screen-body {
+				flex-direction: row;
+			}
+
+			.game-frame {
+				width: auto;
+				height: 100%;
+			}
+
+			.game-screen-body > .game-leaderboard {
+				border-width: 0 0 0 1px;
+			}
+		}
+	}
 }

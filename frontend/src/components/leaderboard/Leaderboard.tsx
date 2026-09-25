@@ -21,7 +21,7 @@ export function Leaderboard({ title, entries, loading, highlightUserId, classNam
 	const { t } = useTranslation();
 
 	return (
-		<div className={`bg-surface-raised border border-surface-border rounded-xl p-4 flex flex-col gap-3 [@media(orientation:landscape)_and_(pointer:coarse)]:hidden ${className ?? ''}`}>
+		<div className={`bg-surface-raised border border-surface-border rounded-xl p-4 flex flex-col gap-3 ${className ?? ''}`}>
 			<h2 className="font-fantasy text-lg text-gold-300">{title}</h2>
 
 			{loading && (
@@ -34,8 +34,11 @@ export function Leaderboard({ title, entries, loading, highlightUserId, classNam
 				<p className="text-sm text-silver-400">{t('leaderboard.empty')}</p>
 			)}
 
+			{/* flex-1/min-h-0/overflow only bite where the card has a bounded height
+			    (the touch game screens): the title stays pinned and the list scrolls.
+			    Elsewhere the card still grows naturally. */}
 			{!loading && entries.length > 0 && (
-				<ol className="flex flex-col gap-2">
+				<ol className="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto">
 					{entries.map((entry) => (
 						<li
 							key={entry.user_id}

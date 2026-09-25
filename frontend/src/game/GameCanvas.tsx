@@ -3,7 +3,8 @@ import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import type { Grid, Direction } from '@ft/shared';
 import { GameScene } from './scenes/GameScene';
-import { TouchPad } from '@/components/ui/TouchPad';
+import { Joystick } from '@/components/ui/Joystick';
+import { useGameViewport } from '@/hooks/useGameViewport';
 import { createPortal } from 'react-dom';
 
 interface GameCanvasProps {
@@ -14,9 +15,6 @@ interface GameCanvasProps {
   onExit: (time_ms: number) => void;
   onDeath?: () => void;
 }
-
-const CANVAS_WIDTH  = 800;
-const CANVAS_HEIGHT = 600;
 
 	export function GameCanvas({
 	grid,
@@ -30,6 +28,12 @@ const CANVAS_HEIGHT = 600;
 	const gameRef = useRef<Phaser.Game | null>(null);
 	const initialGameConfigRef = useRef({ grid, settings, player_id, player_sprite });
 
+	// Frozen at mount like the config above: the canvas size is baked into the
+	// Phaser game, so switching pointer type mid-run would mean rebuilding it
+	// (only reachable through DevTools emulation — reload the page there).
+	const { width: canvasWidth, height: canvasHeight, zoom: cameraZoom } = useGameViewport();
+	const viewportRef = useRef({ width: canvasWidth, height: canvasHeight, zoom: cameraZoom });
+
 	const onExitRef = useRef(onExit);
 	useEffect(() => { onExitRef.current = onExit; }, [onExit]);
 
@@ -42,8 +46,8 @@ const CANVAS_HEIGHT = 600;
 		const config: Phaser.Types.Core.GameConfig = {
 		type: Phaser.AUTO,
 		parent: containerRef.current,
-		width: CANVAS_WIDTH,
-		height: CANVAS_HEIGHT,
+		width: viewportRef.current.width,
+		height: viewportRef.current.height,
 		backgroundColor: '#0d1117',
 		physics: {
 			default: 'arcade',
@@ -70,6 +74,7 @@ const CANVAS_HEIGHT = 600;
 				settings: initialGameConfig.settings,
 				player_id: initialGameConfig.player_id,
 				player_sprite: initialGameConfig.player_sprite,
+				camera_zoom: viewportRef.current.zoom,
 			});
 		});
 
@@ -87,8 +92,8 @@ const CANVAS_HEIGHT = 600;
 	  <>
 		<div
 		ref={containerRef}
-		style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}
+		style={{ width: viewportRef.current.width, height: viewportRef.current.height }}
 		/>
-      	{createPortal(<TouchPad onDirection={handleDirection} />, document.body)}	  </>
+      	{createPortal(<Joystick onDirection={handleDirection} />, document.body)}	  </>
 	);
 	}

@@ -65,7 +65,6 @@
     "duel_game_page.lose": "Defeat",
     "duel_game_page.back_duel": "Back to duel",
     "duel_game_page.wait_other_player": "Waiting for other players…",
-    "duel_game_page.instructions": "Arrows or WASD · Reach the exit before your opponents",
     "duel_game_page.waiting_others": "Finished! Waiting for other players…",
     "duel_game_page.dead_waiting": "Eliminated! Waiting for other players…",
     "duel_game_page.rank": "Rank: {{rank}}/{{total}}",
@@ -136,7 +135,6 @@
     "editor_page.toast_unsaved_before_publish": "You have unsaved changes. You must save and test your map before publishing it.",
 
     "game_page.toast_score_error": "Score not saved",
-    "game_page.instructions": "Use the arrows or WASD to move",
     "game_page.no_map": "Map not found",
     "game_page.toast_finished": "Completed in {{time}}s!",
     "game_page.exit": "Exit",

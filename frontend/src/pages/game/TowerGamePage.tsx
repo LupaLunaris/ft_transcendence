@@ -150,34 +150,35 @@ if (error || !level) {
 
 return (
   <>
-    <div className="min-h-screen bg-surface flex flex-col items-center gap-4 p-4">
-      <h2 className="guild-title font-fantasy text-xl font-semibold tracking-wide flex items-center gap-2">
-        <img src="/assets/icons/tower.svg" alt="" className="h-6 w-6 object-contain opacity-80" />
-        {t('tower_levels.level_' + orderIndex)}
-      </h2>
+    <div className="game-screen">
+      <header className="game-screen-header">
+        <h2 className="guild-title font-fantasy text-xl font-semibold tracking-wide flex items-center gap-2 min-w-0 truncate">
+          <img src="/assets/icons/tower.svg" alt="" className="h-6 w-6 object-contain opacity-80 shrink-0" />
+          {t('tower_levels.level_' + orderIndex)}
+        </h2>
 
-      <p className="text-silver-400 text-xs uppercase tracking-widest">
-        {t('tower_game_page.level', { orderIndex })}
-      </p>
+        {/* Dropped on touch: every header row eats into the square's side. */}
+        <p className="text-silver-400 text-xs uppercase tracking-widest [@media(pointer:coarse)]:hidden">
+          {t('tower_game_page.level', { orderIndex })}
+        </p>
 
-      <Button type="button" variant="secondary" size="sm" onClick={handleExitMap}>
-        {t('tower_game_page.exit_level')}
-      </Button>
+        <Button type="button" variant="secondary" size="sm" onClick={handleExitMap}>
+          {t('tower_game_page.exit_level')}
+        </Button>
+      </header>
 
-      <p className="text-silver-500 text-sm">
-        {t('game_page.instructions')}
-      </p>
-
-      <ScaledGameFrame>
-        <GameCanvas
-          key={gameKey}
-          grid={level.grid_json}
-          player_id={user!.id}
-          player_sprite={AVATAR_TO_SPRITE[user!.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE}
-          onExit={handleExit}
-          onDeath={handleDeath}
-        />
-      </ScaledGameFrame>
+      <div className="game-screen-body">
+        <ScaledGameFrame>
+          <GameCanvas
+            key={gameKey}
+            grid={level.grid_json}
+            player_id={user!.id}
+            player_sprite={AVATAR_TO_SPRITE[user!.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE}
+            onExit={handleExit}
+            onDeath={handleDeath}
+          />
+        </ScaledGameFrame>
+      </div>
     </div>
 
     <GameOverModal

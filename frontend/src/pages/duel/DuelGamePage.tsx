@@ -21,8 +21,9 @@ import { Spinner } from '@/components/ui/Spinner';
 import { useToast } from '@/components/ui/useToast';
 import { api } from '@/services/api.service';
 import { useTranslation } from 'react-i18next';
-import { TouchPad } from '@/components/ui/TouchPad';
+import { Joystick } from '@/components/ui/Joystick';
 import { ScaledGameFrame } from '@/components/game/ScaledGameFrame';
+import { useGameViewport } from '@/hooks/useGameViewport';
 import { createPortal } from 'react-dom';
 
 const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
@@ -31,9 +32,6 @@ const ACHIEVEMENT_LABEL: Record<AchievementCode, string> = {
   EXPLORER: 'explorer',
   DUEL_CHAMPION: 'duel_champion',
 };
-
-const CANVAS_W = 800;
-const CANVAS_H = 600;
 
 // ─── Result overlay ───────────────────────────────────────────────────────────
 // Full ranking (2 to 4 players) — replaces the binary win/lose of the
@@ -103,6 +101,10 @@ export function DuelGamePage() {
 
   const containerRef  = useRef<HTMLDivElement>(null);
   const gameRef       = useRef<Phaser.Game | null>(null);
+  // Canvas size frozen at mount: it is baked into the Phaser game, and a
+  // square viewport is what zooms the map in on touch devices.
+  const { width: canvasWidth, height: canvasHeight, zoom: cameraZoom } = useGameViewport();
+  const viewportRef = useRef({ width: canvasWidth, height: canvasHeight, zoom: cameraZoom });
   const socketRef = useRef<typeof socket>(null);
   useEffect(() => { socketRef.current = socket; }, [socket]);
   const translateRef = useRef(t);
@@ -214,8 +216,8 @@ export function DuelGamePage() {
     const config: Phaser.Types.Core.GameConfig = {
       type:            Phaser.AUTO,
       parent:          containerRef.current,
-      width:           CANVAS_W,
-      height:          CANVAS_H,
+      width:           viewportRef.current.width,
+      height:          viewportRef.current.height,
       backgroundColor: '#0d1117',
       pixelArt:        false,
       physics: {
@@ -257,6 +259,7 @@ export function DuelGamePage() {
         opponent_sprites: Object.fromEntries(
           state.opponents.map(o => [o.id, AVATAR_TO_SPRITE[o.avatar ?? ''] ?? DEFAULT_PLAYER_SPRITE]),
         ),
+        camera_zoom: viewportRef.current.zoom,
       });
     });
 
@@ -273,23 +276,21 @@ export function DuelGamePage() {
   if (!state) return null;
 
 return (
-  <div className="min-h-screen bg-surface flex flex-col items-center gap-4 p-4">
+  <div className="game-screen">
     {/* Header with opponent usernames */}
-    <div className="flex items-center gap-4 text-sm text-white/60 flex-wrap justify-center">
-      <span className="text-white font-medium">{user?.username}</span>
-      <span className="text-white/30">vs</span>
-      {state.opponents.map((o, i) => (
-        <span key={o.id} className="text-deep-300 font-medium">
-          {o.username}{i < state.opponents.length - 1 ? ',' : ''}
-        </span>
-      ))}
-    </div>
+    <header className="game-screen-header">
+      <div className="flex-1 min-w-0 flex items-center gap-4 text-sm text-white/60 flex-wrap justify-center">
+        <span className="text-white font-medium">{user?.username}</span>
+        <span className="text-white/30">vs</span>
+        {state.opponents.map((o, i) => (
+          <span key={o.id} className="text-deep-300 font-medium">
+            {o.username}{i < state.opponents.length - 1 ? ',' : ''}
+          </span>
+        ))}
+      </div>
+    </header>
 
-    <p className="text-white/60 text-sm">
-      {t('duel_game_page.instructions')}
-    </p>
-
-    <div className="w-full flex flex-row items-start justify-center gap-4">
+    <div className="game-screen-body">
       <ScaledGameFrame
         overlay={
           <>
@@ -336,7 +337,7 @@ return (
         <div
           ref={containerRef}
           className="rounded-lg overflow-hidden shadow-lg"
-          style={{ width: CANVAS_W, height: CANVAS_H }}
+          style={{ width: viewportRef.current.width, height: viewportRef.current.height }}
         />
       </ScaledGameFrame>
 
@@ -345,11 +346,11 @@ return (
         entries={leaderboardEntries}
         loading={leaderboardLoading}
         highlightUserId={user?.id}
-        className="w-64 shrink-0 mt-12 hidden md:flex"
+        className="game-leaderboard"
       />
     </div>
 
-    {createPortal(<TouchPad onDirection={handleDirection} />, document.body)}
+    {createPortal(<Joystick onDirection={handleDirection} />, document.body)}
   </div>
 );
 }

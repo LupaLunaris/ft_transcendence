@@ -14,11 +14,12 @@ Features currently implemented:
 * panels and cards that reorganize themselves according to the available screen width
 * game and editor areas that use scrolling when space is limited
 * compact language selector, usable on small screens as well
-* dedicated touch component for mobile devices and touch controls
+* dedicated touch layout for the game screens: a square play area sized to the screen, the map leaderboard filling the remaining space, and an on-screen joystick anchored bottom-right in both orientations
+* a tighter camera on touch devices, so tiles stay large enough to read on a phone
 
 Current limitation:
 
-* some content-heavy pages, especially the editor and game screens, remain more comfortable to use on large displays than on small mobile devices
+* some content-heavy pages, especially the editor, remain more comfortable to use on large displays than on small mobile devices
 
 ## Accessibility
 
@@ -53,7 +54,7 @@ Reusable components currently available:
 * `Spinner`
 * `Toast`
 * `LanguageSelector`
-* `TouchPad`
+* `Joystick`
 
 Reusable layout components:
 
